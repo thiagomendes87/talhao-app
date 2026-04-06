@@ -1,0 +1,41 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --navy: #1A1A2E;
+  --green-brand: #2D6A4F;
+  --green-light: #40916C;
+  --green-pale: #D8F3DC;
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-[#1A1A2E] text-white font-semibold px-5 py-2.5 rounded-lg text-sm transition-colors hover:bg-[#2d2d50];
+  }
+  .btn-green {
+    @apply bg-[#2D6A4F] text-white font-semibold px-5 py-2.5 rounded-lg text-sm transition-colors hover:bg-[#40916C];
+  }
+  .btn-ghost {
+    @apply text-[#1A1A2E] font-medium px-4 py-2 rounded-lg text-sm transition-colors hover:bg-gray-100;
+  }
+  .form-input {
+    @apply w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm text-gray-900 outline-none focus:border-[#1A1A2E] transition-colors;
+  }
+  .form-label {
+    @apply block text-xs font-bold text-gray-600 mb-1.5 uppercase tracking-wide;
+  }
+}

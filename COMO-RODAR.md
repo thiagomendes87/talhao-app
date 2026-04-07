@@ -33,7 +33,21 @@ O projeto agora sobe fixo em `localhost` para manter o terminal e o navegador us
 - `/assinar` → Assinar Plano Pro
 
 ## Para subir no ar (Vercel)
-1. Cria conta em vercel.com
-2. Conecta com GitHub
-3. Faz push do projeto no GitHub
-4. A Vercel detecta e sobe automaticamente
+1. Importe o repositório `thiagomendes87/talhao-app` na Vercel
+2. Confirme que a branch de produção é `main`
+3. Faça suas mudanças no projeto
+4. Rode um build local para validar:
+
+```bash
+npm run build
+```
+
+5. Envie para produção com:
+
+```bash
+git add .
+git commit -m "Sua mensagem"
+git push origin main
+```
+
+6. A Vercel detecta o push e atualiza `https://talhao-app.vercel.app/`

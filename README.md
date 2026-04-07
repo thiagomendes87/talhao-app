@@ -44,6 +44,20 @@ npm run dev
 
 ## Deployment
 
-O site é automaticamente deploiado no Vercel quando você faz push para a branch `main` no GitHub.
+O fluxo de deploy deste projeto deve ser:
 
-[Acessar site ao vivo](https://talhao.ai)
+1. O repositório `thiagomendes87/talhao-app` conectado na Vercel
+2. A branch de produção configurada como `main`
+3. Cada `git push origin main` dispara um novo build e publica a versão atualizada
+
+Comandos:
+
+```bash
+git add .
+git commit -m "Sua mensagem"
+git push origin main
+```
+
+Se o projeto já estiver importado na Vercel com esse repositório, o site em produção atualiza automaticamente após o push.
+
+[Acessar site ao vivo](https://talhao-app.vercel.app/)

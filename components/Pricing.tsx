@@ -26,7 +26,7 @@ export default function Pricing() {
             Cada arquivo custa <strong className="text-[#1A1A2E]">R$ 3,50</strong> — sem mensalidade, sem surpresa.
           </p>
           <div className="flex gap-2 flex-wrap">
-            {['✓ Sem assinatura', '✓ Créditos não expiram', '✓ PIX instantâneo'].map(tag => (
+            {['✓ Sem assinatura', '✓ Créditos válidos por 1 ano', '✓ PIX instantâneo', '✓ Cartão de Crédito'].map(tag => (
               <span key={tag} className="text-xs font-bold px-3 py-1.5 rounded-full bg-[#D8F3DC] text-[#2D6A4F]">{tag}</span>
             ))}
           </div>

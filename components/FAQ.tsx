@@ -13,7 +13,7 @@ const faqs = [
   },
   {
     q: 'Preciso ser engenheiro agrônomo ou técnico para usar?',
-    a: 'Não. O Talhão foi criado para qualquer pessoa que precise de dados rurais — corretor, investidor, produtor ou consultor. A interface é simples: você busca pelo CPF/CNPJ, nome do proprietário ou localização, e baixa o arquivo.'
+    a: 'Não. O Talhão foi criado para qualquer pessoa que precise de dados rurais — corretor, investidor, produtor ou consultor. A interface é simples: você navega no mapa, busca por município ou coordenadas (latitude/longitude), clica na propriedade que quer e baixa os dados.'
   },
   {
     q: 'Como funciona o sistema de créditos?',
@@ -21,11 +21,11 @@ const faqs = [
   },
   {
     q: 'Quais arquivos e camadas posso acessar?',
-    a: 'Na versão atual: KML e Shapefile da propriedade, PDF com resumo e localização. Em desenvolvimento: SIGEF (INCRA), dados de hidrografia, sobreposição com Áreas de Proteção Permanente (APP), Reserva Legal, áreas de embargo IBAMA, aptidão agrícola EMBRAPA, mapas de satélite (INPE) e análises de evolução temporal. Você pode exportar e cruzar tudo no QGIS, ArcGIS ou qualquer software SIG.'
+    a: 'Na V1: KML, Shapefile e SIGEF (INCRA), além de visualização de topografia no mapa. Você pode baixar direto para usar no QGIS, ArcGIS ou qualquer software SIG. Em versões futuras: sobreposição com Áreas de Proteção Permanente (APP), Reserva Legal, áreas de embargo IBAMA, aptidão agrícola EMBRAPA, e análises de evolução temporal.'
   },
   {
     q: 'Os dados são atualizados com frequência?',
-    a: 'Sim. A base do SICAR é atualizada periodicamente e o Talhão sincroniza automaticamente. Quando um CAR é retificado ou um novo cadastro é aprovado, a plataforma reflete essa mudança em até 24 horas.'
+    a: 'Sim. O Talhão integra dados de múltiplas fontes (SICAR, SIGEF, INPE, IBGE, etc) que são atualizadas regularmente. A gente sincroniza os dados com base na disponibilidade de cada fonte, garantindo que você sempre trabalhe com a informação mais recente. Novos cadastros, retificações e atualizações são refletidos conforme são aprovados pelos órgãos responsáveis.'
   },
   {
     q: 'Posso usar o Talhão para verificar sobreposições ou pendências?',

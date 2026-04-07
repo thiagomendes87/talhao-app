@@ -9,7 +9,7 @@ const faqs = [
   },
   {
     q: 'De onde vêm os dados do Talhão?',
-    a: 'Todos os dados são extraídos diretamente do SICAR (Sistema Nacional de Cadastro Ambiental Rural), que é a base de dados oficial do governo federal. Os arquivos KML refletem exatamente o que está registrado no sistema público.'
+    a: 'O Talhão agrega dados de múltiplas fontes oficiais e confiáveis: SICAR (Cadastro Ambiental Rural), SIGEF (Serviço de Georreferenciamento de Imóveis Rurais do INCRA), INPE (Instituto Nacional de Pesquisas Espaciais), além de dados cartográficos do IBGE e camadas temáticas de biomas, hidrografia e uso do solo. Isso garante que você tenha uma visão completa e atualizada de qualquer propriedade rural.'
   },
   {
     q: 'Preciso ser engenheiro agrônomo ou técnico para usar?',
@@ -20,8 +20,8 @@ const faqs = [
     a: 'Cada download custa R$3,50. Você compra créditos antecipadamente (mínimo R$14,00 = 4 downloads) e vai usando conforme precisar. Os créditos não expiram. Para quem usa mais de 14 downloads por mês, o Plano Pro por R$49/mês é mais vantajoso.'
   },
   {
-    q: 'Quais arquivos posso baixar?',
-    a: 'Na versão atual: KML (Google Earth e outros SIGs), shapefile e PDF com resumo da propriedade. Em breve: SIGEF, INCRA e sobreposição com outras camadas temáticas como biomas, áreas embargadas e aptidão agrícola.'
+    q: 'Quais arquivos e camadas posso acessar?',
+    a: 'Na versão atual: KML e Shapefile da propriedade, PDF com resumo e localização. Em desenvolvimento: SIGEF (INCRA), dados de hidrografia, sobreposição com Áreas de Proteção Permanente (APP), Reserva Legal, áreas de embargo IBAMA, aptidão agrícola EMBRAPA, mapas de satélite (INPE) e análises de evolução temporal. Você pode exportar e cruzar tudo no QGIS, ArcGIS ou qualquer software SIG.'
   },
   {
     q: 'Os dados são atualizados com frequência?',

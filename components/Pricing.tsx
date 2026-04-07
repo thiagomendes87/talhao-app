@@ -49,21 +49,22 @@ export default function Pricing() {
       </div>
 
       {/* Cards Grátis + Pro */}
-      <div className="max-w-3xl mx-auto grid grid-cols-2 gap-5">
+      <div className="max-w-3xl mx-auto grid grid-cols-2 gap-5 items-stretch">
         {/* Grátis */}
-        <div className="bg-white rounded-xl p-7 border-2 border-gray-200">
+        <div className="bg-white rounded-xl p-7 border-2 border-gray-200 flex flex-col">
           <p className="text-xs font-bold tracking-widest text-gray-500 uppercase mb-2">Gratuito</p>
           <div className="text-4xl font-extrabold text-[#1A1A2E]">R$0 <span className="text-base font-normal text-gray-500">para sempre</span></div>
-          <ul className="mt-4 mb-5 space-y-2 text-sm text-gray-700">
-            {['Visualização completa do mapa', 'Busca por CAR, endereço, município', 'Ver dados da propriedade', 'Downloads com créditos pré-pagos'].map(i => (
+          <p className="mt-1 mb-4 text-xs font-semibold invisible">= R$ 3,50/download a partir de 14 downloads/mês</p>
+          <ul className="mb-5 space-y-2 text-sm text-gray-700">
+            {['Visualização completa do mapa', 'Busca por CAR, endereço, município', 'KML, SIGEF, SNCR, Topografia', 'Downloads com créditos pré-pagos'].map(i => (
               <li key={i} className="flex items-center gap-2"><span className="text-[#2D6A4F] font-bold">✓</span>{i}</li>
             ))}
           </ul>
-          <Link href="/cadastro" className="btn-primary w-full text-center block py-2.5 rounded-lg">Começar grátis</Link>
+          <Link href="/cadastro" className="btn-primary mt-auto block w-full rounded-lg py-2.5 text-center">Começar grátis</Link>
         </div>
 
         {/* Pro */}
-        <div className="bg-white rounded-xl p-7 border-2 border-[#1A1A2E] relative">
+        <div className="bg-white rounded-xl p-7 border-2 border-[#1A1A2E] relative flex flex-col">
           <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#1A1A2E] text-white text-xs font-bold px-4 py-1 rounded-full whitespace-nowrap tracking-wide uppercase">
             Melhor custo-benefício
           </div>
@@ -71,11 +72,14 @@ export default function Pricing() {
           <div className="text-4xl font-extrabold text-[#1A1A2E]">R$49 <span className="text-base font-normal text-gray-500">/mês</span></div>
           <p className="text-xs text-[#2D6A4F] font-semibold mt-1 mb-4">= R$ 3,50/download a partir de 14 downloads/mês</p>
           <ul className="mb-5 space-y-2 text-sm text-gray-700">
-            {['Downloads ilimitados', 'KML, SIGEF, SNCR, Topografia', 'Busca por CPF, CNPJ, matrícula'].map(i => (
-              <li key={i} className="flex items-center gap-2"><span className="text-[#2D6A4F] font-bold">✓</span>{i}</li>
+            {['Visualização completa do mapa', 'Busca por CAR, endereço, município', 'KML, SIGEF, SNCR, Topografia', 'Downloads ilimitados'].map(i => (
+              <li key={i} className="flex items-center gap-2">
+                <span className="text-[#2D6A4F] font-bold">✓</span>
+                <span className={i === 'Downloads ilimitados' ? 'font-bold text-[#1A1A2E]' : ''}>{i}</span>
+              </li>
             ))}
           </ul>
-          <Link href="/assinar" className="btn-green w-full text-center block py-2.5 rounded-lg">Assinar Pro — R$49/mês</Link>
+          <Link href="/assinar" className="btn-green mt-auto block w-full rounded-lg py-2.5 text-center">Assinar Pro — R$49/mês</Link>
         </div>
       </div>
     </section>

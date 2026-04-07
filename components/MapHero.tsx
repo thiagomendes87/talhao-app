@@ -48,16 +48,16 @@ export default function MapHero() {
       <span className="absolute text-white/70 text-xs font-medium" style={{ top: '27%', left: '43%' }}>SP-3550308...</span>
 
       {/* Search overlay centralizado */}
-      <div className="absolute top-[44%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] max-w-[92vw] text-center">
+      <div className="absolute top-[44%] left-1/2 flex w-[680px] max-w-[92vw] -translate-x-1/2 -translate-y-1/2 flex-col items-center text-center">
         <h1 className="mb-2.5 whitespace-nowrap text-[clamp(1.9rem,4.8vw,3.5rem)] font-extrabold leading-tight text-white" style={{ textShadow: '0 2px 12px rgba(0,0,0,0.4)' }}>
           Encontre qualquer fazenda no Brasil
         </h1>
-        <p className="text-white/85 text-base mb-6 leading-relaxed" style={{ textShadow: '0 1px 6px rgba(0,0,0,0.3)' }}>
+        <p className="mb-6 max-w-2xl text-base leading-relaxed text-white/85" style={{ textShadow: '0 1px 6px rgba(0,0,0,0.3)' }}>
           Navegue pelo mapa, busque pelo CAR, CPF, coordenadas<br />ou nome da propriedade e baixe o KML em segundos.
         </p>
 
         {/* Search box */}
-        <div className="bg-white rounded-xl px-4 py-1.5 flex items-center gap-2.5 shadow-2xl">
+        <div className="flex w-full items-center gap-2.5 rounded-xl bg-white px-4 py-1.5 shadow-2xl">
           <span className="text-gray-400 text-lg">🔍</span>
           <input
             type="text"

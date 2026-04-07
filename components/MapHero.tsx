@@ -53,7 +53,7 @@ export default function MapHero() {
           Encontre qualquer fazenda no Brasil
         </h1>
         <p className="mb-6 max-w-2xl text-base leading-relaxed text-white/85" style={{ textShadow: '0 1px 6px rgba(0,0,0,0.3)' }}>
-          Navegue pelo mapa, busque pelo CAR, CPF, coordenadas<br />ou nome da propriedade e baixe o KML em segundos.
+          Navegue pelo mapa, busque pelo município, CAR, coordenadas<br /> e baixe o KML em segundos.
         </p>
 
         {/* Search box */}

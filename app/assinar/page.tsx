@@ -1,7 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
+import { supabase } from '@/lib/supabase'
 
 const beneficios = [
   'Downloads ilimitados de qualquer arquivo',
@@ -12,8 +14,28 @@ const beneficios = [
 ]
 
 export default function AssinarPage() {
-  const [tipoCompra, setTipoCompra] = useState<'pro' | 'downloads'>('pro')
+  const searchParams = useSearchParams()
+  const tabParam = searchParams.get('tab')
+  const [tipoCompra, setTipoCompra] = useState<'pro' | 'downloads'>(tabParam === 'downloads' ? 'downloads' : 'pro')
   const [quantidadeDownloads, setQuantidadeDownloads] = useState(4)
+  const [creditos, setCreditos] = useState(0)
+  const [usuario, setUsuario] = useState<any>(null)
+
+  useEffect(() => {
+    const carregarDados = async () => {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (session) {
+        setUsuario(session.user)
+        const { data } = await supabase
+          .from('carteira')
+          .select('creditos')
+          .eq('user_id', session.user.id)
+          .single()
+        setCreditos(data?.creditos ?? 0)
+      }
+    }
+    carregarDados()
+  }, [])
 
   const precoDownload = 3.50
   const totalDownloads = quantidadeDownloads * precoDownload
@@ -34,7 +56,7 @@ export default function AssinarPage() {
         </Link>
         <span className="text-sm font-medium text-gray-600">💳 Planos e Pagamento</span>
         <div className="bg-[#D8F3DC] text-[#2D6A4F] text-xs font-bold px-3 py-1.5 rounded-lg">
-          Saldo: R$ 21,00 · 6 créditos
+          Saldo: R$ {(creditos * 3.5).toFixed(2)} · {creditos} créditos
         </div>
       </nav>
 

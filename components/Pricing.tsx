@@ -2,8 +2,8 @@ import Link from 'next/link'
 
 const packages = [
   { downloads: 4, price: 'R$ 14,00' },
-  { downloads: 5, price: 'R$ 17,50' },
   { downloads: 6, price: 'R$ 21,00' },
+  { downloads: 8, price: 'R$ 28,00' },
 ]
 
 export default function Pricing() {
@@ -41,7 +41,7 @@ export default function Pricing() {
               </div>
             ))}
             <div className="flex justify-between items-center bg-indigo-50 rounded-lg px-3.5 py-2.5 text-sm border border-dashed border-indigo-200">
-              <span className="text-gray-600">+ R$ 3,50 por download adicional</span>
+              <span className="text-gray-600">R$ 3,50 por download</span>
               <span className="text-gray-400 text-xs">a qualquer hora</span>
             </div>
           </div>

@@ -22,11 +22,47 @@ const features = [
 
 export default function MapHero() {
   return (
-    <div>
-      {/* Hero */}
-      <section className="relative overflow-hidden" style={{
-        background: 'linear-gradient(135deg, #1B4332 0%, #2D6A4F 30%, #40916C 60%, #74C69D 100%)',
-        minHeight: 'clamp(400px, 70vh, 700px)'
+    <>
+      {/* ========== MOBILE ========== */}
+      <section className="md:hidden" style={{ background: 'linear-gradient(135deg, #1B4332 0%, #2D6A4F 50%, #40916C 100%)' }}>
+        <div className="px-5 pt-12 pb-8 text-center">
+          <h1 className="text-2xl font-extrabold text-white mb-3 leading-tight">
+            Encontre qualquer fazenda no Brasil
+          </h1>
+          <p className="text-sm text-white/80 leading-relaxed mb-6">
+            Busque pelo município, CAR ou coordenadas e baixe o KML em segundos.
+          </p>
+          <div className="rounded-xl bg-white px-4 py-2 shadow-xl mb-4">
+            <input
+              type="text"
+              placeholder="CAR, município ou coordenadas..."
+              className="w-full border-none outline-none text-sm text-gray-700 bg-transparent py-2"
+            />
+            <Link href="/mapa" className="btn-primary block w-full text-center rounded-lg py-2.5 mt-2 text-sm">
+              Buscar →
+            </Link>
+          </div>
+        </div>
+
+        {/* Features no mobile — abaixo do hero */}
+        <div className="bg-white border-t border-gray-200 px-5 py-6 space-y-4">
+          {features.map(f => (
+            <div key={f.title} className="flex items-start gap-4">
+              <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-[#D8F3DC] flex items-center justify-center text-lg">
+                {f.icon}
+              </div>
+              <div>
+                <h3 className="font-bold text-[#1A1A2E] text-sm">{f.title}</h3>
+                <p className="text-xs text-gray-600 mt-0.5 leading-relaxed">{f.desc}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ========== DESKTOP (original intacto) ========== */}
+      <section className="hidden md:block relative min-h-[calc(100vh-72px)] overflow-hidden" style={{
+        background: 'linear-gradient(135deg, #1B4332 0%, #2D6A4F 30%, #40916C 60%, #74C69D 100%)'
       }}>
         {/* Grid overlay */}
         <div className="absolute inset-0" style={{
@@ -36,88 +72,78 @@ export default function MapHero() {
           `
         }} />
 
-        {/* Polígonos decorativos — só em desktop */}
-        <div className="hidden md:block">
-          <div className="absolute" style={{ top: '20%', left: '15%', width: 120, height: 80, background: 'rgba(255,230,100,0.15)', border: '1.5px solid rgba(255,230,100,0.5)', borderRadius: 2, transform: 'rotate(-5deg)' }} />
-          <div className="absolute" style={{ top: '35%', left: '8%', width: 90, height: 110, background: 'rgba(255,230,100,0.15)', border: '1.5px solid rgba(255,230,100,0.5)', borderRadius: 2, transform: 'rotate(10deg)' }} />
-          <div className="absolute" style={{ top: '55%', left: '20%', width: 160, height: 70, background: 'rgba(255,230,100,0.15)', border: '1.5px solid rgba(255,230,100,0.5)', borderRadius: 2, transform: 'rotate(-2deg)' }} />
-          <div className="absolute" style={{ top: '25%', left: '70%', width: 100, height: 90, background: 'rgba(255,230,100,0.15)', border: '1.5px solid rgba(255,230,100,0.5)', borderRadius: 2, transform: 'rotate(8deg)' }} />
-          <div className="absolute" style={{ top: '50%', left: '65%', width: 140, height: 100, background: 'rgba(255,230,100,0.15)', border: '1.5px solid rgba(255,230,100,0.5)', borderRadius: 2, transform: 'rotate(-6deg)' }} />
-          <div className="absolute" style={{ top: '30%', left: '42%', width: 150, height: 110, background: 'rgba(255,210,50,0.35)', border: '2.5px solid rgba(255,210,0,0.9)', borderRadius: 2, boxShadow: '0 0 0 6px rgba(255,215,0,0.15)', transform: 'rotate(3deg)' }} />
-          <span className="absolute text-white/70 text-xs font-medium" style={{ top: '17%', left: '16%' }}>MT-1234567...</span>
-          <span className="absolute text-white/70 text-xs font-medium" style={{ top: '26%', left: '71%' }}>GO-9876543...</span>
-          <span className="absolute text-white/70 text-xs font-medium" style={{ top: '27%', left: '43%' }}>SP-3550308...</span>
-        </div>
+        {/* Polígonos decorativos */}
+        <div className="absolute" style={{ top: '20%', left: '15%', width: 120, height: 80, background: 'rgba(255,230,100,0.15)', border: '1.5px solid rgba(255,230,100,0.5)', borderRadius: 2, transform: 'rotate(-5deg)' }} />
+        <div className="absolute" style={{ top: '35%', left: '8%', width: 90, height: 110, background: 'rgba(255,230,100,0.15)', border: '1.5px solid rgba(255,230,100,0.5)', borderRadius: 2, transform: 'rotate(10deg)' }} />
+        <div className="absolute" style={{ top: '55%', left: '20%', width: 160, height: 70, background: 'rgba(255,230,100,0.15)', border: '1.5px solid rgba(255,230,100,0.5)', borderRadius: 2, transform: 'rotate(-2deg)' }} />
+        <div className="absolute" style={{ top: '25%', left: '70%', width: 100, height: 90, background: 'rgba(255,230,100,0.15)', border: '1.5px solid rgba(255,230,100,0.5)', borderRadius: 2, transform: 'rotate(8deg)' }} />
+        <div className="absolute" style={{ top: '50%', left: '65%', width: 140, height: 100, background: 'rgba(255,230,100,0.15)', border: '1.5px solid rgba(255,230,100,0.5)', borderRadius: 2, transform: 'rotate(-6deg)' }} />
+        <div className="absolute" style={{ top: '30%', left: '42%', width: 150, height: 110, background: 'rgba(255,210,50,0.35)', border: '2.5px solid rgba(255,210,0,0.9)', borderRadius: 2, boxShadow: '0 0 0 6px rgba(255,215,0,0.15)', transform: 'rotate(3deg)' }} />
+        <span className="absolute text-white/70 text-xs font-medium" style={{ top: '17%', left: '16%' }}>MT-1234567...</span>
+        <span className="absolute text-white/70 text-xs font-medium" style={{ top: '26%', left: '71%' }}>GO-9876543...</span>
+        <span className="absolute text-white/70 text-xs font-medium" style={{ top: '27%', left: '43%' }}>SP-3550308...</span>
 
-        {/* Conteúdo central */}
-        <div className="relative z-10 flex flex-col items-center justify-center text-center px-4 sm:px-8 py-16 sm:py-24 h-full">
-          <h1 className="text-2xl sm:text-4xl md:text-5xl font-extrabold text-white mb-3 max-w-3xl leading-tight" style={{ textShadow: '0 2px 12px rgba(0,0,0,0.4)' }}>
+        {/* Search overlay centralizado */}
+        <div className="absolute top-[44%] left-1/2 flex w-[680px] max-w-[92vw] -translate-x-1/2 -translate-y-1/2 flex-col items-center text-center">
+          <h1 className="mb-2.5 whitespace-nowrap text-[clamp(1.9rem,4.8vw,3.5rem)] font-extrabold leading-tight text-white" style={{ textShadow: '0 2px 12px rgba(0,0,0,0.4)' }}>
             Encontre qualquer fazenda no Brasil
           </h1>
-          <p className="mb-6 max-w-xl text-sm sm:text-base leading-relaxed text-white/85" style={{ textShadow: '0 1px 6px rgba(0,0,0,0.3)' }}>
-            Navegue pelo mapa, busque pelo município, CAR ou coordenadas e baixe o KML em segundos.
+          <p className="mb-6 max-w-2xl text-base leading-relaxed text-white/85" style={{ textShadow: '0 1px 6px rgba(0,0,0,0.3)' }}>
+            Navegue pelo mapa, busque pelo município, CAR ou coordenadas<br /> e baixe o KML em segundos.
           </p>
-
-          {/* Search box */}
-          <div className="w-full max-w-2xl">
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 rounded-xl bg-white px-4 py-2 shadow-2xl">
-              <span className="text-gray-400 text-lg hidden sm:block">🔍</span>
-              <input
-                type="text"
-                placeholder="Digite o CAR, município ou coordenadas..."
-                className="flex-1 border-none outline-none text-sm text-gray-700 bg-transparent py-2"
-              />
-              <Link href="/mapa" className="btn-primary text-center whitespace-nowrap text-sm py-2 px-4 rounded-lg">
-                Buscar →
-              </Link>
-            </div>
-
-            {/* Tags */}
-            <div className="flex gap-2 justify-center mt-3 flex-wrap">
-              {['CAR: MT-5107602-...', 'CPF / CNPJ', 'Matrícula SIGEF', '-15.78, -47.92'].map(tag => (
-                <span key={tag} className="text-white/90 text-xs px-2.5 py-1 rounded-full" style={{ background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.25)' }}>
-                  {tag}
-                </span>
-              ))}
-            </div>
+          <div className="flex w-full items-center gap-2.5 rounded-xl bg-white px-4 py-1.5 shadow-2xl">
+            <span className="text-gray-400 text-lg">🔍</span>
+            <input
+              type="text"
+              placeholder="Digite o CAR, nome da fazenda, município ou coordenadas..."
+              className="flex-1 border-none outline-none text-sm text-gray-700 bg-transparent py-2"
+            />
+            <Link href="/mapa" className="btn-primary whitespace-nowrap">
+              Buscar no mapa →
+            </Link>
+          </div>
+          <div className="flex gap-2 justify-center mt-3 flex-wrap">
+            {['CAR: MT-5107602-...', 'CPF / CNPJ', 'Matrícula SIGEF', '-15.78, -47.92'].map(tag => (
+              <span key={tag} className="text-white/90 text-xs px-2.5 py-1 rounded-full" style={{ background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.25)', backdropFilter: 'blur(4px)' }}>
+                {tag}
+              </span>
+            ))}
           </div>
         </div>
 
-        {/* Controles — só em desktop */}
-        <div className="hidden md:flex absolute right-5 bottom-16 flex-col gap-1">
+        {/* Zoom controls */}
+        <div className="absolute right-5 bottom-16 flex flex-col gap-1">
           {['+', '−'].map(c => (
-            <div key={c} className="w-8 h-8 bg-white rounded flex items-center justify-center font-bold text-gray-600 shadow-md cursor-pointer">
+            <div key={c} className="w-8 h-8 bg-white rounded flex items-center justify-center font-bold text-gray-600 shadow-md cursor-pointer text-base">
               {c}
             </div>
           ))}
         </div>
-        <div className="hidden md:flex absolute bottom-5 left-5 gap-1.5">
+
+        {/* Layer toggles */}
+        <div className="absolute bottom-5 left-5 flex gap-1.5">
           {['🛰 Satélite', '🗺 Mapa', '⛰ Topografia'].map((l, i) => (
             <div key={l} className={`rounded-md px-2.5 py-1.5 text-xs font-semibold shadow-md cursor-pointer ${i === 0 ? 'bg-[#1A1A2E] text-white' : 'bg-white text-gray-700'}`}>
               {l}
             </div>
           ))}
         </div>
-      </section>
 
-      {/* Bloco de features — fora do hero, sempre visível */}
-      <div className="bg-white border-b border-gray-200 shadow-sm">
-        <div className="max-w-5xl mx-auto px-4 sm:px-8 py-6 sm:py-8">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
+        {/* Bloco de benefícios dentro do mapa */}
+        <div className="absolute left-1/2 bottom-5 z-20 w-[92vw] max-w-5xl -translate-x-1/2 rounded-2xl border border-gray-200 bg-white/95 p-5 shadow-2xl backdrop-blur-sm">
+          <div className="grid grid-cols-3 gap-5">
             {features.map(f => (
-              <div key={f.title} className="flex items-start gap-4 sm:flex-col sm:items-center sm:text-center">
-                <div className="flex-shrink-0 flex h-11 w-11 items-center justify-center rounded-xl bg-[#D8F3DC] text-xl">
+              <div key={f.title} className="text-center px-4 py-2">
+                <div className="mx-auto mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-[#D8F3DC] text-xl">
                   {f.icon}
                 </div>
-                <div>
-                  <h3 className="font-bold text-[#1A1A2E] text-sm sm:text-base mb-1">{f.title}</h3>
-                  <p className="text-xs sm:text-sm leading-relaxed text-gray-600">{f.desc}</p>
-                </div>
+                <h3 className="mb-1.5 font-bold text-[#1A1A2E]">{f.title}</h3>
+                <p className="text-sm leading-relaxed text-gray-600">{f.desc}</p>
               </div>
             ))}
           </div>
         </div>
-      </div>
-    </div>
+      </section>
+    </>
   )
 }

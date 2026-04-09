@@ -19,9 +19,9 @@ npm run dev
 ```
 
 ## 5. Abra no browser
-Acesse: http://localhost:3000
+Acesse: http://127.0.0.1:3000
 
-O projeto agora sobe fixo em `localhost` para manter o terminal e o navegador usando o mesmo endereco.
+O projeto agora sobe fixo em `127.0.0.1` para evitar erro de IPv6/`localhost` em alguns ambientes.
 
 ---
 

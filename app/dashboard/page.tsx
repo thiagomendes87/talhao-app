@@ -6,17 +6,22 @@ import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import Navbar from '@/components/Navbar'
 
-// Downloads de exemplo (futuramente virão do banco de dados)
-const downloadsExemplo = [
-  { id: 1, propriedade: 'Fazenda Santa Cruz', car: 'MT-5107909-7A2B...', municipio: 'Sorriso, MT', tipo: 'KML', data: '07/04/2025', creditos: 1 },
-  { id: 2, propriedade: 'Sítio Boa Esperança', car: 'GO-5218805-3C4D...', municipio: 'Rio Verde, GO', tipo: 'SIGEF', data: '06/04/2025', creditos: 1 },
-  { id: 3, propriedade: 'Chácara Recanto Verde', car: 'SP-3516200-1A2C...', municipio: 'Ribeirão Preto, SP', tipo: 'KML', data: '05/04/2025', creditos: 1 },
-]
+type Download = {
+  id: string
+  car_code: string | null
+  propriedade: string | null
+  municipio: string | null
+  estado: string | null
+  tipo: string
+  creditos_usados: number
+  criado_em: string
+}
 
 export default function DashboardPage() {
   const [busca, setBusca] = useState('')
   const [usuario, setUsuario] = useState<any>(null)
   const [creditos, setCreditos] = useState(0)
+  const [downloads, setDownloads] = useState<Download[]>([])
   const [carregando, setCarregando] = useState(true)
   const router = useRouter()
 
@@ -30,14 +35,24 @@ export default function DashboardPage() {
           router.push('/onboarding')
         } else {
           setUsuario(session.user)
-          // Busca créditos reais do Supabase (cria carteira se não existir)
-          const { data } = await supabase
+
+          // Busca créditos reais
+          const { data: carteira } = await supabase
             .from('carteira')
             .upsert({ user_id: session.user.id, creditos: 0 }, { onConflict: 'user_id', ignoreDuplicates: true })
             .select('creditos')
             .eq('user_id', session.user.id)
             .single()
-          setCreditos(data?.creditos ?? 0)
+          setCreditos(carteira?.creditos ?? 0)
+
+          // Busca histórico real de downloads
+          const { data: historico } = await supabase
+            .from('downloads')
+            .select('*')
+            .eq('user_id', session.user.id)
+            .order('criado_em', { ascending: false })
+            .limit(50)
+          setDownloads(historico ?? [])
         }
       }
       setCarregando(false)
@@ -136,7 +151,7 @@ export default function DashboardPage() {
             <span className="text-xs text-gray-400">Últimos 30 dias</span>
           </div>
 
-          {downloadsExemplo.length === 0 ? (
+          {downloads.length === 0 ? (
             <div className="text-center py-12 text-gray-400">
               <svg className="w-10 h-10 mx-auto mb-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
@@ -157,17 +172,21 @@ export default function DashboardPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-50">
-                  {downloadsExemplo.map((d) => (
+                  {downloads.map((d) => (
                     <tr key={d.id} className="hover:bg-gray-50 transition-colors">
                       <td className="py-3.5 pr-4">
-                        <p className="font-semibold text-[#1A1A2E]">{d.propriedade}</p>
-                        <p className="text-xs text-gray-400 font-mono">{d.car}</p>
+                        <p className="font-semibold text-[#1A1A2E]">{d.propriedade || 'Propriedade sem nome'}</p>
+                        {d.car_code && <p className="text-xs text-gray-400 font-mono">{d.car_code}</p>}
                       </td>
-                      <td className="py-3.5 pr-4 text-gray-600">{d.municipio}</td>
+                      <td className="py-3.5 pr-4 text-gray-600">
+                        {[d.municipio, d.estado].filter(Boolean).join(', ') || '—'}
+                      </td>
                       <td className="py-3.5 pr-4">
                         <span className="bg-[#F0FDF4] text-[#2D6A4F] text-xs font-bold px-2.5 py-1 rounded-full">{d.tipo}</span>
                       </td>
-                      <td className="py-3.5 pr-4 text-gray-500">{d.data}</td>
+                      <td className="py-3.5 pr-4 text-gray-500">
+                        {new Date(d.criado_em).toLocaleDateString('pt-BR')}
+                      </td>
                       <td className="py-3.5 text-right">
                         <button className="text-[#2D6A4F] hover:text-[#1A1A2E] font-semibold text-xs transition-colors flex items-center gap-1 ml-auto">
                           <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

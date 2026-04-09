@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useSearchParams } from 'next/navigation'
+import { useSearchParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
 
@@ -21,12 +21,14 @@ const comparativo = [
 ]
 
 export default function AssinarClient() {
+  const router = useRouter()
   const searchParams = useSearchParams()
   const tabParam = searchParams.get('tab')
   const [tipoCompra, setTipoCompra] = useState<'pro' | 'downloads'>(tabParam === 'downloads' ? 'downloads' : 'pro')
   const [quantidadeDownloads, setQuantidadeDownloads] = useState(4)
   const [creditos, setCreditos] = useState(0)
   const [usuario, setUsuario] = useState<any>(null)
+  const [carregando, setCarregando] = useState(true)
 
   const precoDownload = 3.50
   const totalDownloads = quantidadeDownloads * precoDownload
@@ -38,19 +40,29 @@ export default function AssinarClient() {
   useEffect(() => {
     const carregarDados = async () => {
       const { data: { session } } = await supabase.auth.getSession()
-      if (session) {
-        setUsuario(session.user)
-        const { data } = await supabase
-          .from('carteira')
-          .upsert({ user_id: session.user.id, creditos: 0 }, { onConflict: 'user_id', ignoreDuplicates: true })
-          .select('creditos')
-          .eq('user_id', session.user.id)
-          .single()
-        setCreditos(data?.creditos ?? 0)
+
+      if (!session) {
+        // Usuário não autenticado - redirecionar para login e voltar após
+        router.push('/entrar?redirect=/assinar')
+        return
       }
+
+      setUsuario(session.user)
+      const { data } = await supabase
+        .from('carteira')
+        .upsert({ user_id: session.user.id, creditos: 0 }, { onConflict: 'user_id', ignoreDuplicates: true })
+        .select('creditos')
+        .eq('user_id', session.user.id)
+        .single()
+      setCreditos(data?.creditos ?? 0)
+      setCarregando(false)
     }
     carregarDados()
-  }, [])
+  }, [router])
+
+  if (carregando) {
+    return <div className="min-h-screen flex items-center justify-center">Carregando...</div>
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">

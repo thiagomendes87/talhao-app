@@ -78,7 +78,7 @@ export default function AssinarClient() {
                 : 'text-gray-500 border-transparent'
             }`}
           >
-            Comprar Downloads
+            Comprar Créditos
           </button>
         </div>
 
@@ -97,9 +97,10 @@ export default function AssinarClient() {
                 <ul className="space-y-3 text-gray-700">
                   <li className="flex gap-3"><span className="text-[#2D6A4F] font-bold">✓</span> KML (CAR/SICAR)</li>
                   <li className="flex gap-3"><span className="text-[#2D6A4F] font-bold">✓</span> SIGEF e Topografia</li>
+                  <li className="flex gap-3"><span className="text-[#2D6A4F] font-bold">✓</span> Qualquer nova análise da Talhão</li>
                   <li className="flex gap-3"><span className="text-[#2D6A4F] font-bold">✓</span> Downloads ilimitados</li>
-                  <li className="flex gap-3"><span className="text-[#2D6A4F] font-bold">✓</span> Suporte por email</li>
-                  <li className="flex gap-3"><span className="text-[#2D6A4F] font-bold">✓</span> Sem compromisso mensal</li>
+                  <li className="flex gap-3"><span className="text-[#2D6A4F] font-bold">✓</span> Suporte por email e Whatsapp</li>
+                  <li className="flex gap-3"><span className="text-[#2D6A4F] font-bold">✓</span> Sem compromisso anual</li>
                 </ul>
               </div>
 
@@ -136,29 +137,47 @@ export default function AssinarClient() {
             <div className="space-y-6">
               <div>
                 <p className="text-sm font-bold text-gray-500 uppercase mb-2">Créditos Avulsos</p>
-                <h1 className="text-4xl font-extrabold text-[#1A1A2E] mb-3">R$ 3,50 por download</h1>
+                <h1 className="text-4xl font-extrabold text-[#1A1A2E] mb-1">R$ 3,50 por crédito</h1>
                 <p className="text-gray-600 text-lg">Pague só quando precisar</p>
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
-                {pacotes.map(qty => (
-                  <button
-                    key={qty}
-                    onClick={() => setQuantidadeDownloads(qty)}
-                    className={`p-4 rounded-lg border-2 transition-all text-left ${
-                      quantidadeDownloads === qty
-                        ? 'border-[#2D6A4F] bg-[#F0FDF4]'
-                        : 'border-gray-200 bg-white hover:border-gray-300'
-                    }`}
-                  >
-                    <p className="font-bold text-[#1A1A2E] text-lg">{qty}</p>
-                    <p className="text-xs text-gray-500">R$ {(qty * 3.5).toFixed(2)}</p>
-                  </button>
-                ))}
+              <div className="bg-[#F0FDF4] border border-[#2D6A4F] rounded-xl p-5">
+                <p className="font-bold text-[#2D6A4F] text-sm mb-3">Como funciona:</p>
+                <div className="bg-white rounded-lg p-4 mb-3">
+                  <p className="font-bold text-[#1A1A2E] text-base">1 crédito = 1 download</p>
+                  <p className="text-xs text-gray-500 mt-1">de qualquer arquivo</p>
+                </div>
+                <ul className="space-y-2 text-sm text-gray-700">
+                  <li className="flex gap-2"><span className="text-[#2D6A4F] font-bold">✓</span> KML (CAR/SICAR)</li>
+                  <li className="flex gap-2"><span className="text-[#2D6A4F] font-bold">✓</span> SIGEF</li>
+                  <li className="flex gap-2"><span className="text-[#2D6A4F] font-bold">✓</span> Mapa de Topografia</li>
+                  <li className="flex gap-2"><span className="text-[#2D6A4F] font-bold">✓</span> E outros formatos</li>
+                </ul>
+                <p className="text-xs text-gray-500 mt-3">Créditos válidos por 1 ano</p>
+              </div>
+
+              <div className="space-y-3">
+                <p className="text-sm font-bold text-gray-700">Escolha a quantidade:</p>
+                <div className="grid grid-cols-3 gap-2">
+                  {pacotes.map(qty => (
+                    <button
+                      key={qty}
+                      onClick={() => setQuantidadeDownloads(qty)}
+                      className={`p-4 rounded-lg border-2 transition-all text-center font-bold ${
+                        quantidadeDownloads === qty
+                          ? 'border-[#2D6A4F] bg-[#F0FDF4] text-[#1A1A2E]'
+                          : 'border-gray-200 bg-white text-gray-700 hover:border-gray-400'
+                      }`}
+                    >
+                      <div className="text-lg">{qty} créditos</div>
+                      <div className="text-xs text-gray-500 mt-1">R$ {(qty * 3.5).toFixed(2)}</div>
+                    </button>
+                  ))}
+                </div>
               </div>
 
               <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-sm text-amber-800">
-                <strong>💡 Dica:</strong> A partir de 14 downloads (R$ 49), considere o Plano Pro.
+                <strong>💡 Dica:</strong> A partir de 14 créditos (R$ 49), o Plano Pro é mais vantajoso.
               </div>
             </div>
 

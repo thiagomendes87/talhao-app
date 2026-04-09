@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
+import PaymentForm from '@/components/PaymentForm'
 
 const beneficios = [
   'Downloads ilimitados de qualquer arquivo',
@@ -29,6 +30,7 @@ export default function AssinarClient() {
   const [creditos, setCreditos] = useState(0)
   const [usuario, setUsuario] = useState<any>(null)
   const [carregando, setCarregando] = useState(true)
+  const [showPaymentModal, setShowPaymentModal] = useState(false)
 
   const precoDownload = 3.50
   const totalDownloads = quantidadeDownloads * precoDownload
@@ -343,7 +345,84 @@ export default function AssinarClient() {
             </>
           )}
         </div>
+
+        {/* Sidebar — Botão de Pagar */}
+        <div className="col-span-2 space-y-4">
+          <div className="bg-white rounded-2xl border border-gray-200 p-6 sticky top-8 space-y-4">
+            <h3 className="text-lg font-bold text-[#1A1A2E]">Resumo</h3>
+
+            {tipoCompra === 'pro' ? (
+              <>
+                <div className="space-y-2">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Plano Pro (1 mês)</span>
+                    <span className="font-bold text-[#1A1A2E]">R$ 49,00</span>
+                  </div>
+                  <div className="text-xs text-gray-500">Renova automaticamente</div>
+                </div>
+
+                <button
+                  onClick={() => setShowPaymentModal(true)}
+                  className="w-full bg-[#2D6A4F] hover:bg-[#1A5C3A] text-white font-bold px-4 py-3 rounded-lg transition-colors flex items-center justify-center gap-2"
+                >
+                  Assinar Pro — R$ 49,00 →
+                </button>
+              </>
+            ) : (
+              <>
+                <div className="space-y-2">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">{quantidadeDownloads} créditos</span>
+                    <span className="font-bold text-[#1A1A2E]">R$ {totalDownloads.toFixed(2)}</span>
+                  </div>
+                  <div className="text-xs text-gray-500">R$ 3,50 por download</div>
+                </div>
+
+                <button
+                  onClick={() => setShowPaymentModal(true)}
+                  className="w-full bg-[#2D6A4F] hover:bg-[#1A5C3A] text-white font-bold px-4 py-3 rounded-lg transition-colors flex items-center justify-center gap-2"
+                >
+                  Comprar {quantidadeDownloads} créditos →
+                </button>
+              </>
+            )}
+
+            <p className="text-xs text-gray-500 text-center">
+              Seus dados estão seguros
+            </p>
+          </div>
+        </div>
       </div>
+
+      {/* Modal de Pagamento */}
+      {showPaymentModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl max-w-md w-full p-6 max-h-96 overflow-y-auto">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-bold text-[#1A1A2E]">
+                {tipoCompra === 'pro' ? 'Assinar Pro' : 'Comprar Créditos'}
+              </h2>
+              <button
+                onClick={() => setShowPaymentModal(false)}
+                className="text-gray-400 hover:text-gray-600 text-2xl leading-none"
+              >
+                ✕
+              </button>
+            </div>
+
+            <PaymentForm
+              tipoCompra={tipoCompra}
+              quantidade={quantidadeDownloads}
+              amount={tipoCompra === 'pro' ? 49.0 : totalDownloads}
+              onPaymentSuccess={(paymentId) => {
+                console.log('Pagamento iniciado:', paymentId)
+                // Aqui pode mostrar um loading ou sucesso
+              }}
+              onClose={() => setShowPaymentModal(false)}
+            />
+          </div>
+        </div>
+      )}
     </div>
   )
 }

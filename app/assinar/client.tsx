@@ -4,22 +4,6 @@ import { useState, useEffect } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
-import PaymentForm from '@/components/PaymentForm'
-
-const beneficios = [
-  'Downloads ilimitados de qualquer arquivo',
-  'KML (CAR/SICAR), SIGEF, Topografia',
-  'Sem limite de requisições',
-  'Suporte prioritário por email',
-  'Acesso a novas camadas quando lançadas',
-]
-
-const comparativo = [
-  { label: '10 downloads (créditos avulsos)', valor: 'R$ 35,00', destaque: false, positivo: false },
-  { label: '14 downloads (créditos avulsos)', valor: 'R$ 49,00 ← break-even', destaque: false, positivo: false },
-  { label: '20 downloads (Plano Pro)', valor: 'R$ 49,00 ✓ mais barato', destaque: true, positivo: true },
-  { label: 'Ilimitado (Plano Pro)', valor: 'R$ 49,00 ✓ sem limite', destaque: true, positivo: true },
-]
 
 export default function AssinarClient() {
   const router = useRouter()
@@ -28,401 +12,148 @@ export default function AssinarClient() {
   const [tipoCompra, setTipoCompra] = useState<'pro' | 'downloads'>(tabParam === 'downloads' ? 'downloads' : 'pro')
   const [quantidadeDownloads, setQuantidadeDownloads] = useState(4)
   const [creditos, setCreditos] = useState(0)
-  const [usuario, setUsuario] = useState<any>(null)
   const [carregando, setCarregando] = useState(true)
-  const [showPaymentModal, setShowPaymentModal] = useState(false)
-
-  const precoDownload = 3.50
-  const totalDownloads = quantidadeDownloads * precoDownload
-  const precoPro = 49.00
-  const downloadEquivalentePro = 14
-  const custoDowloads14 = downloadEquivalentePro * precoDownload
-  const economia = Math.max(0, totalDownloads - precoPro)
 
   useEffect(() => {
-    const carregarDados = async () => {
+    const verificarAuth = async () => {
       const { data: { session } } = await supabase.auth.getSession()
-
       if (!session) {
-        // Usuário não autenticado - redirecionar para login e voltar após
         router.push('/entrar?redirect=/assinar')
         return
       }
 
-      setUsuario(session.user)
       const { data } = await supabase
         .from('carteira')
         .upsert({ user_id: session.user.id, creditos: 0 }, { onConflict: 'user_id', ignoreDuplicates: true })
         .select('creditos')
         .eq('user_id', session.user.id)
         .single()
+
       setCreditos(data?.creditos ?? 0)
       setCarregando(false)
     }
-    carregarDados()
+    verificarAuth()
   }, [router])
 
   if (carregando) {
     return <div className="min-h-screen flex items-center justify-center">Carregando...</div>
   }
 
+  const precoPro = 49.0
+  const totalDownloads = quantidadeDownloads * 3.5
+
   return (
     <div className="min-h-screen bg-gray-50">
       <nav className="bg-white border-b border-gray-200 px-10 py-4 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2">
-          <div className="w-7 h-7 bg-[#2D6A4F] rounded-md flex items-center justify-center text-sm">🌿</div>
+          <div className="w-7 h-7 bg-[#2D6A4F] rounded-md flex items-center justify-center">🌿</div>
           <span className="font-extrabold text-[#1A1A2E]">Talhão</span>
         </Link>
-        <span className="text-sm font-medium text-gray-600">💳 Planos e Pagamento</span>
+        <span className="text-sm font-medium text-gray-600">Planos</span>
         <div className="bg-[#D8F3DC] text-[#2D6A4F] text-xs font-bold px-3 py-1.5 rounded-lg">
-          Saldo: R$ {(creditos * 3.5).toFixed(2)} · {creditos} créditos
+          Saldo: {creditos} créditos
         </div>
       </nav>
 
-      <div className="max-w-5xl mx-auto py-10 px-8 grid grid-cols-5 gap-8">
-        <div className="col-span-3 space-y-6">
+      <div className="max-w-5xl mx-auto py-10 px-8 grid grid-cols-3 gap-8">
+        <div className="col-span-2 space-y-6">
 
-          {/* Abas de seleção */}
-          <div className="flex border-2 border-gray-300 rounded-2xl overflow-hidden bg-white">
+          {/* Abas */}
+          <div className="flex gap-2 border-b border-gray-200">
             <button
               onClick={() => setTipoCompra('pro')}
-              className={`flex-1 py-4 text-base font-bold transition-all ${
+              className={`pb-3 px-4 font-bold transition-all ${
                 tipoCompra === 'pro'
-                  ? 'bg-[#1A1A2E] text-white'
-                  : 'text-gray-600 hover:text-gray-800'
+                  ? 'text-[#1A1A2E] border-b-2 border-[#1A1A2E]'
+                  : 'text-gray-500'
               }`}
             >
-              🌟 Plano Pro
+              Plano Pro
             </button>
             <button
               onClick={() => setTipoCompra('downloads')}
-              className={`flex-1 py-4 text-base font-bold transition-all ${
+              className={`pb-3 px-4 font-bold transition-all ${
                 tipoCompra === 'downloads'
-                  ? 'bg-[#1A1A2E] text-white'
-                  : 'text-gray-600 hover:text-gray-800'
+                  ? 'text-[#1A1A2E] border-b-2 border-[#1A1A2E]'
+                  : 'text-gray-500'
               }`}
             >
-              📥 Comprar Downloads
+              Comprar Downloads
             </button>
           </div>
 
-          {/* SEÇÃO: PLANO PRO */}
-          {tipoCompra === 'pro' && (
-            <>
-              <div>
-                <p className="text-xs font-bold tracking-widest text-gray-400 uppercase mb-1">Plano Pro — Mensal</p>
-                <h1 className="text-3xl font-extrabold text-[#1A1A2E]">Downloads ilimitados</h1>
-                <p className="text-gray-600 text-lg mt-2">R$ 49,00 por mês · cancele quando quiser</p>
-              </div>
-
-              {/* Comparativo */}
-              <div className="bg-[#F0FDF4] border border-[#BBF7D0] rounded-xl p-5 space-y-3">
-                <p className="text-sm font-bold text-green-800">📊 Por que o Pro é melhor?</p>
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between"><span className="text-gray-700">14 downloads avulsos</span><span className="font-bold text-red-600">R$ 49,00</span></div>
-                  <div className="flex justify-between"><span className="text-gray-700">20 downloads avulsos</span><span className="font-bold text-red-600">R$ 70,00</span></div>
-                  <div className="flex justify-between border-t pt-2"><span className="text-gray-700 font-bold">Plano Pro (ilimitado)</span><span className="font-bold text-[#2D6A4F]">R$ 49,00 ✓</span></div>
-                </div>
-              </div>
-
-              <div className="flex border-2 border-gray-200 rounded-xl overflow-hidden mb-5">
-                <button className="flex-1 py-3 text-sm font-semibold bg-[#1A1A2E] text-white">🟢 PIX</button>
-                <button className="flex-1 py-3 text-sm font-semibold text-gray-600 bg-white">💳 Cartão</button>
-              </div>
-
-              <div className="bg-gray-50 rounded-xl p-5 space-y-3 mb-5">
-                <p className="text-sm font-bold text-[#1A1A2E]">Dados para nota fiscal</p>
-                <div>
-                  <label className="form-label">CPF ou CNPJ</label>
-                  <input className="form-input" placeholder="000.000.000-00" />
-                  <p className="text-xs text-gray-400 mt-1">Usado apenas para emissão da nota fiscal mensal</p>
-                </div>
-                <div>
-                  <label className="form-label">Nome completo / Razão social</label>
-                  <input className="form-input" placeholder="João da Silva" />
-                </div>
-              </div>
-
-              <div className="bg-gray-50 rounded-xl p-6 text-center mb-5">
-                <p className="text-sm font-semibold text-[#1A1A2E] mb-1">Escaneie o QR Code</p>
-                <p className="text-xs text-gray-500 mb-4">R$ 49,00 · Plano Pro ativado automaticamente</p>
-                <div className="w-40 h-40 bg-white border-2 border-gray-300 rounded-lg mx-auto mb-4 flex items-center justify-center">
-                  <svg width="100" height="100" viewBox="0 0 100 100" fill="none">
-                    <rect x="5" y="5" width="35" height="35" rx="3" stroke="#1A1A2E" strokeWidth="4" fill="none"/>
-                    <rect x="15" y="15" width="15" height="15" rx="1" fill="#1A1A2E"/>
-                    <rect x="60" y="5" width="35" height="35" rx="3" stroke="#1A1A2E" strokeWidth="4" fill="none"/>
-                    <rect x="70" y="15" width="15" height="15" rx="1" fill="#1A1A2E"/>
-                    <rect x="5" y="60" width="35" height="35" rx="3" stroke="#1A1A2E" strokeWidth="4" fill="none"/>
-                    <rect x="15" y="70" width="15" height="15" rx="1" fill="#1A1A2E"/>
-                    <rect x="55" y="55" width="8" height="8" fill="#1A1A2E"/>
-                    <rect x="67" y="55" width="8" height="8" fill="#1A1A2E"/>
-                    <rect x="79" y="55" width="16" height="8" fill="#1A1A2E"/>
-                  </svg>
-                </div>
-                <div className="flex items-center gap-2 bg-white border border-gray-200 rounded-lg px-3 py-2.5 text-xs font-mono text-gray-600 mb-3">
-                  <span className="flex-1 truncate">00020126580014BR.GOB.BCB.PIX...</span>
-                  <button className="bg-[#1A1A2E] text-white px-3 py-1.5 rounded-md text-xs font-bold">Copiar</button>
-                </div>
-                <p className="text-xs text-gray-400">⏱ Expira em <strong className="text-red-500">14:38</strong></p>
-              </div>
-
-              <div className="border-2 border-gray-200 rounded-xl p-5 bg-white space-y-4">
-                <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Cartão de crédito</p>
-                <div>
-                  <label className="form-label">Número do cartão</label>
-                  <input className="form-input" placeholder="0000 0000 0000 0000" />
-                </div>
-                <div>
-                  <label className="form-label">Nome impresso no cartão</label>
-                  <input className="form-input" placeholder="JOAO DA SILVA" />
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="form-label">Validade</label>
-                    <input className="form-input" placeholder="MM/AA" />
-                  </div>
-                  <div>
-                    <label className="form-label">CVV</label>
-                    <input className="form-input" placeholder="123" />
-                  </div>
-                </div>
-                <button className="btn-primary w-full py-3 rounded-xl text-base font-bold">
-                  Assinar Pro — R$ 49,00/mês →
-                </button>
-              </div>
-            </>
-          )}
-
-          {/* SEÇÃO: COMPRAR DOWNLOADS */}
-          {tipoCompra === 'downloads' && (
-            <>
-              <div>
-                <p className="text-xs font-bold tracking-widest text-gray-400 uppercase mb-1">Créditos Avulsos</p>
-                <h1 className="text-3xl font-extrabold text-[#1A1A2E]">R$ 3,50 por download</h1>
-                <p className="text-gray-600 text-lg mt-2">Use quando quiser, sem compromisso mensal</p>
-              </div>
-
-              <div className="bg-white rounded-2xl border-2 border-gray-200 p-8 space-y-6">
-                <div>
-                  <p className="text-sm font-bold text-[#1A1A2E] mb-4">Quantos downloads você precisa?</p>
-                  <div className="space-y-3">
-                    {[4, 6, 10, 14, 20, 30].map((qty) => (
-                      <button
-                        key={qty}
-                        onClick={() => setQuantidadeDownloads(qty)}
-                        className={`w-full flex items-center justify-between px-5 py-4 rounded-xl border-2 transition-all ${
-                          quantidadeDownloads === qty
-                            ? 'border-[#2D6A4F] bg-[#F0FDF4]'
-                            : 'border-gray-200 bg-white hover:border-gray-300'
-                        }`}
-                      >
-                        <div className="text-left">
-                          <p className="font-semibold text-[#1A1A2E]">{qty} downloads</p>
-                          <p className="text-xs text-gray-500">Validade: 1 ano</p>
-                        </div>
-                        <div className="text-right">
-                          <p className="font-bold text-lg text-[#2D6A4F]">R$ {(qty * precoDownload).toFixed(2)}</p>
-                          <p className="text-xs text-gray-500">{precoDownload.toFixed(2)}/download</p>
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {quantidadeDownloads >= downloadEquivalentePro && (
-                  <div className="bg-amber-50 border-2 border-amber-300 rounded-xl p-4 space-y-2">
-                    <p className="font-bold text-amber-900 text-sm">💡 Dica importante</p>
-                    <p className="text-xs text-amber-800">
-                      {quantidadeDownloads === downloadEquivalentePro
-                        ? `Com ${quantidadeDownloads} downloads você gasta R$ ${totalDownloads.toFixed(2)} — exatamente o preço do Plano Pro! Mas o Pro é ilimitado.`
-                        : `Você vai gastar R$ ${totalDownloads.toFixed(2)} em ${quantidadeDownloads} downloads. O Plano Pro (R$ 49,00/mês) sai mais barato se você fizer mais de ${downloadEquivalentePro} downloads.`
-                      }
-                    </p>
-                  </div>
-                )}
-              </div>
-
-              <div className="bg-gray-50 rounded-xl p-5 space-y-4">
-                <p className="text-sm font-bold text-[#1A1A2E]">Resumo da compra</p>
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between"><span className="text-gray-600">{quantidadeDownloads} downloads</span><span className="font-semibold">R$ {totalDownloads.toFixed(2)}</span></div>
-                  <div className="flex justify-between text-xs text-gray-500"><span>Taxa de processamento</span><span>Grátis</span></div>
-                  <div className="border-t pt-3 flex justify-between font-bold text-base">
-                    <span>Total</span>
-                    <span className="text-[#2D6A4F]">R$ {totalDownloads.toFixed(2)}</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                <p className="text-sm font-bold text-[#1A1A2E]">Forma de pagamento:</p>
-
-                <div className="flex border-2 border-gray-200 rounded-xl overflow-hidden">
-                  <button className="flex-1 py-3 text-sm font-semibold bg-[#1A1A2E] text-white">🟢 PIX</button>
-                  <button className="flex-1 py-3 text-sm font-semibold text-gray-600 bg-white">💳 Cartão</button>
-                </div>
-
-                <div className="bg-gray-50 rounded-xl p-6 text-center">
-                  <p className="text-sm font-semibold text-[#1A1A2E] mb-1">Escaneie o QR Code</p>
-                  <p className="text-xs text-gray-500 mb-4">R$ {totalDownloads.toFixed(2)} · Créditos adicionados imediatamente</p>
-                  <div className="w-40 h-40 bg-white border-2 border-gray-300 rounded-lg mx-auto mb-4 flex items-center justify-center">
-                    <svg width="100" height="100" viewBox="0 0 100 100" fill="none">
-                      <rect x="5" y="5" width="35" height="35" rx="3" stroke="#1A1A2E" strokeWidth="4" fill="none"/>
-                      <rect x="15" y="15" width="15" height="15" rx="1" fill="#1A1A2E"/>
-                      <rect x="60" y="5" width="35" height="35" rx="3" stroke="#1A1A2E" strokeWidth="4" fill="none"/>
-                      <rect x="70" y="15" width="15" height="15" rx="1" fill="#1A1A2E"/>
-                      <rect x="5" y="60" width="35" height="35" rx="3" stroke="#1A1A2E" strokeWidth="4" fill="none"/>
-                      <rect x="15" y="70" width="15" height="15" rx="1" fill="#1A1A2E"/>
-                      <rect x="55" y="55" width="8" height="8" fill="#1A1A2E"/>
-                      <rect x="67" y="55" width="8" height="8" fill="#1A1A2E"/>
-                      <rect x="79" y="55" width="16" height="8" fill="#1A1A2E"/>
-                    </svg>
-                  </div>
-                  <button className="btn-primary w-full py-3 rounded-xl text-base font-bold">
-                    Copiar código PIX
-                  </button>
-                </div>
-              </div>
-            </>
-          )}
-        </div>
-
-        {/* Direita: Benefícios */}
-        <div className="col-span-2 space-y-5">
           {tipoCompra === 'pro' ? (
             <>
-              <h2 className="text-sm font-bold text-[#1A1A2E]">Plano Pro — o que você ganha</h2>
-              <div className="bg-white rounded-xl p-5 border border-gray-200 space-y-4">
-                <div>
-                  <p className="font-bold text-[#1A1A2E] text-lg">🌟 Plano Pro</p>
-                  <p className="text-xs text-gray-500">Mensal · sem contrato</p>
-                </div>
-                <div className="space-y-3">
-                  {beneficios.map(b => (
-                    <div key={b} className="flex items-start gap-2 text-sm text-gray-700">
-                      <span className="text-[#2D6A4F] font-bold mt-0.5">✓</span>
-                      <span>{b}</span>
-                    </div>
-                  ))}
-                </div>
+              <div>
+                <h1 className="text-4xl font-extrabold text-[#1A1A2E] mb-1">R$ 49,00/mês</h1>
+                <p className="text-gray-600">Downloads ilimitados · Cancele quando quiser</p>
               </div>
-              <div className="bg-amber-50 rounded-xl p-4 border border-amber-200 text-xs text-amber-800 space-y-2">
-                <strong className="block">💡 Seus créditos continuam válidos</strong>
-                <p>Ao assinar Pro, seus downloads avulsos não somem. Use-os quando cancelar o plano.</p>
+
+              <div className="bg-[#F0FDF4] border border-[#2D6A4F] rounded-xl p-6">
+                <h3 className="font-bold text-[#2D6A4F] mb-4">Incluso:</h3>
+                <ul className="space-y-2 text-sm text-gray-700">
+                  <li>✓ KML (CAR/SICAR)</li>
+                  <li>✓ SIGEF e Topografia</li>
+                  <li>✓ Downloads ilimitados</li>
+                  <li>✓ Suporte por email</li>
+                  <li>✓ Sem compromisso</li>
+                </ul>
               </div>
             </>
           ) : (
             <>
-              <h2 className="text-sm font-bold text-[#1A1A2E]">Créditos Avulsos</h2>
-              <div className="bg-white rounded-xl p-5 border border-gray-200 space-y-4">
-                <div>
-                  <p className="font-bold text-[#1A1A2E] text-lg">📥 Pague por download</p>
-                  <p className="text-xs text-gray-500">Sem contrato · use quando quiser</p>
-                </div>
-                <div className="space-y-3 text-sm text-gray-700">
-                  <div className="flex items-start gap-2">
-                    <span className="text-[#2D6A4F] font-bold mt-0.5">✓</span>
-                    <span>Sem compromisso mensal</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <span className="text-[#2D6A4F] font-bold mt-0.5">✓</span>
-                    <span>Créditos válidos por 1 ano</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <span className="text-[#2D6A4F] font-bold mt-0.5">✓</span>
-                    <span>Acesso a todos os arquivos</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <span className="text-[#2D6A4F] font-bold mt-0.5">✓</span>
-                    <span>Suporte por email</span>
-                  </div>
-                </div>
+              <div>
+                <h1 className="text-4xl font-extrabold text-[#1A1A2E] mb-1">R$ 3,50 por download</h1>
+                <p className="text-gray-600">Pague só quando precisar</p>
               </div>
-              <div className="bg-blue-50 rounded-xl p-4 border border-blue-200 text-xs text-blue-800 space-y-2">
-                <strong className="block">🎯 Dica</strong>
-                <p>Se você vai fazer mais de 14 downloads por mês, considere assinar o Plano Pro.</p>
+
+              <div className="grid grid-cols-2 gap-2">
+                {[4, 6, 8, 10, 14, 20].map(qty => (
+                  <button
+                    key={qty}
+                    onClick={() => setQuantidadeDownloads(qty)}
+                    className={`p-4 rounded-lg border-2 transition-all font-semibold text-left ${
+                      quantidadeDownloads === qty
+                        ? 'border-[#2D6A4F] bg-[#F0FDF4]'
+                        : 'border-gray-200 bg-white'
+                    }`}
+                  >
+                    <div className="text-[#1A1A2E]">{qty}</div>
+                    <div className="text-xs text-gray-500">R$ {(qty * 3.5).toFixed(2)}</div>
+                  </button>
+                ))}
               </div>
             </>
           )}
         </div>
 
-        {/* Sidebar — Botão de Pagar */}
-        <div className="col-span-2 space-y-4">
-          <div className="bg-white rounded-2xl border border-gray-200 p-6 sticky top-8 space-y-4">
-            <h3 className="text-lg font-bold text-[#1A1A2E]">Resumo</h3>
+        {/* Sidebar */}
+        <div className="bg-white rounded-xl border border-gray-200 p-6 h-fit sticky top-8">
+          <h3 className="font-bold text-[#1A1A2E] mb-4">Resumo</h3>
 
-            {tipoCompra === 'pro' ? (
-              <>
-                <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Plano Pro (1 mês)</span>
-                    <span className="font-bold text-[#1A1A2E]">R$ 49,00</span>
-                  </div>
-                  <div className="text-xs text-gray-500">Renova automaticamente</div>
-                </div>
-
-                <button
-                  onClick={() => setShowPaymentModal(true)}
-                  className="w-full bg-[#2D6A4F] hover:bg-[#1A5C3A] text-white font-bold px-4 py-3 rounded-lg transition-colors flex items-center justify-center gap-2"
-                >
-                  Assinar Pro — R$ 49,00 →
-                </button>
-              </>
-            ) : (
-              <>
-                <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">{quantidadeDownloads} créditos</span>
-                    <span className="font-bold text-[#1A1A2E]">R$ {totalDownloads.toFixed(2)}</span>
-                  </div>
-                  <div className="text-xs text-gray-500">R$ 3,50 por download</div>
-                </div>
-
-                <button
-                  onClick={() => setShowPaymentModal(true)}
-                  className="w-full bg-[#2D6A4F] hover:bg-[#1A5C3A] text-white font-bold px-4 py-3 rounded-lg transition-colors flex items-center justify-center gap-2"
-                >
-                  Comprar {quantidadeDownloads} créditos →
-                </button>
-              </>
-            )}
-
-            <p className="text-xs text-gray-500 text-center">
-              Seus dados estão seguros
-            </p>
+          <div className="space-y-2 mb-6 pb-6 border-b border-gray-200">
+            <div className="flex justify-between text-sm">
+              <span className="text-gray-600">
+                {tipoCompra === 'pro' ? 'Plano Pro (1 mês)' : `${quantidadeDownloads} créditos`}
+              </span>
+              <span className="font-bold">
+                R$ {(tipoCompra === 'pro' ? precoPro : totalDownloads).toFixed(2)}
+              </span>
+            </div>
           </div>
+
+          <button className="w-full bg-[#2D6A4F] hover:bg-[#1A5C3A] text-white font-bold py-3 rounded-lg mb-3 transition-colors">
+            {tipoCompra === 'pro'
+              ? 'Assinar Pro'
+              : `Comprar ${quantidadeDownloads} créditos`
+            }
+          </button>
+
+          <p className="text-xs text-gray-500 text-center">
+            Pagamento com Asaas em breve
+          </p>
         </div>
       </div>
-
-      {/* Modal de Pagamento */}
-      {showPaymentModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 max-h-96 overflow-y-auto">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold text-[#1A1A2E]">
-                {tipoCompra === 'pro' ? 'Assinar Pro' : 'Comprar Créditos'}
-              </h2>
-              <button
-                onClick={() => setShowPaymentModal(false)}
-                className="text-gray-400 hover:text-gray-600 text-2xl leading-none"
-              >
-                ✕
-              </button>
-            </div>
-
-            <PaymentForm
-              tipoCompra={tipoCompra}
-              quantidade={quantidadeDownloads}
-              amount={tipoCompra === 'pro' ? 49.0 : totalDownloads}
-              onPaymentSuccess={(paymentId) => {
-                console.log('Pagamento iniciado:', paymentId)
-                // Aqui pode mostrar um loading ou sucesso
-              }}
-              onClose={() => setShowPaymentModal(false)}
-            />
-          </div>
-        </div>
-      )}
     </div>
   )
 }

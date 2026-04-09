@@ -38,9 +38,9 @@ function LoginForm() {
   }
 
   return (
-    <div className="min-h-screen grid grid-cols-2">
-      {/* Esquerda — visual */}
-      <div className="flex flex-col justify-between p-12" style={{ background: 'linear-gradient(145deg, #1A1A2E 0%, #2D6A4F 100%)' }}>
+    <div className="min-h-screen flex flex-col sm:grid sm:grid-cols-2">
+      {/* Esquerda — visual (escondida no mobile) */}
+      <div className="hidden sm:flex flex-col justify-between p-12" style={{ background: 'linear-gradient(145deg, #1A1A2E 0%, #2D6A4F 100%)' }}>
         <Link href="/" className="flex items-center gap-2">
           <div className="w-8 h-8 bg-white/15 rounded-lg flex items-center justify-center text-lg">🌿</div>
           <span className="text-white font-extrabold text-xl">Talhão</span>
@@ -62,7 +62,12 @@ function LoginForm() {
       </div>
 
       {/* Direita — formulário */}
-      <div className="flex flex-col justify-center px-12 py-10 bg-white">
+      <div className="flex flex-col justify-center px-6 sm:px-12 py-10 bg-white min-h-screen sm:min-h-0">
+        {/* Logo só no mobile */}
+        <Link href="/" className="flex items-center gap-2 mb-8 sm:hidden">
+          <div className="w-8 h-8 bg-[#2D6A4F] rounded-lg flex items-center justify-center text-lg">🌿</div>
+          <span className="font-extrabold text-[#1A1A2E] text-xl">Talhão</span>
+        </Link>
         <h1 className="text-2xl font-extrabold text-[#1A1A2E] mb-1.5">Entrar na conta</h1>
         <p className="text-sm text-gray-600 mb-8">
           Não tem uma conta?{' '}

@@ -41,6 +41,7 @@ export default function AssinarClient() {
 
   const precoPro = 49.0
   const totalDownloads = quantidadeDownloads * 3.5
+  const pacotes = [4, 6, 8, 10, 14, 20, 30]
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -49,110 +50,141 @@ export default function AssinarClient() {
           <div className="w-7 h-7 bg-[#2D6A4F] rounded-md flex items-center justify-center">🌿</div>
           <span className="font-extrabold text-[#1A1A2E]">Talhão</span>
         </Link>
-        <span className="text-sm font-medium text-gray-600">Planos</span>
+        <span className="text-sm font-medium text-gray-600">Planos e Pagamento</span>
         <div className="bg-[#D8F3DC] text-[#2D6A4F] text-xs font-bold px-3 py-1.5 rounded-lg">
-          Saldo: {creditos} créditos
+          Saldo: R$ {(creditos * 3.5).toFixed(2)} · {creditos} créditos
         </div>
       </nav>
 
-      <div className="max-w-5xl mx-auto py-10 px-8 grid grid-cols-3 gap-8">
-        <div className="col-span-2 space-y-6">
+      <div className="max-w-6xl mx-auto py-10 px-8">
 
-          {/* Abas */}
-          <div className="flex gap-2 border-b border-gray-200">
-            <button
-              onClick={() => setTipoCompra('pro')}
-              className={`pb-3 px-4 font-bold transition-all ${
-                tipoCompra === 'pro'
-                  ? 'text-[#1A1A2E] border-b-2 border-[#1A1A2E]'
-                  : 'text-gray-500'
-              }`}
-            >
-              Plano Pro
-            </button>
-            <button
-              onClick={() => setTipoCompra('downloads')}
-              className={`pb-3 px-4 font-bold transition-all ${
-                tipoCompra === 'downloads'
-                  ? 'text-[#1A1A2E] border-b-2 border-[#1A1A2E]'
-                  : 'text-gray-500'
-              }`}
-            >
-              Comprar Downloads
-            </button>
-          </div>
+        {/* Abas */}
+        <div className="flex gap-4 mb-8 border-b-2 border-gray-200">
+          <button
+            onClick={() => setTipoCompra('pro')}
+            className={`pb-3 px-6 font-bold text-lg transition-all border-b-2 ${
+              tipoCompra === 'pro'
+                ? 'text-[#1A1A2E] border-[#1A1A2E]'
+                : 'text-gray-500 border-transparent'
+            }`}
+          >
+            Plano Pro
+          </button>
+          <button
+            onClick={() => setTipoCompra('downloads')}
+            className={`pb-3 px-6 font-bold text-lg transition-all border-b-2 ${
+              tipoCompra === 'downloads'
+                ? 'text-[#1A1A2E] border-[#1A1A2E]'
+                : 'text-gray-500 border-transparent'
+            }`}
+          >
+            Comprar Downloads
+          </button>
+        </div>
 
-          {tipoCompra === 'pro' ? (
-            <>
+        {tipoCompra === 'pro' ? (
+          <div className="grid grid-cols-2 gap-8">
+            {/* Esquerda - Descrição */}
+            <div className="space-y-6">
               <div>
-                <h1 className="text-4xl font-extrabold text-[#1A1A2E] mb-1">R$ 49,00/mês</h1>
-                <p className="text-gray-600">Downloads ilimitados · Cancele quando quiser</p>
+                <p className="text-sm font-bold text-gray-500 uppercase mb-2">Plano Pro</p>
+                <h1 className="text-4xl font-extrabold text-[#1A1A2E] mb-3">R$ 49,00/mês</h1>
+                <p className="text-gray-600 text-lg">Downloads ilimitados · Cancele quando quiser</p>
               </div>
 
-              <div className="bg-[#F0FDF4] border border-[#2D6A4F] rounded-xl p-6">
-                <h3 className="font-bold text-[#2D6A4F] mb-4">Incluso:</h3>
-                <ul className="space-y-2 text-sm text-gray-700">
-                  <li>✓ KML (CAR/SICAR)</li>
-                  <li>✓ SIGEF e Topografia</li>
-                  <li>✓ Downloads ilimitados</li>
-                  <li>✓ Suporte por email</li>
-                  <li>✓ Sem compromisso</li>
+              <div className="bg-[#F0FDF4] border border-[#2D6A4F] rounded-xl p-6 space-y-3">
+                <h3 className="font-bold text-[#2D6A4F] text-lg mb-4">Incluso:</h3>
+                <ul className="space-y-3 text-gray-700">
+                  <li className="flex gap-3"><span className="text-[#2D6A4F] font-bold">✓</span> KML (CAR/SICAR)</li>
+                  <li className="flex gap-3"><span className="text-[#2D6A4F] font-bold">✓</span> SIGEF e Topografia</li>
+                  <li className="flex gap-3"><span className="text-[#2D6A4F] font-bold">✓</span> Downloads ilimitados</li>
+                  <li className="flex gap-3"><span className="text-[#2D6A4F] font-bold">✓</span> Suporte por email</li>
+                  <li className="flex gap-3"><span className="text-[#2D6A4F] font-bold">✓</span> Sem compromisso mensal</li>
                 </ul>
               </div>
-            </>
-          ) : (
-            <>
+
+              <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 text-sm text-blue-800">
+                <strong>💡 Cancelável:</strong> Sem contrato, cancele quando quiser.
+              </div>
+            </div>
+
+            {/* Direita - Botão e resumo */}
+            <div className="bg-white rounded-xl border border-gray-200 p-6 h-fit sticky top-8 space-y-6">
               <div>
-                <h1 className="text-4xl font-extrabold text-[#1A1A2E] mb-1">R$ 3,50 por download</h1>
-                <p className="text-gray-600">Pague só quando precisar</p>
+                <p className="text-sm text-gray-600 mb-2">Resumo</p>
+                <div className="flex justify-between items-end mb-4">
+                  <div>
+                    <p className="text-gray-600 text-sm">Plano Pro (1 mês)</p>
+                    <p className="text-xs text-gray-500">Renova automaticamente</p>
+                  </div>
+                  <p className="text-2xl font-extrabold text-[#1A1A2E]">R$ 49,00</p>
+                </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-2">
-                {[4, 6, 8, 10, 14, 20].map(qty => (
+              <button className="w-full bg-[#2D6A4F] hover:bg-[#1A5C3A] text-white font-bold py-3 rounded-lg transition-colors text-lg">
+                Assinar Pro →
+              </button>
+
+              <p className="text-xs text-gray-500 text-center">
+                Pagamento com Asaas em breve
+              </p>
+            </div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 gap-8">
+            {/* Esquerda - Descrição */}
+            <div className="space-y-6">
+              <div>
+                <p className="text-sm font-bold text-gray-500 uppercase mb-2">Créditos Avulsos</p>
+                <h1 className="text-4xl font-extrabold text-[#1A1A2E] mb-3">R$ 3,50 por download</h1>
+                <p className="text-gray-600 text-lg">Pague só quando precisar</p>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                {pacotes.map(qty => (
                   <button
                     key={qty}
                     onClick={() => setQuantidadeDownloads(qty)}
-                    className={`p-4 rounded-lg border-2 transition-all font-semibold text-left ${
+                    className={`p-4 rounded-lg border-2 transition-all text-left ${
                       quantidadeDownloads === qty
                         ? 'border-[#2D6A4F] bg-[#F0FDF4]'
-                        : 'border-gray-200 bg-white'
+                        : 'border-gray-200 bg-white hover:border-gray-300'
                     }`}
                   >
-                    <div className="text-[#1A1A2E]">{qty}</div>
-                    <div className="text-xs text-gray-500">R$ {(qty * 3.5).toFixed(2)}</div>
+                    <p className="font-bold text-[#1A1A2E] text-lg">{qty}</p>
+                    <p className="text-xs text-gray-500">R$ {(qty * 3.5).toFixed(2)}</p>
                   </button>
                 ))}
               </div>
-            </>
-          )}
-        </div>
 
-        {/* Sidebar */}
-        <div className="bg-white rounded-xl border border-gray-200 p-6 h-fit sticky top-8">
-          <h3 className="font-bold text-[#1A1A2E] mb-4">Resumo</h3>
+              <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-sm text-amber-800">
+                <strong>💡 Dica:</strong> A partir de 14 downloads (R$ 49), considere o Plano Pro.
+              </div>
+            </div>
 
-          <div className="space-y-2 mb-6 pb-6 border-b border-gray-200">
-            <div className="flex justify-between text-sm">
-              <span className="text-gray-600">
-                {tipoCompra === 'pro' ? 'Plano Pro (1 mês)' : `${quantidadeDownloads} créditos`}
-              </span>
-              <span className="font-bold">
-                R$ {(tipoCompra === 'pro' ? precoPro : totalDownloads).toFixed(2)}
-              </span>
+            {/* Direita - Resumo */}
+            <div className="bg-white rounded-xl border border-gray-200 p-6 h-fit sticky top-8 space-y-6">
+              <div>
+                <p className="text-sm text-gray-600 mb-2">Resumo</p>
+                <div className="flex justify-between items-end mb-4">
+                  <div>
+                    <p className="text-gray-600 text-sm">{quantidadeDownloads} créditos</p>
+                    <p className="text-xs text-gray-500">R$ 3,50 cada</p>
+                  </div>
+                  <p className="text-2xl font-extrabold text-[#1A1A2E]">R$ {totalDownloads.toFixed(2)}</p>
+                </div>
+              </div>
+
+              <button className="w-full bg-[#2D6A4F] hover:bg-[#1A5C3A] text-white font-bold py-3 rounded-lg transition-colors text-lg">
+                Comprar {quantidadeDownloads} créditos →
+              </button>
+
+              <p className="text-xs text-gray-500 text-center">
+                Pagamento com Asaas em breve
+              </p>
             </div>
           </div>
-
-          <button className="w-full bg-[#2D6A4F] hover:bg-[#1A5C3A] text-white font-bold py-3 rounded-lg mb-3 transition-colors">
-            {tipoCompra === 'pro'
-              ? 'Assinar Pro'
-              : `Comprar ${quantidadeDownloads} créditos`
-            }
-          </button>
-
-          <p className="text-xs text-gray-500 text-center">
-            Pagamento com Asaas em breve
-          </p>
-        </div>
+        )}
       </div>
     </div>
   )

@@ -31,27 +31,23 @@ export default function DashboardPage() {
       if (!session) {
         router.push('/entrar')
       } else {
-        if (!session.user.user_metadata?.perfil) {
-          router.push('/onboarding')
-        } else {
-          setUsuario(session.user)
+        setUsuario(session.user)
 
-          const { data: carteira } = await supabase
-            .from('carteira')
-            .upsert({ user_id: session.user.id, creditos: 0 }, { onConflict: 'user_id', ignoreDuplicates: true })
-            .select('creditos')
-            .eq('user_id', session.user.id)
-            .single()
-          setCreditos(carteira?.creditos ?? 0)
+        const { data: carteira } = await supabase
+          .from('carteira')
+          .upsert({ user_id: session.user.id, creditos: 0 }, { onConflict: 'user_id', ignoreDuplicates: true })
+          .select('creditos')
+          .eq('user_id', session.user.id)
+          .single()
+        setCreditos(carteira?.creditos ?? 0)
 
-          const { data: historico } = await supabase
-            .from('downloads')
-            .select('*')
-            .eq('user_id', session.user.id)
-            .order('criado_em', { ascending: false })
-            .limit(50)
-          setDownloads(historico ?? [])
-        }
+        const { data: historico } = await supabase
+          .from('downloads')
+          .select('*')
+          .eq('user_id', session.user.id)
+          .order('criado_em', { ascending: false })
+          .limit(50)
+        setDownloads(historico ?? [])
       }
       setCarregando(false)
     }

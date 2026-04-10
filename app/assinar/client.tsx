@@ -172,7 +172,7 @@ export default function AssinarClient() {
                           : 'border-gray-200 bg-white text-gray-700 hover:border-gray-400'
                       }`}
                     >
-                      <div>{qty}</div>
+                      <div>{qty} créditos</div>
                       <div className="text-xs text-gray-500 mt-1">R$ {(qty * 3.5).toFixed(2)}</div>
                     </button>
                   ))}

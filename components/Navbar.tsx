@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 
@@ -9,6 +9,8 @@ export default function Navbar() {
   const [usuario, setUsuario] = useState<any>(null)
   const [creditos, setCreditos] = useState<number>(0)
   const [carregando, setCarregando] = useState(true)
+  const [dropdownOpen, setDropdownOpen] = useState(false)
+  const dropdownRef = useRef<HTMLDivElement>(null)
   const router = useRouter()
   const pathname = usePathname()
 
@@ -16,20 +18,63 @@ export default function Navbar() {
     const verificarSessao = async () => {
       const { data: { session } } = await supabase.auth.getSession()
       setUsuario(session?.user ?? null)
+
+      // Busca créditos se logado
+      if (session?.user) {
+        const { data } = await supabase
+          .from('carteira')
+          .select('saldo')
+          .eq('user_id', session.user.id)
+          .single()
+
+        if (data) {
+          setCreditos(data.saldo)
+        }
+      }
+
       setCarregando(false)
     }
     verificarSessao()
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
       setUsuario(session?.user ?? null)
+
+      if (session?.user) {
+        const { data } = await supabase
+          .from('carteira')
+          .select('saldo')
+          .eq('user_id', session.user.id)
+          .single()
+
+        if (data) {
+          setCreditos(data.saldo)
+        }
+      } else {
+        setCreditos(0)
+      }
     })
 
     return () => subscription.unsubscribe()
   }, [])
 
+  // Fecha dropdown quando clica fora
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setDropdownOpen(false)
+      }
+    }
+
+    if (dropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside)
+      return () => document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [dropdownOpen])
+
   const handleLogout = async () => {
     await supabase.auth.signOut()
     setUsuario(null)
+    setDropdownOpen(false)
     router.push('/')
   }
 
@@ -64,21 +109,49 @@ export default function Navbar() {
         ) : usuario ? (
           // LOGADO
           <>
-            <Link href="/carteira"
-              className="flex items-center gap-2 bg-[#F0FDF4] border border-[#BBF7D0] text-[#2D6A4F] text-sm font-semibold px-4 py-2 rounded-xl hover:bg-[#D8F3DC] transition-colors">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            {/* Botão informativo de créditos */}
+            <div className="flex items-center gap-2 bg-gray-50 border border-gray-200 text-gray-700 text-sm font-medium px-4 py-2 rounded-xl">
+              <svg className="w-4 h-4 text-[#2D6A4F]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
               </svg>
-              Créditos
+              <span>{creditos}</span>
+            </div>
+
+            {/* Botão Comprar Créditos */}
+            <Link href="/assinar"
+              className="flex items-center gap-2 bg-[#F0FDF4] border border-[#BBF7D0] text-[#2D6A4F] text-sm font-semibold px-4 py-2 rounded-xl hover:bg-[#D8F3DC] transition-colors">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+              Comprar Créditos
             </Link>
-            <Link href="/dashboard"
-              className="text-sm text-gray-700 font-medium hover:text-[#1A1A2E] transition-colors px-2">
-              Olá, {nomeUsuario}
-            </Link>
-            <button onClick={handleLogout}
-              className="text-sm text-gray-500 hover:text-red-600 transition-colors px-2">
-              Sair
-            </button>
+
+            {/* Dropdown de perfil */}
+            <div ref={dropdownRef} className="relative">
+              <button
+                onClick={() => setDropdownOpen(!dropdownOpen)}
+                onMouseEnter={() => setDropdownOpen(true)}
+                onMouseLeave={() => setDropdownOpen(false)}
+                className="text-sm text-gray-700 font-medium hover:text-[#1A1A2E] transition-colors px-2 py-2 rounded-lg hover:bg-gray-50">
+                Olá, {nomeUsuario}
+              </button>
+
+              {dropdownOpen && (
+                <div
+                  onMouseEnter={() => setDropdownOpen(true)}
+                  onMouseLeave={() => setDropdownOpen(false)}
+                  className="absolute right-0 mt-1 w-40 bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden z-50">
+                  <Link href="/dashboard"
+                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+                    Minha Conta
+                  </Link>
+                  <button onClick={handleLogout}
+                    className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors border-t border-gray-100">
+                    Sair
+                  </button>
+                </div>
+              )}
+            </div>
           </>
         ) : (
           // NÃO LOGADO

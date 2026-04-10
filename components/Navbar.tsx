@@ -5,6 +5,19 @@ import { useEffect, useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 
+async function buscarCreditos(userId: string): Promise<number> {
+  try {
+    const { data } = await supabase
+      .from('carteira')
+      .select('saldo')
+      .eq('user_id', userId)
+      .single()
+    return data?.saldo ?? 0
+  } catch {
+    return 0
+  }
+}
+
 export default function Navbar() {
   const [usuario, setUsuario] = useState<any>(null)
   const [creditos, setCreditos] = useState<number>(0)
@@ -14,40 +27,18 @@ export default function Navbar() {
   const router = useRouter()
 
   useEffect(() => {
-    const verificarSessao = async () => {
-      const { data: { session } } = await supabase.auth.getSession()
+    supabase.auth.getSession().then(({ data: { session } }) => {
       setUsuario(session?.user ?? null)
-
-      // Busca créditos se logado
       if (session?.user) {
-        const { data } = await supabase
-          .from('carteira')
-          .select('saldo')
-          .eq('user_id', session.user.id)
-          .single()
-
-        if (data) {
-          setCreditos(data.saldo)
-        }
+        buscarCreditos(session.user.id).then(setCreditos)
       }
-
       setCarregando(false)
-    }
-    verificarSessao()
+    }).catch(() => setCarregando(false))
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUsuario(session?.user ?? null)
-
       if (session?.user) {
-        const { data } = await supabase
-          .from('carteira')
-          .select('saldo')
-          .eq('user_id', session.user.id)
-          .single()
-
-        if (data) {
-          setCreditos(data.saldo)
-        }
+        buscarCreditos(session.user.id).then(setCreditos)
       } else {
         setCreditos(0)
       }
@@ -56,38 +47,40 @@ export default function Navbar() {
     return () => subscription.unsubscribe()
   }, [])
 
-  // Fecha dropdown quando clica fora
+  // Fecha dropdown ao clicar fora
   useEffect(() => {
-    function handleClickOutside(e: MouseEvent) {
+    if (!dropdownOpen) return
+    function handler(e: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
         setDropdownOpen(false)
       }
     }
-
-    if (dropdownOpen) {
-      document.addEventListener('mousedown', handleClickOutside)
-      return () => document.removeEventListener('mousedown', handleClickOutside)
-    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
   }, [dropdownOpen])
 
   const handleLogout = async () => {
+    setDropdownOpen(false)
     await supabase.auth.signOut()
     setUsuario(null)
-    setDropdownOpen(false)
     router.push('/')
   }
 
-  const nomeUsuario = usuario?.user_metadata?.full_name?.split(' ')[0] || usuario?.email?.split('@')[0] || 'Conta'
+  const nomeUsuario =
+    usuario?.user_metadata?.full_name?.split(' ')[0] ||
+    usuario?.email?.split('@')[0] ||
+    'Conta'
 
   return (
-    <nav className="flex items-center justify-between px-10 py-4 border-b border-gray-200 bg-white/97 backdrop-blur-sm sticky top-0 z-50">
+    <nav className="flex items-center justify-between px-6 md:px-10 py-4 border-b border-gray-200 bg-white sticky top-0 z-50">
+
       {/* Logo */}
       <Link href="/" className="flex items-center gap-2">
         <div className="w-7 h-7 bg-[#2D6A4F] rounded-md flex items-center justify-center text-white text-sm">🌿</div>
         <span className="text-xl font-extrabold text-[#1A1A2E]">Talhão</span>
       </Link>
 
-      {/* Links */}
+      {/* Links centro — só desktop */}
       <div className="hidden md:flex items-center gap-7 text-sm text-gray-600">
         <Link href="#como-funciona" className="hover:text-[#1A1A2E] transition-colors">Como funciona</Link>
         <Link href="#precos" className="hover:text-[#1A1A2E] transition-colors">Preços</Link>
@@ -102,50 +95,61 @@ export default function Navbar() {
       </div>
 
       {/* Actions */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2 md:gap-3">
+
         {carregando ? (
-          <div className="w-24 h-8 bg-gray-100 animate-pulse rounded-lg" />
+          <div className="w-20 h-8 bg-gray-100 animate-pulse rounded-lg" />
         ) : usuario ? (
-          // LOGADO
           <>
-            {/* Botão informativo de créditos */}
-            <div className="flex items-center gap-2 bg-gray-50 border border-gray-200 text-gray-700 text-sm font-medium px-4 py-2 rounded-xl">
+            {/* Saldo de créditos — só informativo */}
+            <div className="hidden sm:flex items-center gap-1.5 bg-gray-50 border border-gray-200 text-gray-700 text-sm font-medium px-3 py-2 rounded-xl">
               <svg className="w-4 h-4 text-[#2D6A4F]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
               </svg>
-              <span>{creditos}</span>
+              <span>{creditos} créditos</span>
             </div>
 
-            {/* Botão Comprar Créditos */}
+            {/* Comprar Créditos */}
             <Link href="/assinar"
-              className="flex items-center gap-2 bg-[#F0FDF4] border border-[#BBF7D0] text-[#2D6A4F] text-sm font-semibold px-4 py-2 rounded-xl hover:bg-[#D8F3DC] transition-colors">
+              className="flex items-center gap-1.5 bg-[#F0FDF4] border border-[#BBF7D0] text-[#2D6A4F] text-sm font-semibold px-3 py-2 rounded-xl hover:bg-[#D8F3DC] transition-colors">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
               </svg>
-              Comprar Créditos
+              <span className="hidden sm:inline">Comprar Créditos</span>
+              <span className="sm:hidden">Comprar</span>
             </Link>
 
             {/* Dropdown de perfil */}
             <div ref={dropdownRef} className="relative">
               <button
-                onClick={() => setDropdownOpen(!dropdownOpen)}
+                onClick={() => setDropdownOpen(v => !v)}
                 onMouseEnter={() => setDropdownOpen(true)}
-                onMouseLeave={() => setDropdownOpen(false)}
-                className="text-sm text-gray-700 font-medium hover:text-[#1A1A2E] transition-colors px-2 py-2 rounded-lg hover:bg-gray-50">
-                Olá, {nomeUsuario}
+                className="flex items-center gap-1 text-sm text-gray-700 font-medium hover:text-[#1A1A2E] transition-colors px-2 py-2 rounded-lg hover:bg-gray-50">
+                <span>Olá, {nomeUsuario}</span>
+                <svg className="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
               </button>
 
               {dropdownOpen && (
                 <div
-                  onMouseEnter={() => setDropdownOpen(true)}
                   onMouseLeave={() => setDropdownOpen(false)}
-                  className="absolute right-0 mt-1 w-40 bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden z-50">
-                  <Link href="/dashboard"
-                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+                  className="absolute right-0 mt-1 w-44 bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden z-50">
+                  <Link
+                    href="/dashboard"
+                    onClick={() => setDropdownOpen(false)}
+                    className="flex items-center gap-2 w-full px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+                    <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
                     Minha Conta
                   </Link>
-                  <button onClick={handleLogout}
-                    className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors border-t border-gray-100">
+                  <button
+                    onClick={handleLogout}
+                    className="flex items-center gap-2 w-full px-4 py-3 text-sm text-red-600 hover:bg-red-50 transition-colors border-t border-gray-100">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                    </svg>
                     Sair
                   </button>
                 </div>
@@ -153,7 +157,6 @@ export default function Navbar() {
             </div>
           </>
         ) : (
-          // NÃO LOGADO
           <>
             <Link href="/entrar" className="btn-ghost">Entrar</Link>
             <Link href="/cadastro" className="btn-primary">Começar grátis</Link>

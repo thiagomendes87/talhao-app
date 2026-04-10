@@ -72,16 +72,16 @@ export default function Navbar() {
     'Conta'
 
   return (
-    <nav className="flex items-center justify-between px-6 md:px-10 py-4 border-b border-gray-200 bg-white sticky top-0 z-50">
+    <nav className="relative flex items-center justify-between px-6 md:px-10 py-4 border-b border-gray-200 bg-white sticky top-0 z-50">
 
       {/* Logo */}
-      <Link href="/" className="flex items-center gap-2">
+      <Link href="/" className="flex items-center gap-2 z-10">
         <div className="w-7 h-7 bg-[#2D6A4F] rounded-md flex items-center justify-center text-white text-sm">🌿</div>
         <span className="text-xl font-extrabold text-[#1A1A2E]">Talhão</span>
       </Link>
 
-      {/* Links centro — só desktop */}
-      <div className="hidden md:flex items-center gap-7 text-sm text-gray-600">
+      {/* Links centro — absolutamente centralizado, só desktop */}
+      <div className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center gap-7 text-sm text-gray-600">
         <Link href="#como-funciona" className="hover:text-[#1A1A2E] transition-colors">Como funciona</Link>
         <Link href="#precos" className="hover:text-[#1A1A2E] transition-colors">Preços</Link>
         <Link href="#faq" className="hover:text-[#1A1A2E] transition-colors">FAQ</Link>
@@ -95,7 +95,7 @@ export default function Navbar() {
       </div>
 
       {/* Actions */}
-      <div className="flex items-center gap-2 md:gap-3">
+      <div className="flex items-center gap-2 md:gap-3 z-10">
 
         {carregando ? (
           <div className="w-20 h-8 bg-gray-100 animate-pulse rounded-lg" />

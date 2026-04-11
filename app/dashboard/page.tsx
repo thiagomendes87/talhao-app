@@ -35,11 +35,11 @@ export default function DashboardPage() {
 
         const { data: carteira } = await supabase
           .from('carteira')
-          .upsert({ user_id: session.user.id, saldo: 0 }, { onConflict: 'user_id', ignoreDuplicates: true })
-          .select('saldo')
+          .upsert({ user_id: session.user.id, creditos: 0 }, { onConflict: 'user_id', ignoreDuplicates: true })
+          .select('creditos')
           .eq('user_id', session.user.id)
           .single()
-        setCreditos(carteira?.saldo ?? 0)
+        setCreditos(carteira?.creditos ?? 0)
 
         const { data: historico } = await supabase
           .from('downloads')

@@ -9,10 +9,10 @@ async function buscarCreditos(userId: string): Promise<number> {
   try {
     const { data } = await supabase
       .from('carteira')
-      .select('saldo')
+      .select('creditos')
       .eq('user_id', userId)
       .single()
-    return data?.saldo ?? 0
+    return data?.creditos ?? 0
   } catch {
     return 0
   }

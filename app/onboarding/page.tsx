@@ -45,10 +45,17 @@ export default function OnboardingPage() {
     setCarregando(true)
     const perfilEscolhido = perfilIdx === perfis.length - 1 ? outroPerfil : perfis[perfilIdx].nome
 
-    // Atualizar perfil do usuário
+    // Salva no Auth metadata
     const { error } = await supabase.auth.updateUser({
       data: { perfil: perfilEscolhido },
     })
+
+    // Salva na tabela perfis para análise
+    if (usuario) {
+      await supabase
+        .from('perfis')
+        .upsert({ id: usuario.id, perfil: perfilEscolhido }, { onConflict: 'id' })
+    }
 
     if (error) {
       console.error(error)

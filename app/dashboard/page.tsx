@@ -31,6 +31,12 @@ export default function DashboardPage() {
       if (!session) {
         router.push('/entrar')
       } else {
+        // Usuário Google sem perfil → vai para onboarding
+        if (!session.user.user_metadata?.perfil) {
+          router.push('/onboarding')
+          return
+        }
+
         setUsuario(session.user)
 
         const { data: carteira } = await supabase

@@ -21,15 +21,24 @@ export default function OnboardingPage() {
   const router = useRouter()
 
   useEffect(() => {
-    const verificarAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession()
-      if (!session) {
+    // Listener em tempo real — captura sessão mesmo com delay do OAuth
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (session) {
+        setUsuario(session.user)
+      } else if (event === 'SIGNED_OUT') {
         router.push('/entrar')
-      } else {
+      }
+    })
+
+    // Verifica sessão já existente imediatamente
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
         setUsuario(session.user)
       }
-    }
-    verificarAuth()
+      // Se null, aguarda o onAuthStateChange acima resolver
+    })
+
+    return () => subscription.unsubscribe()
   }, [router])
 
   const handleContinuar = async () => {

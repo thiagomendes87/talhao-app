@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
   try {
     const body: AsaasWebhook = await request.json()
 
-    console.log('Webhook do Asaas recebido:', body)
+    console.log('🔔 Webhook do Asaas recebido:', JSON.stringify(body, null, 2))
 
     // 1. Validar se é um evento de pagamento
     if (!body.event || !body.payment) {
@@ -77,6 +77,7 @@ export async function POST(request: NextRequest) {
     }
 
     // 4. Se pagamento foi aprovado, adicionar créditos
+    console.log(`💰 Status: ${novoStatus}, Créditos a adicionar: ${creditosAdicionados}`)
     if (creditosAdicionados && payment) {
       const { data: carteira, error: carteiraError } = await supabase
         .from('carteira')

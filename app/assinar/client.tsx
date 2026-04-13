@@ -97,22 +97,8 @@ export default function AssinarClient() {
         return
       }
 
-      // Cartão → redireciona para página do Asaas
-      if (paymentMethod === 'cartao' && data.invoice_url) {
-        window.open(data.invoice_url, '_blank')
-        setResultado(data)
-        return
-      }
-
-      // Boleto → abre PDF
-      if (paymentMethod === 'boleto' && data.boleto_url) {
-        window.open(data.boleto_url, '_blank')
-        setResultado(data)
-        return
-      }
-
-      // PIX → mostra QR code
-      setResultado(data)
+      // Redireciona para página de acompanhamento
+      router.push(`/pagamento/${data.payment_id}`)
 
     } catch (e: any) {
       setErro(e.message || 'Erro de conexão')
@@ -265,9 +251,7 @@ export default function AssinarClient() {
             <button onClick={() => { setModalAberto(false); setResultado(null) }}
               className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-xl font-bold">✕</button>
 
-            {!resultado ? (
-              <>
-                <h2 className="text-xl font-extrabold text-[#1A1A2E] mb-1">Finalizar pagamento</h2>
+            <h2 className="text-xl font-extrabold text-[#1A1A2E] mb-1">Finalizar pagamento</h2>
                 <p className="text-sm text-gray-500 mb-5">
                   {quantidade} créditos · <strong>R$ {(quantidade * 3.5).toFixed(2)}</strong>
                 </p>

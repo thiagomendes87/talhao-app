@@ -39,9 +39,14 @@ export default function DashboardPage() {
 
         setUsuario(session.user)
 
-        const { data: carteira } = await supabase
+        // Garante que a linha existe (sem sobrescrever créditos existentes)
+        await supabase
           .from('carteira')
           .upsert({ user_id: session.user.id, creditos: 0 }, { onConflict: 'user_id', ignoreDuplicates: true })
+
+        // Busca o saldo atual separadamente
+        const { data: carteira } = await supabase
+          .from('carteira')
           .select('creditos')
           .eq('user_id', session.user.id)
           .single()

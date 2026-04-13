@@ -3,150 +3,170 @@ import { NextRequest, NextResponse } from 'next/server'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 )
 
-interface CreatePaymentRequest {
-  type: 'pro_subscription' | 'credits_purchase'
-  amount: number
-  payment_method: 'pix' | 'card'
-  quantidade_creditos?: number
-  descricao?: string
+const ASAAS_API_URL = 'https://api.asaas.com/v3'
+const ASAAS_API_KEY = process.env.ASAAS_API_KEY!
+
+async function asaasRequest(path: string, method = 'GET', body?: object) {
+  const res = await fetch(`${ASAAS_API_URL}${path}`, {
+    method,
+    headers: {
+      'Content-Type': 'application/json',
+      'access_token': ASAAS_API_KEY,
+    },
+    body: body ? JSON.stringify(body) : undefined,
+  })
+  return res.json()
+}
+
+async function getOrCreateCustomer(userId: string, nome: string, email: string, cpf: string) {
+  // Busca customer_id salvo
+  const { data: perfil } = await supabase
+    .from('perfis')
+    .select('asaas_customer_id')
+    .eq('id', userId)
+    .single()
+
+  if (perfil?.asaas_customer_id) {
+    return perfil.asaas_customer_id
+  }
+
+  // Cria cliente no Asaas
+  const customer = await asaasRequest('/customers', 'POST', {
+    name: nome || email,
+    email,
+    cpfCnpj: cpf.replace(/\D/g, ''),
+  })
+
+  if (!customer.id) {
+    throw new Error(customer.errors?.[0]?.description || 'Erro ao criar cliente no Asaas')
+  }
+
+  // Salva customer_id no perfil
+  await supabase
+    .from('perfis')
+    .upsert({ id: userId, asaas_customer_id: customer.id }, { onConflict: 'id' })
+
+  return customer.id
 }
 
 export async function POST(request: NextRequest) {
   try {
-    // 1. Obter sessão do usuário
+    // Autenticação
     const authHeader = request.headers.get('authorization')
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return NextResponse.json(
-        { error: 'Não autenticado' },
-        { status: 401 }
-      )
+    if (!authHeader?.startsWith('Bearer ')) {
+      return NextResponse.json({ error: 'Não autenticado' }, { status: 401 })
     }
-
-    // Validar token (de forma simples)
     const token = authHeader.substring(7)
-
-    // 2. Parsear corpo da requisição
-    const body: CreatePaymentRequest = await request.json()
-
-    // Validar dados
-    if (!body.type || !body.amount || !body.payment_method) {
-      return NextResponse.json(
-        { error: 'Dados incompletos' },
-        { status: 400 }
-      )
-    }
-
-    // 3. Obter usuário do token
     const { data: { user }, error: userError } = await supabase.auth.getUser(token)
     if (userError || !user) {
-      return NextResponse.json(
-        { error: 'Usuário não encontrado' },
-        { status: 401 }
-      )
+      return NextResponse.json({ error: 'Usuário não encontrado' }, { status: 401 })
     }
 
-    // 4. Criar registro de pagamento no banco (status: pending)
+    const body = await request.json()
+    const { quantidade_creditos, payment_method, cpf } = body
+
+    if (!quantidade_creditos || !payment_method || !cpf) {
+      return NextResponse.json({ error: 'Dados incompletos: quantidade_creditos, payment_method e cpf são obrigatórios' }, { status: 400 })
+    }
+
+    const amount = quantidade_creditos * 3.5
+    const nome = user.user_metadata?.full_name || user.email || 'Cliente'
+
+    // Cria/busca cliente no Asaas
+    const customerId = await getOrCreateCustomer(user.id, nome, user.email!, cpf)
+
+    // Data de vencimento: 1 dia para PIX/cartão, 3 dias para boleto
+    const daysToExpire = payment_method === 'boleto' ? 3 : 1
+    const dueDate = new Date(Date.now() + daysToExpire * 24 * 60 * 60 * 1000)
+      .toISOString().split('T')[0]
+
+    // Mapa de método para billingType do Asaas
+    const billingTypeMap: Record<string, string> = {
+      pix: 'PIX',
+      boleto: 'BOLETO',
+      cartao: 'CREDIT_CARD',
+    }
+
+    const billingType = billingTypeMap[payment_method]
+    if (!billingType) {
+      return NextResponse.json({ error: 'Método de pagamento inválido' }, { status: 400 })
+    }
+
+    // Cria registro local primeiro
     const { data: payment, error: paymentError } = await supabase
       .from('payments')
       .insert({
         user_id: user.id,
-        type: body.type,
-        amount: body.amount,
-        quantidade_creditos: body.quantidade_creditos,
-        payment_method: body.payment_method,
+        type: 'credits_purchase',
+        amount,
+        quantidade_creditos,
+        payment_method,
         status: 'pending',
-        descricao: body.descricao || `${body.type === 'credits_purchase' ? body.quantidade_creditos + ' créditos' : 'Assinatura Pro'}`,
       })
       .select()
       .single()
 
-    if (paymentError) {
-      return NextResponse.json(
-        { error: 'Erro ao criar pagamento', details: paymentError },
-        { status: 500 }
-      )
+    if (paymentError || !payment) {
+      return NextResponse.json({ error: 'Erro ao registrar pagamento' }, { status: 500 })
     }
 
-    // 5. Chamar API do Asaas para criar transação
-    // ⚠️ Isso será feito quando a conta Asaas for aprovada
-    const asaasApiKey = process.env.NEXT_PUBLIC_ASAAS_API_KEY
-
-    if (!asaasApiKey) {
-      // Por enquanto, retorna o pagamento como 'pending' esperando a integração
-      return NextResponse.json({
-        success: true,
-        payment: payment,
-        message: 'Integração com Asaas em desenvolvimento. Pagamento registrado como pendente.',
-      })
+    // Cria cobrança no Asaas
+    const asaasPayload: any = {
+      customer: customerId,
+      billingType,
+      value: amount,
+      dueDate,
+      description: `Talhão — ${quantidade_creditos} créditos`,
+      externalReference: payment.id,
+      notificationUrl: `${process.env.NEXT_PUBLIC_APP_URL}/api/webhooks/asaas`,
     }
 
-    // 6. Integração com Asaas (quando aprovado)
-    try {
-      const asaasResponse = await fetch('https://api.asaas.com/v3/payments', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'access_token': asaasApiKey,
-        },
-        body: JSON.stringify({
-          customer: user.email, // ou customer_id se tiver
-          billingType: body.payment_method === 'pix' ? 'PIX' : 'CREDIT_CARD',
-          value: body.amount,
-          dueDate: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 24h de prazo
-          description: `Talhão - ${body.descricao}`,
-          externalReference: payment.id, // Link com nosso pagamento
-          notificationUrl: `${process.env.NEXT_PUBLIC_APP_URL}/api/webhooks/asaas`,
-        }),
-      })
+    const asaasPayment = await asaasRequest('/payments', 'POST', asaasPayload)
 
-      const asaasData = await asaasResponse.json()
-
-      if (!asaasResponse.ok) {
-        return NextResponse.json(
-          { error: 'Erro na integração com Asaas', details: asaasData },
-          { status: 500 }
-        )
-      }
-
-      // 7. Atualizar pagamento com ID do Asaas
-      const { error: updateError } = await supabase
-        .from('payments')
-        .update({
-          asaas_payment_id: asaasData.id,
-          pix_qr_code: asaasData.pixQrCode,
-          pix_copy_paste: asaasData.pixCopiaECola,
-        })
-        .eq('id', payment.id)
-
-      if (updateError) {
-        console.error('Erro ao atualizar pagamento:', updateError)
-      }
-
+    if (!asaasPayment.id) {
+      await supabase.from('payments').update({ status: 'failed' }).eq('id', payment.id)
       return NextResponse.json({
-        success: true,
-        payment: {
-          ...payment,
-          asaas_payment_id: asaasData.id,
-          pix_qr_code: asaasData.pixQrCode,
-          pix_copy_paste: asaasData.pixCopiaECola,
-        },
-      })
-    } catch (asaasError) {
-      console.error('Erro ao chamar Asaas:', asaasError)
-      return NextResponse.json({
-        success: true,
-        payment: payment,
-        warning: 'Pagamento registrado mas não foi sincronizado com Asaas',
-      })
+        error: asaasPayment.errors?.[0]?.description || 'Erro ao criar cobrança no Asaas'
+      }, { status: 500 })
     }
-  } catch (error) {
-    console.error('Erro no endpoint de pagamento:', error)
-    return NextResponse.json(
-      { error: 'Erro interno do servidor' },
-      { status: 500 }
-    )
+
+    // Para PIX, busca QR code
+    let pixData = null
+    if (payment_method === 'pix') {
+      pixData = await asaasRequest(`/payments/${asaasPayment.id}/pixQrCode`)
+    }
+
+    // Atualiza registro com dados do Asaas
+    await supabase
+      .from('payments')
+      .update({
+        asaas_payment_id: asaasPayment.id,
+        pix_qr_code: pixData?.encodedImage || null,
+        pix_copy_paste: pixData?.payload || null,
+      })
+      .eq('id', payment.id)
+
+    return NextResponse.json({
+      success: true,
+      payment_id: payment.id,
+      asaas_id: asaasPayment.id,
+      // PIX
+      pix_qr_code: pixData?.encodedImage || null,
+      pix_copy_paste: pixData?.payload || null,
+      // Boleto
+      boleto_url: asaasPayment.bankSlipUrl || null,
+      // Cartão / página de pagamento
+      invoice_url: asaasPayment.invoiceUrl || null,
+      // Valor
+      amount,
+      quantidade_creditos,
+    })
+
+  } catch (err: any) {
+    console.error('Erro no pagamento:', err)
+    return NextResponse.json({ error: err.message || 'Erro interno' }, { status: 500 })
   }
 }

@@ -1,51 +1,73 @@
 'use client'
 
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 
 const features = [
   {
     icon: '🗺',
-    title: 'Todos os CAR do Brasil',
-    desc: 'Mais de 10 milhões de polígonos do SICAR disponíveis, com status, área e perímetro.',
+    title: 'SICAR, SIGEF e SNCI',
+    desc: 'Mais de 10 milhões de polígonos do SICAR, além de SIGEF e SNCI com cobertura nacional.',
   },
   {
     icon: '📥',
-    title: 'KML, SIGEF e muito mais',
-    desc: 'Baixe os arquivos da propriedade rural em um clique. KML, SIGEF, SNCR e topografia.',
+    title: 'Download em um clique',
+    desc: 'KML, Shapefile, GeoTIFF e mapas topográficos prontos para uso no campo ou no escritório.',
   },
   {
-    icon: '🔲',
-    title: 'Múltiplas camadas',
-    desc: 'Sobreponha satélite, topografia, SNCR e SIGEF para uma análise completa.',
+    icon: '⛰',
+    title: 'Topografia e altitude',
+    desc: 'Visualize declividade, curvas de nível e altitude de qualquer propriedade rural do Brasil.',
+  },
+]
+
+const GEO_API_URL = (process.env.NEXT_PUBLIC_GEO_API_URL ?? 'http://localhost:8000').replace(/\/$/, '')
+const desktopFeatures = [
+  {
+    icon: '🗺',
+    title: 'SICAR, SIGEF e SNCI',
+    desc: 'Cobertura nacional com 10M+ polígonos',
+  },
+  {
+    icon: '📥',
+    title: 'Download em um clique',
+    desc: 'KML, Shapefile, GeoTIFF e topografia',
+  },
+  {
+    icon: '⛰',
+    title: 'Topografia e altitude',
+    desc: 'Declividade e altitude por propriedade',
   },
 ]
 
 export default function MapHero() {
+  const router = useRouter()
+
   return (
     <>
-      {/* ========== MOBILE ========== */}
-      <section className="md:hidden" style={{ background: 'linear-gradient(135deg, #1B4332 0%, #2D6A4F 50%, #40916C 100%)' }}>
+      {/* ===== MOBILE ===== */}
+      <section className="md:hidden bg-[#1B4332]">
         <div className="px-5 pt-12 pb-8 text-center">
+          <span className="inline-block text-xs font-bold tracking-widest text-[#74C69D] uppercase mb-3">
+            Plataforma geoespacial rural
+          </span>
           <h1 className="text-2xl font-extrabold text-white mb-3 leading-tight">
             Encontre qualquer fazenda no Brasil
           </h1>
-          <p className="text-sm text-white/80 leading-relaxed mb-6">
-            Busque pelo município, CAR ou coordenadas e baixe o KML em segundos.
+          <p className="text-sm text-white/75 leading-relaxed mb-6">
+            Busque pelo CAR, município ou coordenadas e baixe os arquivos em segundos.
           </p>
-          <div className="rounded-xl bg-white px-4 py-2 shadow-xl mb-4">
-            <input
-              type="text"
-              placeholder="CAR, município ou coordenadas..."
-              className="w-full border-none outline-none text-sm text-gray-700 bg-transparent py-2"
-            />
-            <Link href="/mapa" className="btn-primary block w-full text-center rounded-lg py-2.5 mt-2 text-sm">
-              Buscar →
-            </Link>
-          </div>
+          <Link
+            href="/mapa"
+            className="inline-flex items-center gap-2 bg-white text-[#1B4332] font-bold px-6 py-3 rounded-xl text-sm shadow-lg hover:shadow-xl transition-all"
+          >
+            Abrir mapa →
+          </Link>
+          <p className="text-xs text-white/50 mt-3">Grátis para explorar · Pague só ao baixar</p>
         </div>
 
-        {/* Features no mobile — abaixo do hero */}
-        <div className="bg-white border-t border-gray-200 px-5 py-6 space-y-4">
+        {/* Features no mobile */}
+        <div className="bg-white border-t border-gray-100 px-5 py-6 space-y-4">
           {features.map(f => (
             <div key={f.title} className="flex items-start gap-4">
               <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-[#D8F3DC] flex items-center justify-center text-lg">
@@ -53,92 +75,96 @@ export default function MapHero() {
               </div>
               <div>
                 <h3 className="font-bold text-[#1A1A2E] text-sm">{f.title}</h3>
-                <p className="text-xs text-gray-600 mt-0.5 leading-relaxed">{f.desc}</p>
+                <p className="text-xs text-gray-500 mt-0.5 leading-relaxed">{f.desc}</p>
               </div>
             </div>
           ))}
         </div>
       </section>
 
-      {/* ========== DESKTOP (original intacto) ========== */}
-      <section className="hidden md:block relative min-h-[calc(100vh-72px)] overflow-hidden" style={{
-        background: 'linear-gradient(135deg, #1B4332 0%, #2D6A4F 30%, #40916C 60%, #74C69D 100%)'
-      }}>
-        {/* Grid overlay */}
-        <div className="absolute inset-0" style={{
-          backgroundImage: `
-            repeating-linear-gradient(0deg, rgba(255,255,255,0.03) 0px, rgba(255,255,255,0.03) 1px, transparent 1px, transparent 60px),
-            repeating-linear-gradient(90deg, rgba(255,255,255,0.03) 0px, rgba(255,255,255,0.03) 1px, transparent 1px, transparent 60px)
-          `
-        }} />
+      {/* ===== DESKTOP ===== */}
+      <section
+        className="hidden md:block relative w-full min-h-screen overflow-hidden cursor-pointer"
+        onClick={() => router.push('/mapa')}
+      >
+        <iframe
+          src={`${GEO_API_URL}/?cleanmode=1`}
+          title="Mapa Talhão"
+          className="absolute inset-0 w-full h-full border-none pointer-events-none z-0"
+          loading="lazy"
+        />
 
-        {/* Polígonos decorativos */}
-        <div className="absolute" style={{ top: '20%', left: '15%', width: 120, height: 80, background: 'rgba(255,230,100,0.15)', border: '1.5px solid rgba(255,230,100,0.5)', borderRadius: 2, transform: 'rotate(-5deg)' }} />
-        <div className="absolute" style={{ top: '35%', left: '8%', width: 90, height: 110, background: 'rgba(255,230,100,0.15)', border: '1.5px solid rgba(255,230,100,0.5)', borderRadius: 2, transform: 'rotate(10deg)' }} />
-        <div className="absolute" style={{ top: '55%', left: '20%', width: 160, height: 70, background: 'rgba(255,230,100,0.15)', border: '1.5px solid rgba(255,230,100,0.5)', borderRadius: 2, transform: 'rotate(-2deg)' }} />
-        <div className="absolute" style={{ top: '25%', left: '70%', width: 100, height: 90, background: 'rgba(255,230,100,0.15)', border: '1.5px solid rgba(255,230,100,0.5)', borderRadius: 2, transform: 'rotate(8deg)' }} />
-        <div className="absolute" style={{ top: '50%', left: '65%', width: 140, height: 100, background: 'rgba(255,230,100,0.15)', border: '1.5px solid rgba(255,230,100,0.5)', borderRadius: 2, transform: 'rotate(-6deg)' }} />
-        <div className="absolute" style={{ top: '30%', left: '42%', width: 150, height: 110, background: 'rgba(255,210,50,0.35)', border: '2.5px solid rgba(255,210,0,0.9)', borderRadius: 2, boxShadow: '0 0 0 6px rgba(255,215,0,0.15)', transform: 'rotate(3deg)' }} />
-        <span className="absolute text-white/70 text-xs font-medium" style={{ top: '17%', left: '16%' }}>MT-1234567...</span>
-        <span className="absolute text-white/70 text-xs font-medium" style={{ top: '26%', left: '71%' }}>GO-9876543...</span>
-        <span className="absolute text-white/70 text-xs font-medium" style={{ top: '27%', left: '43%' }}>SP-3550308...</span>
+        <div
+          className="absolute inset-0 z-10 pointer-events-none"
+          style={{ background: 'linear-gradient(to bottom, rgba(10,30,15,0.55) 0%, rgba(10,30,15,0.35) 60%, rgba(10,30,15,0.65) 100%)' }}
+        />
 
-        {/* Search overlay centralizado */}
-        <div className="absolute top-[44%] left-1/2 flex w-[680px] max-w-[92vw] -translate-x-1/2 -translate-y-1/2 flex-col items-center text-center">
-          <h1 className="mb-2.5 whitespace-nowrap text-[clamp(1.9rem,4.8vw,3.5rem)] font-extrabold leading-tight text-white" style={{ textShadow: '0 2px 12px rgba(0,0,0,0.4)' }}>
+        <div
+          className="relative z-20 flex min-h-screen flex-col items-center justify-center px-6 pt-28 pb-16 text-center"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <span className="text-xs font-bold tracking-widest text-[#74C69D] uppercase mb-4">
+            Plataforma geoespacial rural
+          </span>
+
+          <h1
+            className="text-5xl font-extrabold text-white leading-tight mb-5"
+            style={{ textShadow: '0 2px 20px rgba(0,0,0,0.5)' }}
+          >
             Encontre qualquer fazenda no Brasil
           </h1>
-          <p className="mb-6 max-w-2xl text-base leading-relaxed text-white/85" style={{ textShadow: '0 1px 6px rgba(0,0,0,0.3)' }}>
-            Navegue pelo mapa, busque pelo município, CAR ou coordenadas<br /> e baixe o KML em segundos.
+
+          <p className="text-base text-white/85 leading-relaxed mb-8 max-w-xl mx-auto">
+            Navegue por mais de 10 milhões de propriedades rurais. Baixe KML, Shapefile e mapas topográficos em segundos.
           </p>
-          <div className="flex w-full items-center gap-2.5 rounded-xl bg-white px-4 py-1.5 shadow-2xl">
+
+          <div className="flex items-center gap-2.5 rounded-2xl bg-white px-4 py-1.5 shadow-2xl max-w-2xl w-full mx-auto">
             <span className="text-gray-400 text-lg">🔍</span>
             <input
               type="text"
-              placeholder="Digite o CAR, nome da fazenda, município ou coordenadas..."
-              className="flex-1 border-none outline-none text-sm text-gray-700 bg-transparent py-2"
+              placeholder="Digite o CAR, fazenda, município ou coordenadas..."
+              className="flex-1 border-none outline-none text-sm text-gray-700 bg-transparent py-2.5 placeholder:text-gray-400"
             />
             <Link href="/mapa" className="btn-primary whitespace-nowrap">
               Buscar no mapa →
             </Link>
           </div>
+
           <div className="flex gap-2 justify-center mt-3 flex-wrap">
-            {['CAR: MT-5107602-...', 'CPF / CNPJ', 'Matrícula SIGEF', '-15.78, -47.92'].map(tag => (
-              <span key={tag} className="text-white/90 text-xs px-2.5 py-1 rounded-full" style={{ background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.25)', backdropFilter: 'blur(4px)' }}>
+            {['CAR: MT-5107602-...', 'CPF / CNPJ', 'Matrícula SIGEF', '-15.78, -47.92'].map((tag) => (
+              <span
+                key={tag}
+                className="text-white/85 text-xs px-3 py-1 rounded-full"
+                style={{
+                  background: 'rgba(255,255,255,0.15)',
+                  border: '1px solid rgba(255,255,255,0.25)',
+                  backdropFilter: 'blur(4px)',
+                }}
+              >
                 {tag}
               </span>
             ))}
           </div>
-        </div>
 
-        {/* Zoom controls */}
-        <div className="absolute right-5 bottom-16 flex flex-col gap-1">
-          {['+', '−'].map(c => (
-            <div key={c} className="w-8 h-8 bg-white rounded flex items-center justify-center font-bold text-gray-600 shadow-md cursor-pointer text-base">
-              {c}
-            </div>
-          ))}
-        </div>
-
-        {/* Layer toggles */}
-        <div className="absolute bottom-5 left-5 flex gap-1.5">
-          {['🛰 Satélite', '🗺 Mapa', '⛰ Topografia'].map((l, i) => (
-            <div key={l} className={`rounded-md px-2.5 py-1.5 text-xs font-semibold shadow-md cursor-pointer ${i === 0 ? 'bg-[#1A1A2E] text-white' : 'bg-white text-gray-700'}`}>
-              {l}
-            </div>
-          ))}
-        </div>
-
-        {/* Bloco de benefícios dentro do mapa */}
-        <div className="absolute left-1/2 bottom-5 z-20 w-[92vw] max-w-5xl -translate-x-1/2 rounded-2xl border border-gray-200 bg-white/95 p-5 shadow-2xl backdrop-blur-sm">
-          <div className="grid grid-cols-3 gap-5">
-            {features.map(f => (
-              <div key={f.title} className="text-center px-4 py-2">
-                <div className="mx-auto mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-[#D8F3DC] text-xl">
-                  {f.icon}
+          {/* Feature icons — abaixo do campo de busca */}
+          <div className="flex gap-6 justify-center mt-6 flex-wrap">
+            {desktopFeatures.map((feature) => (
+              <div key={feature.title} className="flex items-center gap-2.5"
+                style={{
+                  background: 'rgba(255,255,255,0.12)',
+                  border: '1px solid rgba(255,255,255,0.22)',
+                  backdropFilter: 'blur(8px)',
+                  borderRadius: '14px',
+                  padding: '10px 16px',
+                }}
+              >
+                <div className="w-8 h-8 rounded-xl bg-[#D8F3DC]/80 flex items-center justify-center text-sm flex-shrink-0">
+                  {feature.icon}
                 </div>
-                <h3 className="mb-1.5 font-bold text-[#1A1A2E]">{f.title}</h3>
-                <p className="text-sm leading-relaxed text-gray-600">{f.desc}</p>
+                <div className="text-left">
+                  <h3 className="font-bold text-white text-xs leading-tight">{feature.title}</h3>
+                  <p className="text-white/65 text-xs mt-0.5">{feature.desc}</p>
+                </div>
               </div>
             ))}
           </div>

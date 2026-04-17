@@ -9,11 +9,15 @@ export default function MapEmbedded() {
   useEffect(() => {
     // window.__TALHAO_JWT e window.__GEO_API_URL são injetados pelo MapaClient antes de montar este componente
     const jwt = (window as any).__TALHAO_JWT as string | undefined
+    const busca = (window as any).__TALHAO_BUSCA as string | undefined
     const geoUrl = ((window as any).__GEO_API_URL as string | undefined)
       ?.replace(/\/$/, '') ?? 'http://localhost:8000'
 
-    // Passa JWT via URL param para o produto geoespacial conseguir autenticar
-    const url = jwt ? `${geoUrl}/?jwt=${encodeURIComponent(jwt)}` : `${geoUrl}/`
+    const params = new URLSearchParams()
+    if (jwt) params.set('jwt', jwt)
+    if (busca) params.set('busca', busca)
+    const qs = params.toString()
+    const url = qs ? `${geoUrl}/?${qs}` : `${geoUrl}/`
     setIframeSrc(url)
   }, [])
 

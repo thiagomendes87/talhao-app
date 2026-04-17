@@ -1,5 +1,7 @@
 'use client'
 
+import React from 'react'
+
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 
@@ -42,6 +44,17 @@ const desktopFeatures = [
 
 export default function MapHero() {
   const router = useRouter()
+  const [searchQuery, setSearchQuery] = React.useState('')
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault()
+    const q = searchQuery.trim()
+    if (q) {
+      router.push(`/mapa?q=${encodeURIComponent(q)}`)
+    } else {
+      router.push('/mapa')
+    }
+  }
 
   return (
     <>
@@ -118,17 +131,19 @@ export default function MapHero() {
             Navegue por mais de 10 milhões de propriedades rurais. Baixe KML, Shapefile e mapas topográficos em segundos.
           </p>
 
-          <div className="flex items-center gap-2.5 rounded-2xl bg-white px-4 py-1.5 shadow-2xl max-w-2xl w-full mx-auto">
+          <form onSubmit={handleSearch} className="flex items-center gap-2.5 rounded-2xl bg-white px-4 py-1.5 shadow-2xl max-w-2xl w-full mx-auto" onClick={(e) => e.stopPropagation()}>
             <span className="text-gray-400 text-lg">🔍</span>
             <input
               type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Digite o CAR, fazenda, município ou coordenadas..."
               className="flex-1 border-none outline-none text-sm text-gray-700 bg-transparent py-2.5 placeholder:text-gray-400"
             />
-            <Link href="/mapa" className="btn-primary whitespace-nowrap">
+            <button type="submit" className="btn-primary whitespace-nowrap">
               Buscar no mapa →
-            </Link>
-          </div>
+            </button>
+          </form>
 
           <div className="flex gap-2 justify-center mt-3 flex-wrap">
             {['CAR: MT-5107602-...', 'CPF / CNPJ', 'Matrícula SIGEF', '-15.78, -47.92'].map((tag) => (

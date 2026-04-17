@@ -83,7 +83,7 @@ export default function DashboardPage() {
     <div className="min-h-screen bg-gray-50">
       <Navbar />
 
-      <div className="bg-white border-b border-gray-100 py-8 px-4 sm:px-10">
+      <div className="bg-white border-b border-gray-100 pt-24 pb-8 px-4 sm:px-10">
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <p className="text-sm text-gray-500">Olá, {nomeUsuario}! 👋</p>

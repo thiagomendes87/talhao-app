@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import dynamic from 'next/dynamic'
 
@@ -19,18 +20,24 @@ const MapEmbedded = dynamic(() => import('./MapEmbedded'), {
 
 export default function MapaClient() {
   const [pronto, setPronto] = useState(false)
+  const searchParams = useSearchParams()
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
-      // JWT só disponível se logado — downloads exigem auth no servidor Python
       if (session?.access_token) {
         ;(window as any).__TALHAO_JWT = session.access_token
       }
       ;(window as any).__GEO_API_URL = process.env.NEXT_PUBLIC_GEO_API_URL ?? ''
+      
+      // Passa query de busca da landing-page para o produto
+      const q = searchParams.get('q')
+      if (q) {
+        ;(window as any).__TALHAO_BUSCA = q
+      }
 
       setPronto(true)
     })
-  }, [])
+  }, [searchParams])
 
   if (!pronto) {
     return (

@@ -145,21 +145,7 @@ export default function MapHero() {
             </button>
           </form>
 
-          <div className="flex gap-2 justify-center mt-3 flex-wrap">
-            {['CAR: MT-5107602-...', 'CPF / CNPJ', 'Matrícula SIGEF', '-15.78, -47.92'].map((tag) => (
-              <span
-                key={tag}
-                className="text-white/85 text-xs px-3 py-1 rounded-full"
-                style={{
-                  background: 'rgba(255,255,255,0.15)',
-                  border: '1px solid rgba(255,255,255,0.25)',
-                  backdropFilter: 'blur(4px)',
-                }}
-              >
-                {tag}
-              </span>
-            ))}
-          </div>
+
 
           {/* Feature icons — abaixo do campo de busca */}
           <div className="flex gap-6 justify-center mt-6 flex-wrap">

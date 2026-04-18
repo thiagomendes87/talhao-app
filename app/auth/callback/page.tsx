@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { type EmailOtpType } from '@supabase/supabase-js'
 import { supabase } from '@/lib/supabase'
 
 export default function AuthCallback() {
@@ -12,6 +13,12 @@ export default function AuthCallback() {
   useEffect(() => {
     let redirected = false
 
+    const getNextPath = () => {
+      const params = new URLSearchParams(window.location.search)
+      const next = params.get('next') || '/dashboard'
+      return next.startsWith('/') ? next : '/dashboard'
+    }
+
     const go = (path: string) => {
       if (redirected) return
       redirected = true
@@ -21,7 +28,9 @@ export default function AuthCallback() {
     const run = async () => {
       const params = new URLSearchParams(window.location.search)
       const code = params.get('code')
-      const next = params.get('next') || '/dashboard'
+      const tokenHash = params.get('token_hash')
+      const type = params.get('type') as EmailOtpType | null
+      const next = getNextPath()
       const oauthError = params.get('error')
       const oauthErrorDesc = params.get('error_description')
 
@@ -29,6 +38,26 @@ export default function AuthCallback() {
       if (oauthError) {
         setErro(`Erro OAuth: ${oauthErrorDesc || oauthError}`)
         return
+      }
+
+      if (tokenHash && type) {
+        setStatus('Confirmando email...')
+        const { error } = await supabase.auth.verifyOtp({
+          token_hash: tokenHash,
+          type,
+        })
+
+        if (error) {
+          setErro(`Erro ao confirmar email: ${error.message}`)
+          return
+        }
+
+        const { data: { session } } = await supabase.auth.getSession()
+        if (session) {
+          setStatus('Email confirmado! Redirecionando...')
+          go(next)
+          return
+        }
       }
 
       // PKCE flow: há um code na URL
@@ -71,8 +100,7 @@ export default function AuthCallback() {
     // Listener de estado (captura SIGNED_IN de qualquer flow)
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_IN' && session && !redirected) {
-        const params = new URLSearchParams(window.location.search)
-        go(params.get('next') || '/dashboard')
+        go(getNextPath())
       }
     })
 

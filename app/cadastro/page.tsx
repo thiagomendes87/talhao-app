@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { supabase } from '@/lib/supabase'
+import { buildAuthCallbackUrl, supabase } from '@/lib/supabase'
 
 const perfis = [
   { icon: '👨‍🌾', nome: 'Produtor Rural', desc: 'Uso próprio da propriedade' },
@@ -38,26 +38,46 @@ export default function CadastroPage() {
       return
     }
 
-    const { error } = await supabase.auth.signUp({
-      email,
+    const normalizedEmail = email.trim().toLowerCase()
+    const signupRedirectTo = buildAuthCallbackUrl('/dashboard')
+    const perfilNormalizado = perfilEscolhido.trim()
+    const { data, error } = await supabase.auth.signUp({
+      email: normalizedEmail,
       password: senha,
-      options: { data: { full_name: nome, perfil: perfilEscolhido } },
+      options: {
+        emailRedirectTo: signupRedirectTo,
+        data: {
+          full_name: nome.trim(),
+          perfil: perfilNormalizado,
+        },
+      },
     })
 
     if (error) {
       setErro(error.message)
       setCarregando(false)
     } else {
+      setEmail(normalizedEmail)
+      if (data.session) {
+        router.replace('/dashboard')
+        return
+      }
       setEmailEnviado(true)
       setCarregando(false)
     }
   }
 
   const handleGoogle = async () => {
-    await supabase.auth.signInWithOAuth({
+    setErro('')
+
+    const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
-      options: { redirectTo: `${window.location.origin}/auth/callback?next=/dashboard` },
+      options: { redirectTo: buildAuthCallbackUrl('/dashboard') },
     })
+
+    if (error) {
+      setErro(error.message)
+    }
   }
 
   return (

@@ -1,25 +1,35 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import styles from './styles/mapa.module.css'
 
-export default function MapEmbedded() {
+type MapEmbeddedProps = {
+  authToken: string | null
+  geoApiUrl: string
+  searchQuery: string | null
+}
+
+export default function MapEmbedded({ authToken, geoApiUrl, searchQuery }: MapEmbeddedProps) {
   const [iframeSrc, setIframeSrc] = useState<string>('')
 
   useEffect(() => {
-    // window.__TALHAO_JWT e window.__GEO_API_URL são injetados pelo MapaClient antes de montar este componente
-    const jwt = (window as any).__TALHAO_JWT as string | undefined
-    const busca = (window as any).__TALHAO_BUSCA as string | undefined
-    const geoUrl = ((window as any).__GEO_API_URL as string | undefined)
-      ?.replace(/\/$/, '') ?? 'http://localhost:8000'
+    const cleanGeoUrl = geoApiUrl.replace(/\/$/, '') || 'http://localhost:8000'
 
     const params = new URLSearchParams()
-    if (jwt) params.set('jwt', jwt)
-    if (busca) params.set('busca', busca)
+    params.set('cleanmode', '1')
+
+    if (authToken) {
+      params.set('jwt', authToken)
+    }
+
+    if (searchQuery) {
+      params.set('busca', searchQuery)
+    }
+
     const qs = params.toString()
-    const url = qs ? `${geoUrl}/?${qs}` : `${geoUrl}/`
+    const url = qs ? `${cleanGeoUrl}/?${qs}` : `${cleanGeoUrl}/`
     setIframeSrc(url)
-  }, [])
+  }, [authToken, geoApiUrl, searchQuery])
 
   if (!iframeSrc) {
     return (

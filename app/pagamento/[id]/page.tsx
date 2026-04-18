@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { supabase } from '@/lib/supabase'
+import { buildLoginPath, supabase } from '@/lib/supabase'
 
 type Payment = {
   id: string
@@ -63,7 +63,7 @@ export default function PagamentoPage() {
       try {
         const { data: { session } } = await supabase.auth.getSession()
         if (!session) {
-          router.push('/entrar')
+          router.replace(buildLoginPath(`/pagamento/${paymentId}`, 'Entre com sua conta Google para acompanhar este pagamento.'))
           return
         }
 

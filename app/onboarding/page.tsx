@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { supabase } from '@/lib/supabase'
+import { buildLoginPath, supabase } from '@/lib/supabase'
 
 const perfis = [
   { icon: '👨‍🌾', nome: 'Produtor Rural', desc: 'Uso próprio da propriedade' },
@@ -26,7 +26,7 @@ export default function OnboardingPage() {
       if (session) {
         setUsuario(session.user)
       } else if (event === 'SIGNED_OUT') {
-        router.push('/entrar')
+        router.replace(buildLoginPath('/onboarding', 'Entre com sua conta Google para concluir seu perfil.'))
       }
     })
 

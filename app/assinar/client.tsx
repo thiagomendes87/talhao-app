@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { supabase } from '@/lib/supabase'
+import { buildLoginPath, supabase } from '@/lib/supabase'
 
 type PaymentMethod = 'pix' | 'boleto' | 'cartao'
 type PaymentResult = {
@@ -42,7 +42,7 @@ export default function AssinarClient() {
     const verificarAuth = async () => {
       const { data: { session } } = await supabase.auth.getSession()
       if (!session) {
-        router.push('/entrar?redirect=/assinar')
+        router.replace(buildLoginPath('/assinar', 'Entre com sua conta Google para comprar créditos ou assinar o plano Pro.'))
         return
       }
       setSession(session)

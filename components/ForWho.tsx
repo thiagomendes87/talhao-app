@@ -33,8 +33,8 @@ export default function ForWho() {
 
         {/* CTA */}
         <div className="mt-12">
-          <a href="/cadastro" className="inline-block bg-[#2D6A4F] hover:bg-[#245c43] text-white font-semibold px-8 py-4 rounded-xl transition-colors text-base">
-            Criar conta gratuita →
+          <a href="/mapa" className="inline-block bg-[#2D6A4F] hover:bg-[#245c43] text-white font-semibold px-8 py-4 rounded-xl transition-colors text-base">
+            Abrir mapa gratuitamente →
           </a>
         </div>
       </div>

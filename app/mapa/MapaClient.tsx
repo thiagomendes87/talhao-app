@@ -1,8 +1,8 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useMemo } from 'react'
 import { useSearchParams } from 'next/navigation'
-import { supabase } from '@/lib/supabase'
+import { useAuthSession } from '@/lib/use-auth-session'
 import dynamic from 'next/dynamic'
 
 // Leaflet não funciona no SSR — carrega apenas no client
@@ -19,27 +19,18 @@ const MapEmbedded = dynamic(() => import('./MapEmbedded'), {
 })
 
 export default function MapaClient() {
-  const [pronto, setPronto] = useState(false)
+  const { loading, session } = useAuthSession()
   const searchParams = useSearchParams()
+  const searchQuery = searchParams.get('q')
+  const authToken = session?.access_token ?? null
+  const geoApiUrl = process.env.NEXT_PUBLIC_GEO_API_URL ?? ''
 
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session?.access_token) {
-        ;(window as any).__TALHAO_JWT = session.access_token
-      }
-      ;(window as any).__GEO_API_URL = process.env.NEXT_PUBLIC_GEO_API_URL ?? ''
-      
-      // Passa query de busca da landing-page para o produto
-      const q = searchParams.get('q')
-      if (q) {
-        ;(window as any).__TALHAO_BUSCA = q
-      }
+  const iframeKey = useMemo(
+    () => `${authToken ?? 'anonymous'}::${searchQuery ?? ''}`,
+    [authToken, searchQuery]
+  )
 
-      setPronto(true)
-    })
-  }, [searchParams])
-
-  if (!pronto) {
+  if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
@@ -50,6 +41,14 @@ export default function MapaClient() {
     )
   }
 
-  // MapEmbedded agora é um iframe full-screen — sem wrapper extra
-  return <MapEmbedded />
+  return (
+    <div className="h-screen pt-[84px]">
+      <MapEmbedded
+        key={iframeKey}
+        authToken={authToken}
+        geoApiUrl={geoApiUrl}
+        searchQuery={searchQuery}
+      />
+    </div>
+  )
 }

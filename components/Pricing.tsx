@@ -61,7 +61,7 @@ export default function Pricing() {
               <li key={i} className="flex items-start gap-2"><span className="text-[#2D6A4F] font-bold flex-shrink-0">✓</span>{i}</li>
             ))}
           </ul>
-          <Link href="/cadastro" className="btn-primary mt-auto block w-full rounded-lg py-2.5 text-center text-sm">Começar grátis</Link>
+          <Link href="/mapa" className="btn-primary mt-auto block w-full rounded-lg py-2.5 text-center text-sm">Abrir mapa grátis</Link>
         </div>
 
         {/* Pro */}

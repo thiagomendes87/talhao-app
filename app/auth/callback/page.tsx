@@ -1,134 +1,113 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { type EmailOtpType } from '@supabase/supabase-js'
-import { supabase } from '@/lib/supabase'
+import { Suspense, useEffect, useMemo, useState } from 'react'
+import Link from 'next/link'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { getSafeNextPath, supabase } from '@/lib/supabase'
 
-export default function AuthCallback() {
+function AuthCallbackContent() {
   const router = useRouter()
-  const [status, setStatus] = useState('Autenticando...')
-  const [erro, setErro] = useState('')
+  const searchParams = useSearchParams()
+  const [status, setStatus] = useState('Conectando sua conta...')
+  const [errorMessage, setErrorMessage] = useState('')
+
+  const nextPath = useMemo(
+    () => getSafeNextPath(searchParams.get('next')),
+    [searchParams]
+  )
 
   useEffect(() => {
-    let redirected = false
+    let cancelled = false
 
-    const getNextPath = () => {
-      const params = new URLSearchParams(window.location.search)
-      const next = params.get('next') || '/dashboard'
-      return next.startsWith('/') ? next : '/dashboard'
-    }
+    const finishLogin = async () => {
+      const oauthError = searchParams.get('error_description') || searchParams.get('error')
 
-    const go = (path: string) => {
-      if (redirected) return
-      redirected = true
-      router.replace(path)
-    }
-
-    const run = async () => {
-      const params = new URLSearchParams(window.location.search)
-      const code = params.get('code')
-      const tokenHash = params.get('token_hash')
-      const type = params.get('type') as EmailOtpType | null
-      const next = getNextPath()
-      const oauthError = params.get('error')
-      const oauthErrorDesc = params.get('error_description')
-
-      // Supabase/Google retornou erro direto
       if (oauthError) {
-        setErro(`Erro OAuth: ${oauthErrorDesc || oauthError}`)
+        if (!cancelled) {
+          setErrorMessage('Não foi possível concluir o login com Google. Tente novamente.')
+        }
         return
       }
 
-      if (tokenHash && type) {
-        setStatus('Confirmando email...')
-        const { error } = await supabase.auth.verifyOtp({
-          token_hash: tokenHash,
-          type,
-        })
+      const code = searchParams.get('code')
 
-        if (error) {
-          setErro(`Erro ao confirmar email: ${error.message}`)
-          return
-        }
-
-        const { data: { session } } = await supabase.auth.getSession()
-        if (session) {
-          setStatus('Email confirmado! Redirecionando...')
-          go(next)
-          return
-        }
-      }
-
-      // PKCE flow: há um code na URL
       if (code) {
-        setStatus('Trocando código...')
-        const { data, error } = await supabase.auth.exchangeCodeForSession(code)
+        setStatus('Validando sua autenticação...')
+        const { error } = await supabase.auth.exchangeCodeForSession(code)
 
-        if (error) {
-          // Log visível para debug
-          setErro(`Erro ao trocar código: ${error.message}`)
-          console.error('exchangeCodeForSession error:', error)
-
-          // Tenta pegar sessão de qualquer forma (às vezes a troca acontece em paralelo)
-          const { data: { session } } = await supabase.auth.getSession()
-          if (session) {
-            setStatus('Sessão encontrada! Redirecionando...')
-            go(next)
-          }
-          return
-        }
-
-        if (data.session) {
-          setStatus('Logado! Redirecionando...')
-          go(next)
+        if (error && !cancelled) {
+          setErrorMessage('Sua autenticação expirou ou não pôde ser validada. Tente novamente.')
           return
         }
       }
 
-      // Sem code → verifica sessão existente (hash flow ou já logado)
-      setStatus('Verificando sessão...')
       const { data: { session } } = await supabase.auth.getSession()
-      if (session) {
-        go(next)
+
+      if (!cancelled && session?.user) {
+        router.replace(nextPath)
         return
       }
 
-      setErro('Nenhum código ou sessão encontrada. Tente novamente.')
+      if (!cancelled) {
+        setErrorMessage('Não encontramos uma sessão ativa após o login. Tente novamente.')
+      }
     }
 
-    // Listener de estado (captura SIGNED_IN de qualquer flow)
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_IN' && session && !redirected) {
-        go(getNextPath())
+      if (!cancelled && event === 'SIGNED_IN' && session?.user) {
+        router.replace(nextPath)
       }
     })
 
-    run()
+    finishLogin()
 
     return () => {
+      cancelled = true
       subscription.unsubscribe()
-      redirected = true
     }
-  }, [router])
+  }, [nextPath, router, searchParams])
 
-  if (erro) {
+  if (errorMessage) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center gap-4 px-6">
-        <div className="text-4xl">⚠️</div>
-        <h2 className="text-lg font-bold text-[#1A1A2E]">Erro na autenticação</h2>
-        <p className="text-sm text-red-600 bg-red-50 px-4 py-3 rounded-lg max-w-sm text-center">{erro}</p>
-        <a href="/entrar" className="text-sm text-[#2D6A4F] font-semibold underline">
-          Voltar para o login
-        </a>
+      <div className="min-h-screen bg-[#F7FAF8] px-6 py-10">
+        <div className="mx-auto flex min-h-[calc(100vh-80px)] max-w-md items-center">
+          <div className="w-full rounded-[28px] border border-red-100 bg-white p-8 shadow-[0_30px_80px_rgba(16,24,20,0.08)]">
+            <p className="text-xs font-bold uppercase tracking-[0.24em] text-red-500">Erro de autenticação</p>
+            <h1 className="mt-3 text-3xl font-extrabold text-[#162113]">Não foi possível entrar</h1>
+            <p className="mt-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+              {errorMessage}
+            </p>
+            <div className="mt-8 flex flex-col gap-3">
+              <Link href={`/entrar?next=${encodeURIComponent(nextPath)}`} className="btn-primary text-center">
+                Tentar novamente
+              </Link>
+              <Link href="/" className="text-center text-sm font-semibold text-[#1f5230] hover:text-[#162113]">
+                Voltar para o início
+              </Link>
+            </div>
+          </div>
+        </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center gap-4">
-      <div className="w-8 h-8 border-4 border-[#2D6A4F] border-t-transparent rounded-full animate-spin" />
-      <p className="text-sm text-gray-500">{status}</p>
+    <div className="min-h-screen flex flex-col items-center justify-center gap-4 bg-[#F7FAF8] px-6">
+      <div className="w-10 h-10 border-4 border-[#2D6A4F] border-t-transparent rounded-full animate-spin" />
+      <p className="text-sm text-gray-600">{status}</p>
     </div>
+  )
+}
+
+export default function AuthCallbackPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex flex-col items-center justify-center gap-4 bg-[#F7FAF8] px-6">
+        <div className="w-10 h-10 border-4 border-[#2D6A4F] border-t-transparent rounded-full animate-spin" />
+        <p className="text-sm text-gray-600">Conectando sua conta...</p>
+      </div>
+    }>
+      <AuthCallbackContent />
+    </Suspense>
   )
 }

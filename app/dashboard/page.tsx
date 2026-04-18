@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { supabase } from '@/lib/supabase'
+import { buildLoginPath, supabase } from '@/lib/supabase'
 import Navbar from '@/components/Navbar'
 
 type Download = {
@@ -28,7 +28,7 @@ export default function DashboardPage() {
     const verificarAuth = async () => {
       const { data: { session } } = await supabase.auth.getSession()
       if (!session) {
-        router.push('/entrar')
+        router.replace(buildLoginPath('/dashboard', 'Entre com sua conta Google para acessar seu dashboard.'))
       } else {
         // Usuário Google sem perfil → vai para onboarding
         if (!session.user.user_metadata?.perfil) {

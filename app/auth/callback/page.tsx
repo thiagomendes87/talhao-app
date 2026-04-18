@@ -3,6 +3,7 @@
 import { Suspense, useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
+import { type EmailOtpType } from '@supabase/supabase-js'
 import { getSafeNextPath, supabase } from '@/lib/supabase'
 
 function AuthCallbackContent() {
@@ -21,12 +22,27 @@ function AuthCallbackContent() {
 
     const finishLogin = async () => {
       const oauthError = searchParams.get('error_description') || searchParams.get('error')
+      const tokenHash = searchParams.get('token_hash')
+      const type = searchParams.get('type') as EmailOtpType | null
 
       if (oauthError) {
         if (!cancelled) {
           setErrorMessage('Não foi possível concluir o login com Google. Tente novamente.')
         }
         return
+      }
+
+      if (tokenHash && type) {
+        setStatus('Confirmando seu cadastro...')
+        const { error } = await supabase.auth.verifyOtp({
+          token_hash: tokenHash,
+          type,
+        })
+
+        if (error && !cancelled) {
+          setErrorMessage('Não foi possível confirmar seu cadastro. Tente novamente.')
+          return
+        }
       }
 
       const code = searchParams.get('code')

@@ -32,7 +32,7 @@ export default function MapaClient() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="h-screen w-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
           <div className="w-8 h-8 border-4 border-[#2D6A4F] border-t-transparent rounded-full animate-spin mx-auto mb-3" />
           <p className="text-gray-500 text-sm">Carregando mapa...</p>
@@ -42,13 +42,11 @@ export default function MapaClient() {
   }
 
   return (
-    <div className="h-screen pt-[84px]">
-      <MapEmbedded
-        key={iframeKey}
-        authToken={authToken}
-        geoApiUrl={geoApiUrl}
-        searchQuery={searchQuery}
-      />
-    </div>
+    <MapEmbedded
+      key={iframeKey}
+      authToken={authToken}
+      geoApiUrl={geoApiUrl}
+      searchQuery={searchQuery}
+    />
   )
 }

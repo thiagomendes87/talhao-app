@@ -2,7 +2,6 @@
 
 import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
-import { usePathname } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { useAuthSession } from '@/lib/use-auth-session'
 
@@ -14,7 +13,6 @@ const navLinks = [
 ]
 
 export default function Navbar() {
-  const pathname = usePathname()
   const { loading, user } = useAuthSession()
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement | null>(null)
@@ -70,21 +68,15 @@ export default function Navbar() {
         </Link>
 
         <div className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center gap-7 text-[13px] text-[#4f6347]">
-          {navLinks.map((link) => {
-            const active = link.href === '/mapa' && pathname === '/mapa'
-
-            return (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={active
-                  ? 'text-[13px] text-[#1f5230] font-semibold underline underline-offset-4'
-                  : 'text-[13px] font-medium text-[#4f6347] hover:text-[#162113] transition-all duration-150'}
-              >
-                {link.label}
-              </Link>
-            )
-          })}
+          {navLinks.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className="text-[13px] font-medium text-[#4f6347] hover:text-[#162113] transition-all duration-150"
+            >
+              {link.label}
+            </Link>
+          ))}
         </div>
 
         <div className="flex items-center gap-3 z-10">
@@ -131,12 +123,17 @@ export default function Navbar() {
               )}
             </div>
           ) : (
-            <Link
-              href="/entrar?next=%2Fmapa"
-              className="rounded-lg px-[14px] py-[8px] text-[13px] font-semibold text-[#1f5230] transition-all duration-150 hover:bg-[rgba(28,43,24,0.05)] hover:text-[#162113]"
-            >
-              Entrar
-            </Link>
+            <>
+              <Link
+                href="/entrar"
+                className="rounded-lg px-[14px] py-[8px] text-[13px] font-semibold text-[#1f5230] transition-all duration-150 hover:bg-[rgba(28,43,24,0.05)] hover:text-[#162113]"
+              >
+                Entrar
+              </Link>
+              <Link href="/cadastro" className="btn-primary">
+                Criar conta
+              </Link>
+            </>
           )}
         </div>
       </nav>

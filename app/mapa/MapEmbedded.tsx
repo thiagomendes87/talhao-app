@@ -16,7 +16,6 @@ export default function MapEmbedded({ authToken, geoApiUrl, searchQuery }: MapEm
     const cleanGeoUrl = geoApiUrl.replace(/\/$/, '') || 'http://localhost:8000'
 
     const params = new URLSearchParams()
-    params.set('cleanmode', '1')
 
     if (authToken) {
       params.set('jwt', authToken)

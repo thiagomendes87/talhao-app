@@ -1,7 +1,7 @@
 'use client'
 
-import { useMemo } from 'react'
-import { useSearchParams } from 'next/navigation'
+import { useEffect, useRef, useState } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useAuthSession } from '@/lib/use-auth-session'
 import dynamic from 'next/dynamic'
 
@@ -19,18 +19,30 @@ const MapEmbedded = dynamic(() => import('./MapEmbedded'), {
 })
 
 export default function MapaClient() {
+  const router = useRouter()
   const { loading, session } = useAuthSession()
   const searchParams = useSearchParams()
   const searchQuery = searchParams.get('q')
-  const authToken = session?.access_token ?? null
   const geoApiUrl = process.env.NEXT_PUBLIC_GEO_API_URL ?? ''
 
-  const iframeKey = useMemo(
-    () => `${authToken ?? 'anonymous'}::${searchQuery ?? ''}`,
-    [authToken, searchQuery]
-  )
+  // Congela o JWT na primeira vez que o auth carrega.
+  // Isso evita que o iframe remonte quando o Supabase renova o token.
+  const frozenToken = useRef<string | null | undefined>(undefined)
+  const [ready, setReady] = useState(false)
 
-  if (loading) {
+  useEffect(() => {
+    if (!loading && frozenToken.current === undefined) {
+      if (!session) {
+        // Não autenticado → redireciona para login
+        router.replace('/entrar?next=/mapa&message=Entre+com+sua+conta+para+acessar+o+mapa.')
+        return
+      }
+      frozenToken.current = session.access_token
+      setReady(true)
+    }
+  }, [loading, session, router])
+
+  if (!ready || loading) {
     return (
       <div className="h-screen w-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
@@ -43,8 +55,7 @@ export default function MapaClient() {
 
   return (
     <MapEmbedded
-      key={iframeKey}
-      authToken={authToken}
+      authToken={frozenToken.current ?? null}
       geoApiUrl={geoApiUrl}
       searchQuery={searchQuery}
     />

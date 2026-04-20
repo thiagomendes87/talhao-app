@@ -24,7 +24,7 @@ export default function Pricing() {
             <h3 className="text-xl sm:text-2xl font-extrabold text-[#1A1A2E] mt-2 mb-2.5">Créditos pré-pagos</h3>
             <p className="text-sm text-gray-600 leading-relaxed mb-4">
               Carregue sua carteira e baixe o que precisar, quando precisar.
-              Cada arquivo custa <strong className="text-[#1A1A2E]">R$ 3,50</strong> — sem mensalidade, sem surpresa.
+              Cada download custa <strong className="text-[#1A1A2E]">R$ 3,50</strong>, ou 1 crédito — sem mensalidade, sem surpresa.
             </p>
             <div className="flex gap-2 flex-wrap">
               {['✓ Sem assinatura', '✓ Válido por 1 ano', '✓ PIX instantâneo', '✓ Cartão'].map(tag => (

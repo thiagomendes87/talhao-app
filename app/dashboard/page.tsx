@@ -122,8 +122,8 @@ export default function DashboardPage() {
           <div className="mt-8 grid gap-4 lg:grid-cols-[1.3fr_0.7fr_0.7fr]">
             <div className="rounded-2xl border border-[#D8E9DE] bg-[#F3FBF6] p-5">
               <p className="text-xs font-bold uppercase tracking-[0.22em] text-[#5C7C6C]">Saldo atual</p>
-              <p className="mt-3 text-4xl font-extrabold text-[#1f5230]">{formatCurrency(saldoReais)}</p>
-              <p className="mt-2 text-sm text-[#40614E]">{creditos} créditos disponíveis para download</p>
+              <p className="mt-3 text-4xl font-extrabold text-[#1f5230]">{creditos} <span className="text-xl font-bold">créditos</span></p>
+              <p className="mt-1 text-sm text-[#40614E]">{formatCurrency(saldoReais)} disponível</p>
             </div>
 
             <Link
@@ -190,8 +190,8 @@ export default function DashboardPage() {
                             {download.tipo_arquivo || '—'}
                           </span>
                         </td>
-                        <td className="py-3.5 text-right font-semibold text-[#162113]">
-                          {download.creditos_usados}
+                        <td className="py-3.5 text-right font-semibold text-red-500">
+                          {download.creditos_usados > 0 ? `-${download.creditos_usados}` : '0'}
                         </td>
                       </tr>
                     ))}
@@ -211,8 +211,8 @@ export default function DashboardPage() {
                           {new Date(download.criado_em).toLocaleString('pt-BR')}
                         </p>
                       </div>
-                      <span className="rounded-full bg-white px-2.5 py-1 text-xs font-bold text-[#2D6A4F] border border-[#D8F3DC]">
-                        {download.creditos_usados} crédito{download.creditos_usados === 1 ? '' : 's'}
+                      <span className="rounded-full bg-red-50 px-2.5 py-1 text-xs font-bold text-red-500 border border-red-100">
+                        {download.creditos_usados > 0 ? `-${download.creditos_usados}` : '0'} crédito{download.creditos_usados === 1 ? '' : 's'}
                       </span>
                     </div>
                     <div className="mt-3">

@@ -1,5 +1,7 @@
 import Navbar from '@/components/Navbar'
 import MapHero from '@/components/MapHero'
+import TrustBand from '@/components/TrustBand'
+import Features from '@/components/Features'
 import Pricing from '@/components/Pricing'
 import WhatsAppTeaser from '@/components/WhatsAppTeaser'
 import ForWho from '@/components/ForWho'
@@ -11,6 +13,8 @@ export default function Home() {
     <main>
       <Navbar />
       <MapHero />
+      <TrustBand />
+      <Features />
       <Pricing />
       <WhatsAppTeaser />
       <ForWho />

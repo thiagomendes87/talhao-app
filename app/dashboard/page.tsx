@@ -7,12 +7,11 @@ import { buildLoginPath, supabase } from '@/lib/supabase'
 
 type Download = {
   id: string
-  car_code: string | null
-  propriedade: string | null
-  municipio: string | null
-  estado: string | null
-  tipo: string
+  source: string | null
+  codigo_imovel: string | null
+  tipo_arquivo: string | null
   creditos_usados: number
+  status: string | null
   criado_em: string
 }
 
@@ -144,8 +143,8 @@ export default function DashboardPage() {
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b border-gray-100 text-left">
-                      <th className="pb-3 text-xs font-semibold text-gray-400 uppercase tracking-wide">Propriedade</th>
-                      <th className="pb-3 text-xs font-semibold text-gray-400 uppercase tracking-wide">Município</th>
+                      <th className="pb-3 text-xs font-semibold text-gray-400 uppercase tracking-wide">Imóvel / CAR</th>
+                      <th className="pb-3 text-xs font-semibold text-gray-400 uppercase tracking-wide">Fonte</th>
                       <th className="pb-3 text-xs font-semibold text-gray-400 uppercase tracking-wide">Tipo</th>
                       <th className="pb-3 text-xs font-semibold text-gray-400 uppercase tracking-wide">Data</th>
                       <th className="pb-3 text-xs font-semibold text-gray-400 uppercase tracking-wide text-right">Ação</th>
@@ -155,14 +154,13 @@ export default function DashboardPage() {
                     {downloads.map((d) => (
                       <tr key={d.id} className="hover:bg-gray-50 transition-colors">
                         <td className="py-3.5 pr-4">
-                          <p className="font-semibold text-[#1A1A2E]">{d.propriedade || 'Propriedade sem nome'}</p>
-                          {d.car_code && <p className="text-xs text-gray-400 font-mono">{d.car_code}</p>}
+                          <p className="font-semibold text-[#1A1A2E]">{d.codigo_imovel || '—'}</p>
                         </td>
-                        <td className="py-3.5 pr-4 text-gray-600 text-sm">
-                          {[d.municipio, d.estado].filter(Boolean).join(', ') || '—'}
+                        <td className="py-3.5 pr-4 text-gray-600 text-sm capitalize">
+                          {d.source || '—'}
                         </td>
                         <td className="py-3.5 pr-4">
-                          <span className="bg-[#D8F3DC] text-[#1f5230] text-xs font-bold px-2.5 py-1 rounded-full">{d.tipo}</span>
+                          <span className="bg-[#D8F3DC] text-[#1f5230] text-xs font-bold px-2.5 py-1 rounded-full">{d.tipo_arquivo || '—'}</span>
                         </td>
                         <td className="py-3.5 pr-4 text-gray-500 text-sm">
                           {new Date(d.criado_em).toLocaleDateString('pt-BR')}
@@ -186,13 +184,12 @@ export default function DashboardPage() {
                 {downloads.map((d) => (
                   <div key={d.id} className="bg-gray-50 rounded-lg p-4 border border-gray-200">
                     <div className="mb-3">
-                      <p className="font-semibold text-[#1A1A2E] text-sm">{d.propriedade || 'Propriedade sem nome'}</p>
-                      {d.car_code && <p className="text-xs text-gray-400 font-mono mt-1">{d.car_code}</p>}
+                      <p className="font-semibold text-[#1A1A2E] text-sm">{d.codigo_imovel || '—'}</p>
+                      <p className="text-xs text-gray-400 font-mono mt-1 capitalize">{d.source}</p>
                     </div>
                     <div className="flex items-center justify-between gap-2">
                       <div className="flex items-center gap-3 text-xs">
-                        <span className="text-gray-600">{[d.municipio, d.estado].filter(Boolean).join(', ') || '—'}</span>
-                        <span className="bg-[#D8F3DC] text-[#1f5230] font-bold px-2 py-0.5 rounded-full">{d.tipo}</span>
+                        <span className="bg-[#D8F3DC] text-[#1f5230] font-bold px-2 py-0.5 rounded-full">{d.tipo_arquivo || '—'}</span>
                         <span className="text-gray-500">{new Date(d.criado_em).toLocaleDateString('pt-BR')}</span>
                       </div>
                       <button className="text-[#1f5230] hover:text-[#174023] font-semibold text-xs whitespace-nowrap ml-2">

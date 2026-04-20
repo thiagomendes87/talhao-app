@@ -106,7 +106,7 @@ export default function Navbar() {
             <>
               {/* Saldo de créditos */}
               <Link
-                href={mapUrlWithJwt}
+                href="/carteira"
                 className="hidden md:flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition-all duration-150 whitespace-nowrap"
                 style={{
                   background: 'rgba(31,82,48,0.08)',

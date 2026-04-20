@@ -13,6 +13,8 @@ type Payment = {
   payment_method: 'pix' | 'boleto' | 'cartao'
   pix_qr_code?: string
   pix_copy_paste?: string
+  boleto_url?: string
+  invoice_url?: string
   created_at: string
 }
 
@@ -233,6 +235,42 @@ export default function PagamentoPage() {
               </button>
             )}
             <p className="text-xs text-gray-500">A página será atualizada automaticamente assim que o pagamento for confirmado</p>
+          </div>
+        )}
+
+        {payment.status === 'pending' && payment.payment_method === 'boleto' && payment.boleto_url && (
+          <div className="bg-white rounded-xl border border-gray-200 p-6 mb-6 text-center">
+            <div className="text-3xl mb-2">📄</div>
+            <h3 className="font-bold text-[#1A1A2E] mb-3">Seu boleto está pronto</h3>
+            <p className="text-sm text-gray-500 mb-5">
+              Abra o boleto em uma nova aba para concluir o pagamento.
+            </p>
+            <a
+              href={payment.boleto_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-block rounded-xl bg-[#1A1A2E] px-5 py-3 text-sm font-bold text-white transition-colors hover:bg-[#2d2d50]"
+            >
+              Abrir boleto
+            </a>
+          </div>
+        )}
+
+        {payment.status === 'pending' && payment.payment_method === 'cartao' && payment.invoice_url && (
+          <div className="bg-white rounded-xl border border-gray-200 p-6 mb-6 text-center">
+            <div className="text-3xl mb-2">💳</div>
+            <h3 className="font-bold text-[#1A1A2E] mb-3">Continue o pagamento no Asaas</h3>
+            <p className="text-sm text-gray-500 mb-5">
+              Abra a página segura do Asaas para informar os dados do cartão.
+            </p>
+            <a
+              href={payment.invoice_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-block rounded-xl bg-[#1A1A2E] px-5 py-3 text-sm font-bold text-white transition-colors hover:bg-[#2d2d50]"
+            >
+              Abrir página de pagamento
+            </a>
           </div>
         )}
 

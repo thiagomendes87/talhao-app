@@ -12,8 +12,7 @@ type PaymentResult = {
   pix_copy_paste?: string
   boleto_url?: string
   invoice_url?: string
-  amount: number
-  quantidade_creditos: number
+  valor?: number
 }
 
 const pacotes = [4, 6, 8, 10, 14, 20, 30]
@@ -84,6 +83,7 @@ export default function AssinarClient() {
           'Authorization': `Bearer ${currentSession?.access_token}`,
         },
         body: JSON.stringify({
+          user_id: currentSession?.user.id,
           quantidade_creditos: quantidade,
           payment_method: paymentMethod,
           cpf,
@@ -97,7 +97,14 @@ export default function AssinarClient() {
         return
       }
 
-      // Redireciona para página de acompanhamento
+      if (paymentMethod === 'boleto' && data.boleto_url) {
+        window.open(data.boleto_url, '_blank', 'noopener,noreferrer')
+      }
+
+      if (paymentMethod === 'cartao' && data.invoice_url) {
+        window.open(data.invoice_url, '_blank', 'noopener,noreferrer')
+      }
+
       router.push(`/pagamento/${data.payment_id}`)
 
     } catch (e: any) {

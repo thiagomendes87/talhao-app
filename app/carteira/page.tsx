@@ -1,258 +1,333 @@
 'use client'
 
-import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import AppTopbar from '@/components/AppTopbar'
 import { buildLoginPath, supabase } from '@/lib/supabase'
 
-type Transacao = {
+type DownloadHistoryRow = {
   id: string
-  tipo: 'recarga' | 'gasto'
-  descricao: string
-  creditos: number   // + recarga, - gasto
-  data: string
+  codigo_imovel: string | null
+  tipo_arquivo: string | null
+  creditos_usados: number
+  criado_em: string
+}
+
+type PaymentHistoryRow = {
+  id: string
+  amount: number
+  status: 'approved' | 'pending' | 'failed' | 'refunded'
+  created_at: string
+}
+
+type WalletResponse = {
+  success: boolean
+  creditos: number
+  balance_reais: number
+  payments: PaymentHistoryRow[]
+  downloads: DownloadHistoryRow[]
+}
+
+const currencyFormatter = new Intl.NumberFormat('pt-BR', {
+  style: 'currency',
+  currency: 'BRL',
+})
+
+const statusLabelMap: Record<PaymentHistoryRow['status'], string> = {
+  approved: 'Aprovado',
+  pending: 'Pendente',
+  failed: 'Falhou',
+  refunded: 'Reembolsado',
+}
+
+const statusClassMap: Record<PaymentHistoryRow['status'], string> = {
+  approved: 'bg-green-100 text-green-700',
+  pending: 'bg-amber-100 text-amber-700',
+  failed: 'bg-red-100 text-red-700',
+  refunded: 'bg-blue-100 text-blue-700',
+}
+
+function formatCurrency(value: number) {
+  return currencyFormatter.format(value)
+}
+
+function formatDateTime(value: string) {
+  return new Date(value).toLocaleString('pt-BR')
 }
 
 export default function CarteiraPage() {
-  const [usuario, setUsuario] = useState<any>(null)
-  const [creditos, setCreditos] = useState(0)
-  const [extrato, setExtrato] = useState<Transacao[]>([])
-  const [carregando, setCarregando] = useState(true)
   const router = useRouter()
+  const [carregando, setCarregando] = useState(true)
+  const [erro, setErro] = useState('')
+  const [nomeUsuario, setNomeUsuario] = useState('Usuário')
+  const [wallet, setWallet] = useState<WalletResponse | null>(null)
 
   useEffect(() => {
-    const init = async () => {
+    let active = true
+
+    const carregarCarteira = async () => {
       const { data: { session } } = await supabase.auth.getSession()
+
+      if (!active) return
+
       if (!session) {
-        router.replace(buildLoginPath('/carteira', 'Entre com sua conta para acessar sua carteira.'))
+        router.replace(buildLoginPath('/carteira', 'Entre com sua conta Google para acessar sua carteira.'))
         return
       }
-      setUsuario(session.user)
 
-      // Saldo atual
-      const { data: carteira } = await supabase
-        .from('carteira')
-        .select('creditos')
-        .eq('user_id', session.user.id)
-        .single()
-      setCreditos(carteira?.creditos ?? 0)
+      const firstName =
+        session.user.user_metadata?.full_name?.split(' ')[0] ||
+        session.user.email?.split('@')[0] ||
+        'Usuário'
+      setNomeUsuario(firstName)
 
-      // Recargas (pagamentos aprovados)
-      const { data: pagamentos } = await supabase
-        .from('payments')
-        .select('id, quantidade_creditos, amount, created_at, payment_method')
-        .eq('user_id', session.user.id)
-        .eq('status', 'approved')
-        .order('created_at', { ascending: false })
-        .limit(100)
+      try {
+        const response = await fetch('/api/carteira', {
+          headers: { Authorization: `Bearer ${session.access_token}` },
+          cache: 'no-store',
+        })
+        const payload = await response.json().catch(() => null)
 
-      // Gastos (downloads)
-      const { data: downloads } = await supabase
-        .from('downloads')
-        .select('id, tipo_arquivo, codigo_imovel, source, creditos_usados, criado_em')
-        .eq('user_id', session.user.id)
-        .order('criado_em', { ascending: false })
-        .limit(100)
+        if (!active) return
 
-      const recargas: Transacao[] = (pagamentos ?? []).map((p) => ({
-        id: p.id,
-        tipo: 'recarga',
-        descricao: `Recarga · ${p.quantidade_creditos} crédito${p.quantidade_creditos !== 1 ? 's' : ''}`,
-        creditos: p.quantidade_creditos ?? 0,
-        data: p.created_at,
-      }))
+        if (response.status === 401) {
+          router.replace(buildLoginPath('/carteira', 'Entre com sua conta Google para acessar sua carteira.'))
+          return
+        }
 
-      const gastos: Transacao[] = (downloads ?? []).map((d) => ({
-        id: d.id,
-        tipo: 'gasto',
-        descricao: d.codigo_imovel
-          ? `Download ${d.tipo_arquivo ?? ''} · ${d.codigo_imovel}`
-          : `Download ${d.tipo_arquivo ?? ''}`,
-        creditos: -(d.creditos_usados ?? 1),
-        data: d.criado_em,
-      }))
+        if (!response.ok || !payload?.success) {
+          setErro(payload?.error || 'Não foi possível carregar a carteira.')
+          setCarregando(false)
+          return
+        }
 
-      const todos = [...recargas, ...gastos].sort(
-        (a, b) => new Date(b.data).getTime() - new Date(a.data).getTime()
-      )
-      setExtrato(todos)
-      setCarregando(false)
+        setWallet({
+          success: true,
+          creditos: payload.creditos ?? 0,
+          balance_reais: payload.balance_reais ?? 0,
+          payments: payload.payments ?? [],
+          downloads: payload.downloads ?? [],
+        })
+        setCarregando(false)
+      } catch (error) {
+        if (!active) return
+        setErro(error instanceof Error ? error.message : 'Erro ao carregar a carteira.')
+        setCarregando(false)
+      }
     }
-    init()
+
+    carregarCarteira()
+    return () => { active = false }
   }, [router])
 
   if (carregando) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="w-8 h-8 border-4 border-[#2D6A4F] border-t-transparent rounded-full animate-spin" />
+      <div className="min-h-screen flex items-center justify-center bg-[#F7FAF8]">
+        <div className="text-center">
+          <div className="w-10 h-10 border-4 border-[#2D6A4F] border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-sm text-gray-500">Carregando carteira...</p>
+        </div>
       </div>
     )
   }
 
-  if (!usuario) return null
-
-  const nomeUsuario =
-    usuario?.user_metadata?.full_name?.split(' ')[0] || 'Usuário'
-
-  return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white border-b border-gray-100 pt-8 pb-8 px-4 sm:px-10">
-        <div className="max-w-3xl mx-auto flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <Link
-              href="/dashboard"
-              className="text-xs text-gray-400 hover:text-gray-600 transition-colors flex items-center gap-1 mb-2"
-            >
-              ← Dashboard
+  if (!wallet) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#F7FAF8] px-4">
+        <div className="max-w-md rounded-2xl border border-red-100 bg-white p-8 text-center shadow-sm">
+          <p className="text-xs font-bold uppercase tracking-[0.22em] text-red-500">Erro</p>
+          <h1 className="mt-3 text-2xl font-extrabold text-[#162113]">Não foi possível abrir a carteira</h1>
+          <p className="mt-4 text-sm text-gray-600">{erro || 'Tente novamente em instantes.'}</p>
+          <div className="mt-6 flex flex-col gap-3">
+            <Link href="/assinar" className="rounded-xl bg-[#2D6A4F] px-4 py-3 text-sm font-bold text-white transition-colors hover:bg-[#1F5230]">
+              Ir para comprar créditos
             </Link>
-            <h1 className="text-xl font-bold text-[#162113]">Carteira</h1>
-            <p className="text-sm text-gray-500 mt-0.5">Olá, {nomeUsuario}</p>
+            <Link href="/" className="text-sm font-semibold text-[#2D6A4F] hover:text-[#1F5230]">
+              Voltar para o início
+            </Link>
           </div>
-          <Link
-            href="/assinar?tab=downloads"
-            className="bg-[#1f5230] text-white font-bold px-5 py-2.5 rounded-xl hover:bg-[#2a6b3f] transition-all whitespace-nowrap text-sm"
-          >
-            + Comprar créditos
-          </Link>
         </div>
       </div>
+    )
+  }
 
-      <div className="max-w-3xl mx-auto py-6 sm:py-10 px-4 sm:px-10 space-y-6">
-        {/* Saldo */}
-        <div className="bg-white rounded-2xl border border-gray-200 p-6 flex items-center justify-between">
-          <div>
-            <p className="text-sm text-gray-500 mb-1">Saldo disponível</p>
-            <p className="text-4xl font-extrabold text-[#1A1A2E]">{creditos}</p>
-            <p className="text-sm text-gray-500 mt-1">
-              créditos · R$ {(creditos * 3.5).toFixed(2)}
-            </p>
-          </div>
-          <div
-            className="w-16 h-16 rounded-full flex items-center justify-center"
-            style={{ background: 'rgba(31,82,48,0.08)' }}
-          >
-            <svg
-              className="w-8 h-8 text-[#1f5230]"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={1.8}
-                d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-          </div>
-        </div>
+  return (
+    <div className="min-h-screen bg-[#F7FAF8]">
+      <AppTopbar />
 
-        {/* Extrato */}
-        <div className="bg-white rounded-2xl border border-gray-200 p-4 sm:p-6">
-          <h2 className="text-base font-extrabold text-[#1A1A2E] mb-4">
-            Extrato
-          </h2>
+      <main className="mx-auto max-w-6xl px-4 py-8 sm:px-10 sm:py-10">
 
-          {extrato.length === 0 ? (
-            <div className="text-center py-10 text-gray-400">
-              <svg
-                className="w-10 h-10 mx-auto mb-3 text-gray-300"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
+        {/* Saldo + Recarga */}
+        <section className="rounded-[28px] border border-[rgba(28,43,24,0.08)] bg-white px-6 py-7 shadow-sm sm:px-8">
+          <p className="text-sm text-gray-500">Carteira de {nomeUsuario}</p>
+          <h1 className="mt-2 text-3xl font-extrabold text-[#162113]">Compre créditos quando precisar</h1>
+          <p className="mt-3 max-w-2xl text-sm leading-relaxed text-gray-600">
+            Seu saldo fica disponível para novos downloads no mapa. Recarregue a qualquer momento
+            e acompanhe abaixo o histórico completo de recargas e gastos.
+          </p>
+
+          <div className="mt-8 grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
+            <div className="rounded-2xl border border-[#D8E9DE] bg-[#F3FBF6] p-5">
+              <p className="text-xs font-bold uppercase tracking-[0.22em] text-[#5C7C6C]">Saldo disponível</p>
+              <p className="mt-3 text-4xl font-extrabold text-[#1f5230]">{formatCurrency(wallet.balance_reais)}</p>
+              <p className="mt-2 text-sm text-[#40614E]">{wallet.creditos} créditos na sua carteira</p>
+            </div>
+
+            <div className="rounded-2xl border border-gray-200 bg-white p-5">
+              <p className="text-xs font-bold uppercase tracking-[0.22em] text-[#5C7C6C]">Recarga</p>
+              <h2 className="mt-3 text-xl font-extrabold text-[#162113]">Adicionar créditos</h2>
+              <p className="mt-2 text-sm text-gray-600">
+                Compre novos créditos via PIX, boleto ou cartão e continue baixando arquivos no mapa.
+              </p>
+              <Link
+                href="/assinar?tab=downloads"
+                className="mt-5 inline-flex rounded-xl bg-[#1f5230] px-4 py-3 text-sm font-bold text-white transition-colors hover:bg-[#163b23]"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={1.5}
-                  d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
-                />
-              </svg>
-              <p className="text-sm">Nenhuma movimentação ainda.</p>
-              <p className="text-xs mt-1">
-                Compre créditos ou faça um download para ver o extrato aqui.
+                Comprar créditos
+              </Link>
+            </div>
+          </div>
+        </section>
+
+        {/* Gastos — Downloads */}
+        <section className="mt-6 rounded-[28px] border border-[rgba(28,43,24,0.08)] bg-white p-5 shadow-sm sm:p-6">
+          <div className="flex items-center justify-between gap-3 flex-wrap">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.22em] text-[#5C7C6C]">Gastos</p>
+              <h2 className="mt-1 text-xl font-extrabold text-[#162113]">Histórico de downloads</h2>
+            </div>
+            <span className="rounded-full bg-[#F3FBF6] px-3 py-1 text-xs font-semibold text-[#2D6A4F]">
+              Últimos 50 registros
+            </span>
+          </div>
+
+          {wallet.downloads.length === 0 ? (
+            <div className="mt-5 rounded-2xl border border-dashed border-gray-200 bg-gray-50 px-4 py-10 text-center">
+              <p className="text-sm font-semibold text-[#162113]">Nenhum download realizado ainda.</p>
+              <p className="mt-2 text-sm text-gray-500">
+                Seus gastos de crédito aparecerão aqui a cada download feito no mapa.
               </p>
             </div>
           ) : (
-            <div className="divide-y divide-gray-50">
-              {extrato.map((tx) => (
-                <div
-                  key={tx.id}
-                  className="flex items-center justify-between py-3.5 gap-3"
-                >
-                  {/* Ícone */}
-                  <div
-                    className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 ${
-                      tx.tipo === 'recarga'
-                        ? 'bg-green-50'
-                        : 'bg-gray-100'
-                    }`}
-                  >
-                    {tx.tipo === 'recarga' ? (
-                      <svg
-                        className="w-4 h-4 text-green-600"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M12 4v16m8-8H4"
-                        />
-                      </svg>
-                    ) : (
-                      <svg
-                        className="w-4 h-4 text-gray-500"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-                        />
-                      </svg>
-                    )}
-                  </div>
+            <>
+              <div className="mt-5 hidden overflow-x-auto md:block">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-gray-100 text-left">
+                      <th className="pb-3 text-xs font-semibold uppercase tracking-wide text-gray-400">Data</th>
+                      <th className="pb-3 text-xs font-semibold uppercase tracking-wide text-gray-400">Imóvel / CAR</th>
+                      <th className="pb-3 text-xs font-semibold uppercase tracking-wide text-gray-400">Tipo</th>
+                      <th className="pb-3 text-xs font-semibold uppercase tracking-wide text-gray-400 text-right">Créditos</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-50">
+                    {wallet.downloads.map((d) => (
+                      <tr key={d.id} className="hover:bg-gray-50 transition-colors">
+                        <td className="py-3.5 pr-4 text-gray-500">{formatDateTime(d.criado_em)}</td>
+                        <td className="py-3.5 pr-4 font-semibold text-[#162113]">{d.codigo_imovel || '—'}</td>
+                        <td className="py-3.5 pr-4">
+                          <span className="rounded-full bg-[#D8F3DC] px-2.5 py-1 text-xs font-bold text-[#1f5230]">
+                            {d.tipo_arquivo || '—'}
+                          </span>
+                        </td>
+                        <td className="py-3.5 text-right font-semibold text-gray-600">
+                          -{d.creditos_usados ?? 1}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
 
-                  {/* Descrição + data */}
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-[#1A1A2E] truncate">
-                      {tx.descricao}
-                    </p>
-                    <p className="text-xs text-gray-400 mt-0.5">
-                      {new Date(tx.data).toLocaleDateString('pt-BR', {
-                        day: '2-digit',
-                        month: 'short',
-                        year: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit',
-                      })}
-                    </p>
+              <div className="mt-5 space-y-3 md:hidden">
+                {wallet.downloads.map((d) => (
+                  <div key={d.id} className="rounded-2xl border border-gray-200 bg-gray-50 p-4">
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <p className="font-semibold text-[#162113]">{d.codigo_imovel || '—'}</p>
+                        <p className="mt-1 text-xs text-gray-500">{formatDateTime(d.criado_em)}</p>
+                      </div>
+                      <div className="flex flex-col items-end gap-1">
+                        <span className="rounded-full bg-[#D8F3DC] px-2.5 py-1 text-xs font-bold text-[#1f5230]">
+                          {d.tipo_arquivo || '—'}
+                        </span>
+                        <span className="text-xs font-semibold text-gray-500">-{d.creditos_usados ?? 1} crédito</span>
+                      </div>
+                    </div>
                   </div>
-
-                  {/* Valor */}
-                  <span
-                    className={`text-sm font-bold shrink-0 ${
-                      tx.tipo === 'recarga'
-                        ? 'text-green-600'
-                        : 'text-gray-500'
-                    }`}
-                  >
-                    {tx.tipo === 'recarga' ? '+' : ''}{tx.creditos} crédito
-                    {Math.abs(tx.creditos) !== 1 ? 's' : ''}
-                  </span>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            </>
           )}
-        </div>
-      </div>
+        </section>
+
+        {/* Recargas — Pagamentos */}
+        <section className="mt-6 rounded-[28px] border border-[rgba(28,43,24,0.08)] bg-white p-5 shadow-sm sm:p-6">
+          <div className="flex items-center justify-between gap-3 flex-wrap">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.22em] text-[#5C7C6C]">Recargas</p>
+              <h2 className="mt-1 text-xl font-extrabold text-[#162113]">Histórico de pagamentos</h2>
+            </div>
+            <span className="rounded-full bg-[#F3FBF6] px-3 py-1 text-xs font-semibold text-[#2D6A4F]">
+              Últimos 20 registros
+            </span>
+          </div>
+
+          {wallet.payments.length === 0 ? (
+            <div className="mt-5 rounded-2xl border border-dashed border-gray-200 bg-gray-50 px-4 py-10 text-center">
+              <p className="text-sm font-semibold text-[#162113]">Nenhum pagamento registrado ainda.</p>
+              <p className="mt-2 text-sm text-gray-500">
+                Seu histórico aparecerá aqui assim que você fizer a primeira compra.
+              </p>
+            </div>
+          ) : (
+            <>
+              <div className="mt-5 hidden overflow-x-auto md:block">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-gray-100 text-left">
+                      <th className="pb-3 text-xs font-semibold uppercase tracking-wide text-gray-400">Data</th>
+                      <th className="pb-3 text-xs font-semibold uppercase tracking-wide text-gray-400">Valor</th>
+                      <th className="pb-3 text-xs font-semibold uppercase tracking-wide text-gray-400">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-50">
+                    {wallet.payments.map((payment) => (
+                      <tr key={payment.id} className="hover:bg-gray-50 transition-colors">
+                        <td className="py-3.5 pr-4 text-gray-500">{formatDateTime(payment.created_at)}</td>
+                        <td className="py-3.5 pr-4 font-semibold text-[#162113]">{formatCurrency(payment.amount)}</td>
+                        <td className="py-3.5">
+                          <span className={`rounded-full px-2.5 py-1 text-xs font-bold ${statusClassMap[payment.status]}`}>
+                            {statusLabelMap[payment.status]}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              <div className="mt-5 space-y-3 md:hidden">
+                {wallet.payments.map((payment) => (
+                  <div key={payment.id} className="rounded-2xl border border-gray-200 bg-gray-50 p-4">
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <p className="font-semibold text-[#162113]">{formatCurrency(payment.amount)}</p>
+                        <p className="mt-1 text-xs text-gray-500">{formatDateTime(payment.created_at)}</p>
+                      </div>
+                      <span className={`rounded-full px-2.5 py-1 text-xs font-bold ${statusClassMap[payment.status]}`}>
+                        {statusLabelMap[payment.status]}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
+        </section>
+
+      </main>
     </div>
   )
 }

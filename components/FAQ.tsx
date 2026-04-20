@@ -1,84 +1,130 @@
 'use client'
 
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 
 const faqs = [
   {
     q: 'O que é o CAR e por que ele é importante?',
-    a: 'O CAR (Cadastro Ambiental Rural) é um registro eletrônico obrigatório para todos os imóveis rurais do Brasil. Ele contém a localização, os limites e as informações ambientais de cada propriedade. É a base legal para acesso ao crédito rural, regularização ambiental e compra e venda de terras.'
+    a: 'O CAR (Cadastro Ambiental Rural) é um registro eletrônico obrigatório para todos os imóveis rurais do Brasil. Ele contém os limites, a área e as informações ambientais de cada propriedade — e é exigido para acesso a crédito rural, regularização ambiental e compra e venda de terras.',
   },
   {
-    q: 'De onde vêm os dados do Talhão?',
-    a: 'O Talhão agrega dados de múltiplas fontes oficiais e confiáveis: SICAR (Cadastro Ambiental Rural), SIGEF (Serviço de Georreferenciamento de Imóveis Rurais do INCRA), INPE (Instituto Nacional de Pesquisas Espaciais), além de dados cartográficos do IBGE e camadas temáticas de biomas, hidrografia e uso do solo. Isso garante que você tenha uma visão completa e atualizada de qualquer propriedade rural.'
+    q: 'Preciso ser técnico ou agrônomo para usar o Talhão?',
+    a: 'Não. O Talhão foi criado para qualquer pessoa que precise de dados de uma fazenda — corretor, investidor, produtor ou advogado. Você navega no mapa, clica na propriedade e baixa o arquivo. Simples assim.',
   },
   {
-    q: 'Preciso ser engenheiro agrônomo ou técnico para usar?',
-    a: 'Não. O Talhão foi criado para qualquer pessoa que precise de dados rurais — corretor, investidor, produtor ou consultor. A interface é simples: você navega no mapa, busca por município ou coordenadas (latitude/longitude), clica na propriedade que quer e baixa os dados.'
+    q: 'De onde vêm os dados?',
+    a: 'O Talhão agrega dados de fontes oficiais do governo federal: SICAR (IBAMA), SIGEF e SNCI (INCRA) e Topodata (INPE). São os mesmos dados usados por órgãos públicos, bancos e cartórios.',
   },
   {
     q: 'Como funciona o sistema de créditos?',
-    a: 'Cada download custa R$3,50. Você compra créditos antecipadamente (mínimo R$14,00 = 4 downloads) e vai usando conforme precisar. Os créditos não expiram. Para quem usa mais de 14 downloads por mês, o Plano Pro por R$49/mês é mais vantajoso.'
+    a: 'Cada download custa R$3,50 (1 crédito). Você compra um pacote de créditos — mínimo R$14 (4 downloads) — e usa quando precisar. Os créditos são válidos por 1 ano e não expiram.',
   },
   {
-    q: 'Quais arquivos e camadas posso acessar?',
-    a: 'Na V1: KML, Shapefile e SIGEF (INCRA), além de visualização de topografia no mapa. Você pode baixar direto para usar no QGIS, ArcGIS ou qualquer software SIG. Em versões futuras: sobreposição com Áreas de Proteção Permanente (APP), Reserva Legal, áreas de embargo IBAMA, aptidão agrícola EMBRAPA, e análises de evolução temporal.'
+    q: 'Quais arquivos posso baixar?',
+    a: 'KML (para Google Earth), Shapefile (para QGIS ou ArcGIS), GeoTIFF de altitude, mapas de declividade e imagens PNG do mapa. Tudo em um clique.',
   },
   {
-    q: 'Os dados são atualizados com frequência?',
-    a: 'Sim. O Talhão integra dados de múltiplas fontes (SICAR, SIGEF, INPE, IBGE, etc) que são atualizadas regularmente. A gente sincroniza os dados com base na disponibilidade de cada fonte, garantindo que você sempre trabalhe com a informação mais recente. Novos cadastros, retificações e atualizações são refletidos conforme são aprovados pelos órgãos responsáveis.'
+    q: 'Os dados são atualizados?',
+    a: 'Sim. Sincronizamos com as bases oficiais regularmente. Novos cadastros, retificações e atualizações são incorporados conforme aprovados pelos órgãos responsáveis.',
   },
   {
-    q: 'Posso usar o Talhão para verificar sobreposições ou pendências?',
-    a: 'Na versão atual você consegue visualizar o polígono da propriedade no mapa. As análises de sobreposição com APP, Reserva Legal e áreas embargadas estão previstas para versões futuras. Você pode exportar o KML e cruzar com outras bases no QGIS ou ArcGIS.'
-  },
-  {
-    q: 'E se eu precisar de muitos downloads para uma empresa?',
-    a: 'Temos planos corporativos sob medida para escritórios de consultoria, bancos e imobiliárias rurais com alto volume. Entre em contato via WhatsApp e montamos uma proposta personalizada.'
-  },
+    q: 'Tenho uma empresa com muitos downloads. Tem plano corporativo?',
+    a: 'Sim. Para escritórios de consultoria, bancos e imobiliárias rurais com alto volume, montamos propostas personalizadas. Fale com a gente pelo WhatsApp.',
+  }
 ]
+
+function FAQItem({
+  faq,
+  isOpen,
+  onToggle,
+}: {
+  faq: typeof faqs[0]
+  isOpen: boolean
+  onToggle: () => void
+}) {
+  const contentRef = useRef<HTMLDivElement>(null)
+
+  return (
+    <div
+      className="overflow-hidden rounded-2xl transition-all duration-200"
+      style={{
+        background: '#ffffff',
+        border: `1px solid ${isOpen ? 'rgba(31,82,48,0.20)' : 'rgba(22,33,19,0.08)'}`,
+        boxShadow: isOpen ? '0 4px 20px rgba(31,82,48,0.08)' : 'none',
+      }}
+    >
+      <button
+        onClick={onToggle}
+        className="flex w-full items-center justify-between gap-4 px-6 py-5 text-left"
+      >
+        <span className="text-base font-semibold leading-snug" style={{ color: '#162113' }}>
+          {faq.q}
+        </span>
+        <span
+          className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full text-base font-bold transition-all duration-300"
+          style={{
+            background: isOpen ? '#1f5230' : 'rgba(22,33,19,0.06)',
+            color: isOpen ? '#ffffff' : '#162113',
+            transform: isOpen ? 'rotate(45deg)' : 'rotate(0deg)',
+          }}
+        >
+          +
+        </span>
+      </button>
+
+      <div
+        style={{
+          maxHeight: isOpen ? `${contentRef.current?.scrollHeight ?? 300}px` : '0px',
+          opacity: isOpen ? 1 : 0,
+          overflow: 'hidden',
+          transition: 'max-height 0.35s ease, opacity 0.25s ease',
+        }}
+      >
+        <div ref={contentRef} className="px-6 pb-6">
+          <div className="mb-4 h-px" style={{ background: 'rgba(22,33,19,0.07)' }} />
+          <p className="text-sm leading-relaxed" style={{ color: '#6b7280' }}>
+            {faq.a}
+          </p>
+        </div>
+      </div>
+    </div>
+  )
+}
 
 export default function FAQ() {
   const [open, setOpen] = useState<number | null>(null)
 
   return (
-    <section id="faq" className="bg-gray-50 py-24 px-6">
-      <div className="max-w-3xl mx-auto">
-
-        <div className="text-center mb-14">
-          <p className="text-[#2D6A4F] font-semibold text-sm uppercase tracking-widest mb-3">Dúvidas</p>
-          <h2 className="text-4xl font-extrabold text-[#1A1A2E]">Perguntas frequentes</h2>
+    <section id="faq" className="bg-[#f8faf8] px-6 py-28">
+      <div className="mx-auto max-w-3xl">
+        <div className="mb-14 text-center">
+          <p className="mb-4 text-xs font-bold uppercase tracking-widest" style={{ color: '#1f5230' }}>
+            Dúvidas
+          </p>
+          <h2 className="text-4xl font-extrabold md:text-5xl" style={{ color: '#162113' }}>
+            Perguntas frequentes
+          </h2>
         </div>
 
         <div className="flex flex-col gap-3">
           {faqs.map((faq, i) => (
-            <div
+            <FAQItem
               key={i}
-              className="bg-white rounded-2xl border border-gray-200 overflow-hidden"
-            >
-              <button
-                onClick={() => setOpen(open === i ? null : i)}
-                className="w-full flex items-center justify-between px-6 py-5 text-left"
-              >
-                <span className="font-semibold text-[#1A1A2E] text-base pr-4">{faq.q}</span>
-                <span className={`text-[#2D6A4F] text-xl font-bold flex-shrink-0 transition-transform duration-200 ${open === i ? 'rotate-45' : ''}`}>
-                  +
-                </span>
-              </button>
-
-              {open === i && (
-                <div className="px-6 pb-5">
-                  <div className="h-px bg-gray-100 mb-4" />
-                  <p className="text-gray-600 text-sm leading-relaxed">{faq.a}</p>
-                </div>
-              )}
-            </div>
+              faq={faq}
+              isOpen={open === i}
+              onToggle={() => setOpen(open === i ? null : i)}
+            />
           ))}
         </div>
 
-        <p className="text-center text-sm text-gray-400 mt-10">
+        <p className="mt-10 text-center text-sm" style={{ color: '#9ca3af' }}>
           Ainda tem dúvida?{' '}
-          <a href="https://wa.me/5511999999999" className="text-[#2D6A4F] font-semibold hover:underline">
-            Fale com a gente no WhatsApp
+          <a
+            href="https://wa.me/5519981150397"
+            className="font-semibold transition-colors hover:opacity-80"
+            style={{ color: '#1f5230' }}
+          >
+            Fale com a gente no WhatsApp →
           </a>
         </p>
       </div>

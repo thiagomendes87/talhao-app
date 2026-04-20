@@ -6,6 +6,7 @@ import Pricing from '@/components/Pricing'
 import WhatsAppTeaser from '@/components/WhatsAppTeaser'
 import ForWho from '@/components/ForWho'
 import FAQ from '@/components/FAQ'
+import CTASection from '@/components/CTASection'
 import Footer from '@/components/Footer'
 
 export default function Home() {
@@ -19,6 +20,7 @@ export default function Home() {
       <WhatsAppTeaser />
       <ForWho />
       <FAQ />
+      <CTASection />
       <Footer />
     </main>
   )

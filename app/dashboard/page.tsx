@@ -1,19 +1,26 @@
 'use client'
 
 import Link from 'next/link'
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import AppTopbar from '@/components/AppTopbar'
 import { buildLoginPath, supabase } from '@/lib/supabase'
 
 type Download = {
   id: string
-  car_code: string | null
-  propriedade: string | null
-  municipio: string | null
-  estado: string | null
-  tipo: string
+  codigo_imovel: string | null
+  tipo_arquivo: string
   creditos_usados: number
   criado_em: string
+}
+
+const currencyFormatter = new Intl.NumberFormat('pt-BR', {
+  style: 'currency',
+  currency: 'BRL',
+})
+
+function formatCurrency(value: number) {
+  return currencyFormatter.format(value)
 }
 
 export default function DashboardPage() {
@@ -24,48 +31,63 @@ export default function DashboardPage() {
   const router = useRouter()
 
   useEffect(() => {
+    let active = true
+
     const verificarAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession()
+      const {
+        data: { session },
+      } = await supabase.auth.getSession()
+
+      if (!active) {
+        return
+      }
+
       if (!session) {
-        router.replace(buildLoginPath('/dashboard', 'Entre com sua conta Google para acessar seu dashboard.'))
-      } else {
-        // Usuário Google sem perfil → vai para onboarding
-        if (!session.user.user_metadata?.perfil) {
-          router.push('/onboarding')
-          return
-        }
+        router.replace(
+          buildLoginPath('/dashboard', 'Entre com sua conta Google para acessar seu dashboard.')
+        )
+        return
+      }
 
-        setUsuario(session.user)
+      setUsuario(session.user)
 
-        // Garante que a linha existe (sem sobrescrever créditos existentes)
-        await supabase
-          .from('carteira')
-          .upsert({ user_id: session.user.id, creditos: 0 }, { onConflict: 'user_id', ignoreDuplicates: true })
+      await supabase
+        .from('carteira')
+        .upsert({ user_id: session.user.id, creditos: 0 }, { onConflict: 'user_id', ignoreDuplicates: true })
 
-        // Busca o saldo atual separadamente
-        const { data: carteira } = await supabase
+      const [{ data: carteira }, { data: historico }] = await Promise.all([
+        supabase
           .from('carteira')
           .select('creditos')
           .eq('user_id', session.user.id)
-          .single()
-        setCreditos(carteira?.creditos ?? 0)
-
-        const { data: historico } = await supabase
+          .single(),
+        supabase
           .from('downloads')
-          .select('*')
+          .select('id, codigo_imovel, tipo_arquivo, creditos_usados, criado_em')
           .eq('user_id', session.user.id)
           .order('criado_em', { ascending: false })
-          .limit(50)
-        setDownloads(historico ?? [])
+          .limit(10),
+      ])
+
+      if (!active) {
+        return
       }
+
+      setCreditos(carteira?.creditos ?? 0)
+      setDownloads(historico ?? [])
       setCarregando(false)
     }
+
     verificarAuth()
+
+    return () => {
+      active = false
+    }
   }, [router])
 
   if (carregando) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-[#F7FAF8]">
         <div className="text-center">
           <div className="w-8 h-8 border-4 border-[#2D6A4F] border-t-transparent rounded-full animate-spin mx-auto mb-3" />
           <p className="text-gray-500 text-sm">Carregando...</p>
@@ -76,104 +98,99 @@ export default function DashboardPage() {
 
   if (!usuario) return null
 
-  const nomeUsuario = usuario?.user_metadata?.full_name?.split(' ')[0] || 'Usuário'
+  const nomeUsuario =
+    usuario?.user_metadata?.full_name?.split(' ')[0]
+    || usuario?.email?.split('@')[0]
+    || 'Usuário'
+
+  const saldoReais = Number((creditos * 3.5).toFixed(2))
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="bg-white border-b border-gray-100 pt-8 pb-8 px-4 sm:px-10">
-        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <p className="text-sm text-gray-500">Olá, {nomeUsuario}! 👋</p>
-            <h1 className="text-xl font-bold text-[#162113] mt-1">O que você quer fazer hoje?</h1>
-          </div>
-          <Link href="/mapa" className="bg-[#1f5230] text-white font-bold px-5 py-2.5 rounded-xl hover:bg-[#2a6b3f] transition-all whitespace-nowrap">
-            Abrir mapa →
-          </Link>
-        </div>
-      </div>
+    <div className="min-h-screen bg-[#F7FAF8]">
+      <AppTopbar />
 
-      <div className="max-w-6xl mx-auto py-6 sm:py-10 px-4 sm:px-10 space-y-6 sm:space-y-8">
+      <main className="mx-auto max-w-6xl px-4 py-8 sm:px-10 sm:py-10">
+        <section className="rounded-[28px] border border-[rgba(28,43,24,0.08)] bg-white px-6 py-7 shadow-sm sm:px-8">
+          <p className="text-sm text-gray-500">Olá, {nomeUsuario}.</p>
+          <h1 className="mt-2 text-3xl font-extrabold text-[#162113]">Seu dashboard</h1>
+          <p className="mt-3 max-w-2xl text-sm leading-relaxed text-gray-600">
+            Acompanhe seu saldo disponível, veja os downloads mais recentes e acesse rapidamente
+            sua carteira ou os dados da sua conta.
+          </p>
 
-        {/* Saldo + Ações */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-5">
-
-          {/* Saldo de créditos */}
-          <div className="sm:col-span-2 bg-white rounded-2xl border border-gray-200 p-4 sm:p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <div>
-              <p className="text-xs sm:text-sm text-gray-500 mb-1">Seu saldo</p>
-              <p className="text-2xl sm:text-4xl font-extrabold text-[#1A1A2E]">{creditos} créditos</p>
-              <p className="text-xs sm:text-sm text-gray-500 mt-1">= R$ {(creditos * 3.5).toFixed(2)} disponível</p>
+          <div className="mt-8 grid gap-4 lg:grid-cols-[1.3fr_0.7fr_0.7fr]">
+            <div className="rounded-2xl border border-[#D8E9DE] bg-[#F3FBF6] p-5">
+              <p className="text-xs font-bold uppercase tracking-[0.22em] text-[#5C7C6C]">Saldo atual</p>
+              <p className="mt-3 text-4xl font-extrabold text-[#1f5230]">{formatCurrency(saldoReais)}</p>
+              <p className="mt-2 text-sm text-[#40614E]">{creditos} créditos disponíveis para download</p>
             </div>
-            <Link href="/carteira" className="bg-[#1f5230] hover:bg-[#2a6b3f] text-white font-bold px-4 sm:px-6 py-2 sm:py-3 rounded-xl transition-colors text-xs sm:text-sm whitespace-nowrap">
-              Recarregar
+
+            <Link
+              href="/carteira"
+              className="rounded-2xl border border-gray-200 bg-white p-5 transition-colors hover:border-[#2D6A4F] hover:bg-[#FBFEFC]"
+            >
+              <p className="text-xs font-bold uppercase tracking-[0.22em] text-[#5C7C6C]">Atalho</p>
+              <h2 className="mt-3 text-xl font-extrabold text-[#162113]">Carteira</h2>
+              <p className="mt-2 text-sm text-gray-600">Recarregue créditos e acompanhe pagamentos.</p>
+            </Link>
+
+            <Link
+              href="/conta"
+              className="rounded-2xl border border-gray-200 bg-white p-5 transition-colors hover:border-[#2D6A4F] hover:bg-[#FBFEFC]"
+            >
+              <p className="text-xs font-bold uppercase tracking-[0.22em] text-[#5C7C6C]">Atalho</p>
+              <h2 className="mt-3 text-xl font-extrabold text-[#162113]">Conta</h2>
+              <p className="mt-2 text-sm text-gray-600">Edite seu perfil e gerencie a sessão atual.</p>
             </Link>
           </div>
+        </section>
 
-          {/* Plano */}
-          <div className="bg-white rounded-2xl border border-gray-200 p-4 sm:p-6 flex flex-col justify-between">
+        <section className="mt-8 rounded-[28px] border border-[rgba(28,43,24,0.08)] bg-white p-5 shadow-sm sm:p-6">
+          <div className="flex items-center justify-between gap-3 flex-wrap">
             <div>
-              <p className="text-xs sm:text-sm text-gray-500 mb-1">Seu plano</p>
-              <p className="text-lg sm:text-xl font-extrabold text-[#1A1A2E]">Gratuito</p>
-              <p className="text-xs text-gray-400 mt-1">R$ 3,50 por download</p>
+              <p className="text-xs font-bold uppercase tracking-[0.22em] text-[#5C7C6C]">Downloads</p>
+              <h2 className="mt-1 text-xl font-extrabold text-[#162113]">Downloads recentes</h2>
             </div>
-            <Link href="/assinar" className="text-[#1f5230] font-semibold text-xs sm:text-sm hover:underline mt-3">
-              Assinar Pro →
-            </Link>
-          </div>
-        </div>
-
-        {/* Histórico de Downloads */}
-        <div className="bg-white rounded-2xl border border-gray-200 p-4 sm:p-6">
-          <div className="flex items-center justify-between mb-4 sm:mb-5 flex-wrap gap-2">
-            <h2 className="text-base sm:text-lg font-extrabold text-[#1A1A2E]">Histórico de downloads</h2>
-            <span className="text-xs text-gray-400">Últimos 30 dias</span>
+            <span className="rounded-full bg-[#F3FBF6] px-3 py-1 text-xs font-semibold text-[#2D6A4F]">
+              Últimos 10 arquivos
+            </span>
           </div>
 
           {downloads.length === 0 ? (
-            <div className="text-center py-8 sm:py-12 text-gray-400">
-              <svg className="w-8 sm:w-10 h-8 sm:h-10 mx-auto mb-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-              </svg>
-              <p className="text-xs sm:text-sm">Você ainda não fez nenhum download.</p>
-              <p className="text-xs mt-1">Busque uma propriedade acima para começar!</p>
+            <div className="mt-5 rounded-2xl border border-dashed border-gray-200 bg-gray-50 px-4 py-10 text-center">
+              <p className="text-sm font-semibold text-[#162113]">Você ainda não fez downloads.</p>
+              <p className="mt-2 text-sm text-gray-500">
+                Abra o mapa pela topbar para buscar propriedades e baixar arquivos.
+              </p>
             </div>
           ) : (
             <>
-              {/* Desktop: Tabela */}
-              <div className="hidden sm:block overflow-x-auto">
+              <div className="mt-5 hidden overflow-x-auto md:block">
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b border-gray-100 text-left">
-                      <th className="pb-3 text-xs font-semibold text-gray-400 uppercase tracking-wide">Propriedade</th>
-                      <th className="pb-3 text-xs font-semibold text-gray-400 uppercase tracking-wide">Município</th>
-                      <th className="pb-3 text-xs font-semibold text-gray-400 uppercase tracking-wide">Tipo</th>
-                      <th className="pb-3 text-xs font-semibold text-gray-400 uppercase tracking-wide">Data</th>
-                      <th className="pb-3 text-xs font-semibold text-gray-400 uppercase tracking-wide text-right">Ação</th>
+                      <th className="pb-3 text-xs font-semibold uppercase tracking-wide text-gray-400">Data</th>
+                      <th className="pb-3 text-xs font-semibold uppercase tracking-wide text-gray-400">Propriedade</th>
+                      <th className="pb-3 text-xs font-semibold uppercase tracking-wide text-gray-400">Tipo</th>
+                      <th className="pb-3 text-xs font-semibold uppercase tracking-wide text-gray-400 text-right">Créditos</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-50">
-                    {downloads.map((d) => (
-                      <tr key={d.id} className="hover:bg-gray-50 transition-colors">
+                    {downloads.map((download) => (
+                      <tr key={download.id} className="hover:bg-gray-50 transition-colors">
+                        <td className="py-3.5 pr-4 text-gray-500">
+                          {new Date(download.criado_em).toLocaleString('pt-BR')}
+                        </td>
+                        <td className="py-3.5 pr-4 font-semibold text-[#162113]">
+                          {download.codigo_imovel || 'Código não informado'}
+                        </td>
                         <td className="py-3.5 pr-4">
-                          <p className="font-semibold text-[#1A1A2E]">{d.propriedade || 'Propriedade sem nome'}</p>
-                          {d.car_code && <p className="text-xs text-gray-400 font-mono">{d.car_code}</p>}
+                          <span className="rounded-full bg-[#D8F3DC] px-2.5 py-1 text-xs font-bold text-[#1f5230]">
+                            {download.tipo_arquivo}
+                          </span>
                         </td>
-                        <td className="py-3.5 pr-4 text-gray-600 text-sm">
-                          {[d.municipio, d.estado].filter(Boolean).join(', ') || '—'}
-                        </td>
-                        <td className="py-3.5 pr-4">
-                          <span className="bg-[#D8F3DC] text-[#1f5230] text-xs font-bold px-2.5 py-1 rounded-full">{d.tipo}</span>
-                        </td>
-                        <td className="py-3.5 pr-4 text-gray-500 text-sm">
-                          {new Date(d.criado_em).toLocaleDateString('pt-BR')}
-                        </td>
-                        <td className="py-3.5 text-right">
-                          <button className="text-[#1f5230] hover:text-[#174023] font-semibold text-xs transition-colors flex items-center gap-1 ml-auto">
-                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                            </svg>
-                            Baixar
-                          </button>
+                        <td className="py-3.5 text-right font-semibold text-[#162113]">
+                          {download.creditos_usados}
                         </td>
                       </tr>
                     ))}
@@ -181,34 +198,34 @@ export default function DashboardPage() {
                 </table>
               </div>
 
-              {/* Mobile: Cards */}
-              <div className="sm:hidden space-y-3">
-                {downloads.map((d) => (
-                  <div key={d.id} className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                    <div className="mb-3">
-                      <p className="font-semibold text-[#1A1A2E] text-sm">{d.propriedade || 'Propriedade sem nome'}</p>
-                      {d.car_code && <p className="text-xs text-gray-400 font-mono mt-1">{d.car_code}</p>}
-                    </div>
-                    <div className="flex items-center justify-between gap-2">
-                      <div className="flex items-center gap-3 text-xs">
-                        <span className="text-gray-600">{[d.municipio, d.estado].filter(Boolean).join(', ') || '—'}</span>
-                        <span className="bg-[#D8F3DC] text-[#1f5230] font-bold px-2 py-0.5 rounded-full">{d.tipo}</span>
-                        <span className="text-gray-500">{new Date(d.criado_em).toLocaleDateString('pt-BR')}</span>
+              <div className="mt-5 space-y-3 md:hidden">
+                {downloads.map((download) => (
+                  <div key={download.id} className="rounded-2xl border border-gray-200 bg-gray-50 p-4">
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <p className="font-semibold text-[#162113]">
+                          {download.codigo_imovel || 'Código não informado'}
+                        </p>
+                        <p className="mt-1 text-xs text-gray-500">
+                          {new Date(download.criado_em).toLocaleString('pt-BR')}
+                        </p>
                       </div>
-                      <button className="text-[#1f5230] hover:text-[#174023] font-semibold text-xs whitespace-nowrap ml-2">
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                        </svg>
-                      </button>
+                      <span className="rounded-full bg-white px-2.5 py-1 text-xs font-bold text-[#2D6A4F] border border-[#D8F3DC]">
+                        {download.creditos_usados} crédito{download.creditos_usados === 1 ? '' : 's'}
+                      </span>
+                    </div>
+                    <div className="mt-3">
+                      <span className="rounded-full bg-[#D8F3DC] px-2.5 py-1 text-xs font-bold text-[#1f5230]">
+                        {download.tipo_arquivo}
+                      </span>
                     </div>
                   </div>
                 ))}
               </div>
             </>
           )}
-        </div>
-
-      </div>
+        </section>
+      </main>
     </div>
   )
 }

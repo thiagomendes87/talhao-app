@@ -3,15 +3,8 @@
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import AppTopbar from '@/components/AppTopbar'
 import { buildLoginPath, supabase } from '@/lib/supabase'
-
-type DownloadHistoryRow = {
-  id: string
-  codigo_imovel: string | null
-  tipo_arquivo: string
-  creditos_usados: number
-  criado_em: string
-}
 
 type PaymentHistoryRow = {
   id: string
@@ -24,7 +17,6 @@ type WalletResponse = {
   success: boolean
   creditos: number
   balance_reais: number
-  downloads: DownloadHistoryRow[]
   payments: PaymentHistoryRow[]
 }
 
@@ -47,12 +39,12 @@ const statusClassMap: Record<PaymentHistoryRow['status'], string> = {
   refunded: 'bg-blue-100 text-blue-700',
 }
 
-function formatDateTime(value: string) {
-  return new Date(value).toLocaleString('pt-BR')
-}
-
 function formatCurrency(value: number) {
   return currencyFormatter.format(value)
+}
+
+function formatDateTime(value: string) {
+  return new Date(value).toLocaleString('pt-BR')
 }
 
 export default function CarteiraPage() {
@@ -83,7 +75,6 @@ export default function CarteiraPage() {
 
       const firstName =
         session.user.user_metadata?.full_name?.split(' ')[0]
-        || session.user.user_metadata?.name?.split(' ')[0]
         || session.user.email?.split('@')[0]
         || 'Usuário'
 
@@ -116,7 +107,12 @@ export default function CarteiraPage() {
           return
         }
 
-        setWallet(payload as WalletResponse)
+        setWallet({
+          success: true,
+          creditos: payload.creditos ?? 0,
+          balance_reais: payload.balance_reais ?? 0,
+          payments: payload.payments ?? [],
+        })
         setCarregando(false)
       } catch (error) {
         if (!active) {
@@ -137,7 +133,7 @@ export default function CarteiraPage() {
 
   if (carregando) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-[#F7FAF8]">
         <div className="text-center">
           <div className="w-10 h-10 border-4 border-[#2D6A4F] border-t-transparent rounded-full animate-spin mx-auto mb-4" />
           <p className="text-sm text-gray-500">Carregando carteira...</p>
@@ -148,7 +144,7 @@ export default function CarteiraPage() {
 
   if (!wallet) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+      <div className="min-h-screen flex items-center justify-center bg-[#F7FAF8] px-4">
         <div className="max-w-md rounded-2xl border border-red-100 bg-white p-8 text-center shadow-sm">
           <p className="text-xs font-bold uppercase tracking-[0.22em] text-red-500">Erro</p>
           <h1 className="mt-3 text-2xl font-extrabold text-[#162113]">Não foi possível abrir a carteira</h1>
@@ -170,140 +166,62 @@ export default function CarteiraPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="bg-white border-b border-gray-100 pt-8 pb-8 px-4 sm:px-10">
-        <div className="max-w-6xl mx-auto flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
-          <div>
-            <p className="text-sm text-gray-500">Carteira de {nomeUsuario}</p>
-            <h1 className="mt-1 text-2xl sm:text-3xl font-extrabold text-[#162113]">Seu saldo atual</h1>
-            <p className="mt-3 text-4xl sm:text-5xl font-extrabold text-[#2D6A4F]">
-              {formatCurrency(wallet.balance_reais)}
-            </p>
-            <p className="mt-2 text-sm text-gray-500">{wallet.creditos} créditos disponíveis</p>
-          </div>
+    <div className="min-h-screen bg-[#F7FAF8]">
+      <AppTopbar />
 
-          <div className="flex flex-col sm:flex-row gap-3">
-            <Link
-              href="/assinar"
-              className="rounded-xl bg-[#2D6A4F] px-5 py-3 text-center text-sm font-bold text-white transition-colors hover:bg-[#1F5230]"
-            >
-              Comprar créditos
-            </Link>
-            <a
-              href="https://www.talhao.ai/mapa"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="rounded-xl border border-[#2D6A4F] px-5 py-3 text-center text-sm font-bold text-[#2D6A4F] transition-colors hover:bg-[#F0FDF4]"
-            >
-              Abrir mapa
-            </a>
-          </div>
-        </div>
-      </div>
+      <main className="mx-auto max-w-6xl px-4 py-8 sm:px-10 sm:py-10">
+        <section className="rounded-[28px] border border-[rgba(28,43,24,0.08)] bg-white px-6 py-7 shadow-sm sm:px-8">
+          <p className="text-sm text-gray-500">Carteira de {nomeUsuario}</p>
+          <h1 className="mt-2 text-3xl font-extrabold text-[#162113]">Compre créditos quando precisar</h1>
+          <p className="mt-3 max-w-2xl text-sm leading-relaxed text-gray-600">
+            Seu saldo fica disponível para novos downloads no mapa. Recarregue a qualquer momento
+            e acompanhe abaixo o histórico dos pagamentos já feitos.
+          </p>
 
-      <div className="max-w-6xl mx-auto py-6 sm:py-10 px-4 sm:px-10 space-y-6 sm:space-y-8">
-        <section className="rounded-2xl border border-gray-200 bg-white p-5 sm:p-6 shadow-sm">
-          <div className="flex items-center justify-between gap-3 flex-wrap mb-5">
-            <div>
-              <p className="text-xs font-bold uppercase tracking-[0.22em] text-[#5C7C6C]">Downloads</p>
-              <h2 className="mt-1 text-lg sm:text-xl font-extrabold text-[#162113]">
-                Últimos 50 downloads
-              </h2>
+          <div className="mt-8 grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
+            <div className="rounded-2xl border border-[#D8E9DE] bg-[#F3FBF6] p-5">
+              <p className="text-xs font-bold uppercase tracking-[0.22em] text-[#5C7C6C]">Saldo disponível</p>
+              <p className="mt-3 text-4xl font-extrabold text-[#1f5230]">{formatCurrency(wallet.balance_reais)}</p>
+              <p className="mt-2 text-sm text-[#40614E]">{wallet.creditos} créditos na sua carteira</p>
             </div>
-            <span className="rounded-full bg-[#F3FBF6] px-3 py-1 text-xs font-semibold text-[#2D6A4F]">
-              Histórico completo do consumo de créditos
-            </span>
-          </div>
 
-          {wallet.downloads.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-gray-200 bg-gray-50 px-4 py-10 text-center">
-              <p className="text-sm font-semibold text-[#162113]">Nenhum download registrado ainda.</p>
-              <p className="mt-2 text-sm text-gray-500">
-                Quando você baixar arquivos no mapa, eles aparecerão aqui.
+            <div className="rounded-2xl border border-gray-200 bg-white p-5">
+              <p className="text-xs font-bold uppercase tracking-[0.22em] text-[#5C7C6C]">Recarga</p>
+              <h2 className="mt-3 text-xl font-extrabold text-[#162113]">Adicionar créditos</h2>
+              <p className="mt-2 text-sm text-gray-600">
+                Compre novos créditos via PIX, boleto ou cartão e continue baixando arquivos no mapa.
               </p>
+              <Link
+                href="/assinar?tab=downloads"
+                className="mt-5 inline-flex rounded-xl bg-[#1f5230] px-4 py-3 text-sm font-bold text-white transition-colors hover:bg-[#163b23]"
+              >
+                Comprar créditos
+              </Link>
             </div>
-          ) : (
-            <>
-              <div className="hidden md:block overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b border-gray-100 text-left">
-                      <th className="pb-3 text-xs font-semibold uppercase tracking-wide text-gray-400">Data</th>
-                      <th className="pb-3 text-xs font-semibold uppercase tracking-wide text-gray-400">Propriedade</th>
-                      <th className="pb-3 text-xs font-semibold uppercase tracking-wide text-gray-400">Tipo de arquivo</th>
-                      <th className="pb-3 text-xs font-semibold uppercase tracking-wide text-gray-400 text-right">Créditos usados</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-50">
-                    {wallet.downloads.map((download) => (
-                      <tr key={download.id} className="hover:bg-gray-50 transition-colors">
-                        <td className="py-3.5 pr-4 text-gray-500">{formatDateTime(download.criado_em)}</td>
-                        <td className="py-3.5 pr-4 font-semibold text-[#162113]">
-                          {download.codigo_imovel || 'Código não informado'}
-                        </td>
-                        <td className="py-3.5 pr-4">
-                          <span className="rounded-full bg-[#D8F3DC] px-2.5 py-1 text-xs font-bold text-[#1F5230]">
-                            {download.tipo_arquivo}
-                          </span>
-                        </td>
-                        <td className="py-3.5 text-right font-semibold text-[#162113]">
-                          {download.creditos_usados}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-
-              <div className="space-y-3 md:hidden">
-                {wallet.downloads.map((download) => (
-                  <div key={download.id} className="rounded-xl border border-gray-200 bg-gray-50 p-4">
-                    <div className="flex items-start justify-between gap-3">
-                      <div>
-                        <p className="font-semibold text-[#162113]">
-                          {download.codigo_imovel || 'Código não informado'}
-                        </p>
-                        <p className="mt-1 text-xs text-gray-500">{formatDateTime(download.criado_em)}</p>
-                      </div>
-                      <span className="rounded-full bg-white px-2.5 py-1 text-xs font-bold text-[#2D6A4F] border border-[#D8F3DC]">
-                        {download.creditos_usados} crédito{download.creditos_usados === 1 ? '' : 's'}
-                      </span>
-                    </div>
-                    <div className="mt-3">
-                      <span className="rounded-full bg-[#D8F3DC] px-2.5 py-1 text-xs font-bold text-[#1F5230]">
-                        {download.tipo_arquivo}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </>
-          )}
+          </div>
         </section>
 
-        <section className="rounded-2xl border border-gray-200 bg-white p-5 sm:p-6 shadow-sm">
-          <div className="flex items-center justify-between gap-3 flex-wrap mb-5">
+        <section className="mt-8 rounded-[28px] border border-[rgba(28,43,24,0.08)] bg-white p-5 shadow-sm sm:p-6">
+          <div className="flex items-center justify-between gap-3 flex-wrap">
             <div>
               <p className="text-xs font-bold uppercase tracking-[0.22em] text-[#5C7C6C]">Pagamentos</p>
-              <h2 className="mt-1 text-lg sm:text-xl font-extrabold text-[#162113]">
-                Últimos 20 pagamentos
-              </h2>
+              <h2 className="mt-1 text-xl font-extrabold text-[#162113]">Histórico de pagamentos</h2>
             </div>
             <span className="rounded-full bg-[#F3FBF6] px-3 py-1 text-xs font-semibold text-[#2D6A4F]">
-              Compras de créditos e confirmações
+              Últimos 20 registros
             </span>
           </div>
 
           {wallet.payments.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-gray-200 bg-gray-50 px-4 py-10 text-center">
+            <div className="mt-5 rounded-2xl border border-dashed border-gray-200 bg-gray-50 px-4 py-10 text-center">
               <p className="text-sm font-semibold text-[#162113]">Nenhum pagamento registrado ainda.</p>
               <p className="mt-2 text-sm text-gray-500">
-                Quando você comprar créditos, o histórico aparecerá aqui.
+                Seu histórico aparecerá aqui assim que você fizer a primeira compra.
               </p>
             </div>
           ) : (
             <>
-              <div className="hidden md:block overflow-x-auto">
+              <div className="mt-5 hidden overflow-x-auto md:block">
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b border-gray-100 text-left">
@@ -330,9 +248,9 @@ export default function CarteiraPage() {
                 </table>
               </div>
 
-              <div className="space-y-3 md:hidden">
+              <div className="mt-5 space-y-3 md:hidden">
                 {wallet.payments.map((payment) => (
-                  <div key={payment.id} className="rounded-xl border border-gray-200 bg-gray-50 p-4">
+                  <div key={payment.id} className="rounded-2xl border border-gray-200 bg-gray-50 p-4">
                     <div className="flex items-start justify-between gap-3">
                       <div>
                         <p className="font-semibold text-[#162113]">{formatCurrency(payment.amount)}</p>
@@ -348,7 +266,7 @@ export default function CarteiraPage() {
             </>
           )}
         </section>
-      </div>
+      </main>
     </div>
   )
 }

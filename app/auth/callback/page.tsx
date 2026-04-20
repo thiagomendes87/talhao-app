@@ -1,21 +1,18 @@
 'use client'
 
-import { Suspense, useEffect, useMemo, useState } from 'react'
+import { Suspense, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { type EmailOtpType } from '@supabase/supabase-js'
-import { getSafeNextPath, supabase } from '@/lib/supabase'
+import { supabase } from '@/lib/supabase'
+
+const POST_LOGIN_PATH = '/mapa'
 
 function AuthCallbackContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [status, setStatus] = useState('Conectando sua conta...')
   const [errorMessage, setErrorMessage] = useState('')
-
-  const nextPath = useMemo(
-    () => getSafeNextPath(searchParams.get('next')),
-    [searchParams]
-  )
 
   useEffect(() => {
     let cancelled = false
@@ -60,7 +57,7 @@ function AuthCallbackContent() {
       const { data: { session } } = await supabase.auth.getSession()
 
       if (!cancelled && session?.user) {
-        router.replace(nextPath)
+        router.replace(POST_LOGIN_PATH)
         return
       }
 
@@ -71,7 +68,7 @@ function AuthCallbackContent() {
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (!cancelled && event === 'SIGNED_IN' && session?.user) {
-        router.replace(nextPath)
+        router.replace(POST_LOGIN_PATH)
       }
     })
 
@@ -81,7 +78,7 @@ function AuthCallbackContent() {
       cancelled = true
       subscription.unsubscribe()
     }
-  }, [nextPath, router, searchParams])
+  }, [router, searchParams])
 
   if (errorMessage) {
     return (
@@ -94,7 +91,7 @@ function AuthCallbackContent() {
               {errorMessage}
             </p>
             <div className="mt-8 flex flex-col gap-3">
-              <Link href={`/entrar?next=${encodeURIComponent(nextPath)}`} className="btn-primary text-center">
+              <Link href="/entrar" className="btn-primary text-center">
                 Tentar novamente
               </Link>
               <Link href="/" className="text-center text-sm font-semibold text-[#1f5230] hover:text-[#162113]">

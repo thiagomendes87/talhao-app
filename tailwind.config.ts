@@ -9,12 +9,14 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        navy: '#1A1A2E',
-        'navy-light': '#2d2d50',
         green: {
-          brand: '#2D6A4F',
-          light: '#40916C',
-          pale: '#D8F3DC',
+          900: '#162113',
+          800: '#1f5230',
+          700: '#2a6b3f',
+          600: '#2D6A4F',
+          500: '#40916C',
+          100: '#D8F3DC',
+          50: '#F0FDF4',
         },
       },
       fontFamily: {

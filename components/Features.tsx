@@ -62,82 +62,37 @@ const features = [
 
 export default function Features() {
   return (
-    <section
-      className="relative overflow-hidden px-6 py-24"
-      style={{ background: '#0a1a0e' }}
-    >
-      <div
-        className="pointer-events-none absolute inset-0"
-        style={{
-          background:
-            'radial-gradient(ellipse 70% 50% at 50% -10%, rgba(31,82,48,0.45), transparent)',
-        }}
-      />
-
-      <div className="relative mx-auto max-w-5xl">
+    <section className="bg-[#f8f9fb] px-6 py-24">
+      <div className="mx-auto max-w-6xl">
         <div className="mb-16 text-center">
-          <p
-            className="mb-4 text-xs font-bold uppercase tracking-widest"
-            style={{ color: '#52b788' }}
-          >
+          <span className="mb-6 inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-4 py-1.5 text-sm font-medium text-[#1a5c38] shadow-sm">
             Por que o Talhão?
-          </p>
-          <h2
-            className="text-4xl font-extrabold leading-tight md:text-5xl"
-            style={{ color: '#f0fdf4' }}
-          >
-            Dados de 10 milhões de fazendas.{' '}
-            <br className="hidden md:block" />
-            <span
-              style={{
-                background: 'linear-gradient(135deg, #52b788, #1f5230)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-              }}
-            >
-              Na palma da mão.
-            </span>
+          </span>
+          <h2 className="mb-4 text-center text-4xl font-bold text-gray-900">
+            A plataforma que o agro estava esperando
           </h2>
+          <p className="mx-auto mb-16 max-w-2xl text-center text-lg text-gray-500">
+            Encontre propriedades rurais, baixe arquivos e visualize topografia com a velocidade que faltava no campo e no escritório.
+          </p>
         </div>
 
-        <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
           {features.map((f) => (
             <div
               key={f.num}
-              className="group relative cursor-default rounded-2xl border border-[rgba(255,255,255,0.07)] bg-[rgba(255,255,255,0.03)] p-7 transition-all duration-300 hover:-translate-y-1 hover:border-[rgba(82,183,136,0.25)] hover:bg-[rgba(31,82,48,0.12)]"
+              className="flex flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm"
             >
-              <span
-                className="mb-5 block text-xs font-bold tracking-widest"
-                style={{ color: 'rgba(82,183,136,0.5)' }}
-              >
-                {f.num}
-              </span>
-
-              <div
-                className="mb-5 flex h-11 w-11 items-center justify-center rounded-xl"
-                style={{
-                  background: 'rgba(31,82,48,0.35)',
-                  color: '#52b788',
-                  border: '1px solid rgba(82,183,136,0.2)',
-                }}
-              >
-                {f.icon}
+              <div className="flex h-40 items-center justify-center bg-[#e8f5ee]">
+                <div className="rounded-full bg-white p-4 text-[#1a5c38] shadow-sm [&_svg]:h-10 [&_svg]:w-10">
+                  {f.icon}
+                </div>
               </div>
 
-              <h3
-                className="mb-2.5 text-lg font-bold leading-snug"
-                style={{ color: '#f0fdf4' }}
-              >
-                {f.title}
-              </h3>
-              <p className="text-sm leading-relaxed" style={{ color: '#9ca3af' }}>
-                {f.desc}
-              </p>
-
-              <div
-                className="absolute bottom-0 left-7 right-7 h-px rounded-full opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-                style={{ background: 'linear-gradient(90deg, transparent, #52b788, transparent)' }}
-              />
+              <div className="p-6">
+                <span className="mb-2 block text-sm font-bold text-[#1a5c38]">{f.num}</span>
+                <h3 className="mb-2 text-xl font-semibold text-gray-900">{f.title}</h3>
+                <p className="text-sm leading-relaxed text-gray-500">{f.desc}</p>
+              </div>
             </div>
           ))}
         </div>

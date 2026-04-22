@@ -113,21 +113,46 @@ export default function MapHero() {
         />
 
         <div
-          className="relative z-20 flex min-h-screen flex-col items-center justify-center px-6 pt-28 pb-16 text-center"
+          className="absolute inset-0 z-20 pointer-events-none"
+          style={{ background: 'radial-gradient(ellipse 80% 70% at 50% 40%, rgba(0,0,0,0.52) 0%, rgba(0,0,0,0.18) 65%, transparent 100%)' }}
+        />
+
+        <div
+          className="relative z-30 flex min-h-screen flex-col items-center justify-center px-6 pt-28 pb-16 text-center"
           onClick={(e) => e.stopPropagation()}
         >
-          <span className="text-xs font-bold tracking-widest text-[#74C69D] uppercase mb-4">
+          <span
+            className="mb-4 inline-flex items-center gap-2 rounded-full border px-[14px] py-1 font-bold uppercase"
+            style={{
+              background: 'rgba(255,255,255,0.10)',
+              borderColor: 'rgba(255,255,255,0.30)',
+              backdropFilter: 'blur(8px)',
+              fontSize: '11px',
+              letterSpacing: '0.12em',
+              color: 'rgba(255,255,255,0.90)',
+            }}
+          >
+            <span aria-hidden="true" style={{ color: '#4ade80' }}>
+              ●
+            </span>
             Plataforma geoespacial rural
           </span>
 
           <h1
             className="text-5xl font-extrabold text-white leading-tight mb-5"
-            style={{ textShadow: '0 2px 20px rgba(0,0,0,0.5)' }}
+            style={{ textShadow: '0 2px 24px rgba(0,0,0,0.45), 0 1px 4px rgba(0,0,0,0.30)' }}
           >
             Encontre qualquer fazenda no Brasil
           </h1>
 
-          <p className="text-base text-white/85 leading-relaxed mb-8 max-w-xl mx-auto">
+          <p
+            className="leading-relaxed mb-8 max-w-xl mx-auto"
+            style={{
+              color: 'rgba(255,255,255,0.92)',
+              fontSize: '17px',
+              textShadow: '0 1px 12px rgba(0,0,0,0.50)',
+            }}
+          >
             Navegue por mais de 10 milhões de propriedades rurais. Baixe KML, Shapefile e mapas topográficos em segundos.
           </p>
 

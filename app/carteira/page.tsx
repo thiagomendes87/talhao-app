@@ -157,9 +157,22 @@ export default function CarteiraPage() {
 
           <div className="mt-8 grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
             <div className="rounded-2xl border border-[#D8E9DE] bg-[#F3FBF6] p-5">
-              <p className="text-xs font-bold uppercase tracking-[0.22em] text-[#5C7C6C]">Saldo disponível</p>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#4f6347]">Saldo disponível</p>
               <p className="mt-3 text-3xl font-bold text-[#1f5230]">{formatCurrency(wallet.balance_reais)}</p>
-              <p className="mt-2 text-sm text-[#40614E]">{wallet.creditos} créditos na sua carteira</p>
+              <p className="mt-1 text-xs text-[#4f6347]">{wallet.creditos} créditos na sua carteira</p>
+              <div className="mt-4">
+                <div className="flex items-center justify-between mb-1.5">
+                  <span className="text-[11px] text-[#4f6347]">uso estimado</span>
+                  <span className="text-[11px] font-semibold text-[#1f5230]">{wallet.creditos} restantes</span>
+                </div>
+                <div className="h-1.5 w-full rounded-full bg-[#D8E9DE] overflow-hidden">
+                  <div
+                    className="h-full rounded-full bg-[#1f5230] transition-all"
+                    style={{ width: `${Math.min(100, Math.max(4, (wallet.creditos / 300) * 100))}%` }}
+                  />
+                </div>
+                <p className="mt-1.5 text-[11px] text-[#4f6347]">referência: pacote de 300 créditos</p>
+              </div>
             </div>
 
             <div className="rounded-2xl border border-gray-200 bg-white p-5">

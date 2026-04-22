@@ -144,15 +144,15 @@ export default function MapHero() {
         {/* Conteúdo central — stopPropagation para não disparar o click do section */}
         <div
           className="relative z-20 flex min-h-screen flex-col items-center justify-center px-6 pt-28 pb-16 text-center"
-          onClick={(e) => e.stopPropagation()}
         >
           {/* Painel de vidro opaco */}
           <div
+            onClick={(e) => e.stopPropagation()}
             style={{
-              background: 'rgba(10, 28, 14, 0.52)',
-              backdropFilter: 'blur(22px) saturate(150%)',
-              WebkitBackdropFilter: 'blur(22px) saturate(150%)',
-              border: '1px solid rgba(255,255,255,0.1)',
+              background: 'rgba(255, 255, 255, 0.13)',
+              backdropFilter: 'blur(24px) saturate(180%)',
+              WebkitBackdropFilter: 'blur(24px) saturate(180%)',
+              border: '1px solid rgba(255,255,255,0.28)',
               borderRadius: '28px',
             }}
             className="px-10 py-12 max-w-3xl w-full mx-auto"

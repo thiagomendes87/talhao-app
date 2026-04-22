@@ -2,7 +2,6 @@ import Navbar from '@/components/Navbar'
 import MapHero from '@/components/MapHero'
 import Features from '@/components/Features'
 import Pricing from '@/components/Pricing'
-import WhatsAppTeaser from '@/components/WhatsAppTeaser'
 import ForWho from '@/components/ForWho'
 import FAQ from '@/components/FAQ'
 import CTASection from '@/components/CTASection'
@@ -15,7 +14,6 @@ export default function Home() {
       <MapHero />
       <Features />
       <Pricing />
-      <WhatsAppTeaser />
       <ForWho />
       <FAQ />
       <CTASection />

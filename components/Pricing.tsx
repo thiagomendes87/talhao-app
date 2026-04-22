@@ -42,10 +42,10 @@ export default function Pricing() {
 
       <div className="relative mx-auto max-w-5xl">
         <div className="mb-16 text-center">
-          <p className="mb-4 text-xs font-bold uppercase tracking-widest" style={{ color: '#1f5230' }}>
-            Preços
-          </p>
-          <h2 className="mb-4 text-4xl font-extrabold leading-tight md:text-5xl" style={{ color: '#162113' }}>
+          <div className="inline-flex items-center rounded-lg border border-[rgba(28,43,24,0.12)] bg-[#f4f7f5] px-3 py-1.5 mb-5">
+            <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#1f5230]">Preços</span>
+          </div>
+          <h2 className="mb-4 text-3xl font-bold leading-tight md:text-4xl" style={{ color: '#162113' }}>
             Simples. Transparente.{' '}
             <span
               style={{

@@ -79,9 +79,14 @@ export default function FAQ() {
     >
       <div className="mx-auto max-w-6xl">
         <div className="mb-16 flex flex-wrap items-start justify-between gap-8">
-          <h2 className="max-w-xs text-4xl font-bold text-gray-900">
-            Perguntas frequentes
-          </h2>
+          <div>
+            <div className="inline-flex items-center rounded-lg border border-[rgba(28,43,24,0.15)] bg-white/70 px-3 py-1.5 mb-4">
+              <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#1f5230]">Dúvidas frequentes</span>
+            </div>
+            <h2 className="max-w-xs text-3xl font-bold text-[#162113]">
+              Perguntas frequentes
+            </h2>
+          </div>
           <p className="max-w-sm text-base text-gray-600">
             Não encontrou sua resposta? Fale com a gente pelo WhatsApp.
           </p>

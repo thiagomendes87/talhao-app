@@ -107,7 +107,7 @@ export default function DashboardPage() {
   const saldoReais = Number((creditos * 3.5).toFixed(2))
 
   return (
-    <div className="min-h-screen bg-[#f4f7f5]">
+    <div className="min-h-screen page-topo-bg">
       <AppTopbar />
 
       <main className="mx-auto max-w-5xl px-4 py-8 sm:px-10 sm:py-10">
@@ -147,6 +147,41 @@ export default function DashboardPage() {
         </section>
 
         <section className="mt-8 rounded-2xl border border-[rgba(28,43,24,0.08)] bg-white p-5 shadow-sm sm:p-6">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#4f6347]">Como usar</p>
+          <h2 className="mt-1 text-lg font-semibold text-[#162113]">Em 3 passos</h2>
+          <div className="mt-5 grid gap-4 sm:grid-cols-3">
+            <div className="rounded-xl border border-[rgba(28,43,24,0.08)] bg-[#f4f7f5] p-4">
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#D8F3DC]">
+                <svg className="h-5 w-5 text-[#1f5230]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+                  <circle cx="11" cy="11" r="8" />
+                  <path strokeLinecap="round" d="M21 21l-4.35-4.35" />
+                </svg>
+              </div>
+              <p className="mt-3 text-sm font-semibold text-[#162113]">Buscar</p>
+              <p className="mt-1 text-xs leading-relaxed text-[#4f6347]">Encontre imóveis por município, nome ou código CAR no mapa interativo.</p>
+            </div>
+            <div className="rounded-xl border border-[rgba(28,43,24,0.08)] bg-[#f4f7f5] p-4">
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#D8F3DC]">
+                <svg className="h-5 w-5 text-[#1f5230]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                </svg>
+              </div>
+              <p className="mt-3 text-sm font-semibold text-[#162113]">Analisar</p>
+              <p className="mt-1 text-xs leading-relaxed text-[#4f6347]">Veja área, perímetro, situação e dados geoespaciais de cada propriedade.</p>
+            </div>
+            <div className="rounded-xl border border-[rgba(28,43,24,0.08)] bg-[#f4f7f5] p-4">
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#D8F3DC]">
+                <svg className="h-5 w-5 text-[#1f5230]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                </svg>
+              </div>
+              <p className="mt-3 text-sm font-semibold text-[#162113]">Baixar</p>
+              <p className="mt-1 text-xs leading-relaxed text-[#4f6347]">Exporte KML, SHP e outros formatos usando créditos da sua carteira.</p>
+            </div>
+          </div>
+        </section>
+
+        <section className="mt-8 rounded-2xl border border-[rgba(28,43,24,0.08)] bg-white p-5 shadow-sm sm:p-6">
           <div className="flex items-center justify-between gap-3 flex-wrap">
             <div>
               <p className="text-xs font-bold uppercase tracking-[0.22em] text-[#5C7C6C]">Downloads</p>
@@ -158,11 +193,17 @@ export default function DashboardPage() {
           </div>
 
           {downloads.length === 0 ? (
-            <div className="mt-5 rounded-2xl border border-dashed border-gray-200 bg-gray-50 px-4 py-10 text-center">
-              <p className="text-sm font-semibold text-[#162113]">Você ainda não fez downloads.</p>
-              <p className="mt-2 text-sm text-gray-500">
-                Abra o mapa pela topbar para buscar propriedades e baixar arquivos.
-              </p>
+            <div className="mt-5 rounded-2xl border border-dashed border-[rgba(28,43,24,0.12)] bg-[#f4f7f5] px-4 py-12 text-center">
+              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-[#D8F3DC]">
+                <svg className="h-6 w-6 text-[#1f5230]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+              </div>
+              <p className="mt-4 text-sm font-semibold text-[#162113]">Nenhum download ainda.</p>
+              <p className="mt-1.5 text-xs text-[#4f6347]">Busque uma propriedade no mapa e baixe os dados para aparecer aqui.</p>
+              <Link href="/mapa" className="mt-5 inline-flex rounded-xl bg-[#1f5230] px-4 py-2.5 text-xs font-bold text-white transition-colors hover:bg-[#163b23]">
+                Abrir mapa →
+              </Link>
             </div>
           ) : (
             <>

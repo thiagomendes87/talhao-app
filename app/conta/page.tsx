@@ -128,7 +128,7 @@ export default function ContaPage() {
   if (!usuario) return null
 
   return (
-    <div className="min-h-screen bg-[#f4f7f5]">
+    <div className="min-h-screen page-topo-bg">
       <AppTopbar />
 
       <main className="mx-auto max-w-5xl px-4 py-8 sm:px-10 sm:py-10">

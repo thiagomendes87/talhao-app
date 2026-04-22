@@ -142,6 +142,12 @@ export default function CarteiraPage() {
     )
   }
 
+  const ultimoPagamentoAprovado = wallet.payments.find(p => p.status === 'approved')
+  const creditosPacote = ultimoPagamentoAprovado
+    ? Math.round(ultimoPagamentoAprovado.amount / 3.5)
+    : wallet.creditos || 100
+  const percentualCreditos = Math.min(100, Math.max(4, (wallet.creditos / creditosPacote) * 100))
+
   return (
     <div className="min-h-screen bg-[#f4f7f5]">
       <AppTopbar />
@@ -168,10 +174,10 @@ export default function CarteiraPage() {
                 <div className="h-1.5 w-full rounded-full bg-[#D8E9DE] overflow-hidden">
                   <div
                     className="h-full rounded-full bg-[#1f5230] transition-all"
-                    style={{ width: `${Math.min(100, Math.max(4, (wallet.creditos / 300) * 100))}%` }}
+                    style={{ width: `${percentualCreditos}%` }}
                   />
                 </div>
-                <p className="mt-1.5 text-[11px] text-[#4f6347]">referência: pacote de 300 créditos</p>
+                <p className="mt-1.5 text-[11px] text-[#4f6347]">referência: último pacote de {creditosPacote} créditos</p>
               </div>
             </div>
 

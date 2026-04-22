@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useState } from 'react'
+import { useState } from 'react'
 
 const faqs = [
   {
@@ -42,51 +42,29 @@ function FAQItem({
   isOpen: boolean
   onToggle: () => void
 }) {
-  const contentRef = useRef<HTMLDivElement>(null)
-
   return (
     <div
-      className="overflow-hidden rounded-2xl transition-all duration-200"
-      style={{
-        background: '#ffffff',
-        border: `1px solid ${isOpen ? 'rgba(31,82,48,0.20)' : 'rgba(22,33,19,0.08)'}`,
-        boxShadow: isOpen ? '0 4px 20px rgba(31,82,48,0.08)' : 'none',
-      }}
+      className="rounded-xl bg-white px-5 py-4 shadow-sm"
+      style={{ border: '1px solid rgba(255,255,255,0.8)' }}
     >
       <button
         onClick={onToggle}
-        className="flex w-full items-center justify-between gap-4 px-6 py-5 text-left"
+        className="flex w-full cursor-pointer items-center justify-between gap-4 text-left"
+        aria-expanded={isOpen}
       >
-        <span className="text-base font-semibold leading-snug" style={{ color: '#162113' }}>
+        <span className="text-sm font-medium text-gray-800">
           {faq.q}
         </span>
-        <span
-          className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full text-base font-bold transition-all duration-300"
-          style={{
-            background: isOpen ? '#1f5230' : 'rgba(22,33,19,0.06)',
-            color: isOpen ? '#ffffff' : '#162113',
-            transform: isOpen ? 'rotate(45deg)' : 'rotate(0deg)',
-          }}
-        >
-          +
+        <span className="flex-shrink-0 text-lg font-bold text-[#1a5c38]">
+          {isOpen ? '×' : '+'}
         </span>
       </button>
 
-      <div
-        style={{
-          maxHeight: isOpen ? `${contentRef.current?.scrollHeight ?? 300}px` : '0px',
-          opacity: isOpen ? 1 : 0,
-          overflow: 'hidden',
-          transition: 'max-height 0.35s ease, opacity 0.25s ease',
-        }}
-      >
-        <div ref={contentRef} className="px-6 pb-6">
-          <div className="mb-4 h-px" style={{ background: 'rgba(22,33,19,0.07)' }} />
-          <p className="text-sm leading-relaxed" style={{ color: '#6b7280' }}>
-            {faq.a}
-          </p>
+      {isOpen ? (
+        <div className="mt-3 border-t border-gray-100 pt-3 text-sm leading-relaxed text-gray-600">
+          {faq.a}
         </div>
-      </div>
+      ) : null}
     </div>
   )
 }
@@ -95,18 +73,29 @@ export default function FAQ() {
   const [open, setOpen] = useState<number | null>(null)
 
   return (
-    <section id="faq" className="bg-[#f8faf8] px-6 py-28">
-      <div className="mx-auto max-w-3xl">
-        <div className="mb-14 text-center">
-          <p className="mb-4 text-xs font-bold uppercase tracking-widest" style={{ color: '#1f5230' }}>
-            Dúvidas
-          </p>
-          <h2 className="text-4xl font-extrabold md:text-5xl" style={{ color: '#162113' }}>
+    <section
+      id="faq"
+      className="bg-gradient-to-br from-[#f0faf4] via-[#d1ead9] to-[#a8d5b5] px-6 py-24"
+    >
+      <div className="mx-auto max-w-6xl">
+        <div className="mb-16 flex flex-wrap items-start justify-between gap-8">
+          <h2 className="max-w-xs text-4xl font-bold text-gray-900">
             Perguntas frequentes
           </h2>
+          <p className="max-w-sm text-base text-gray-600">
+            Não encontrou sua resposta? Fale com a gente pelo WhatsApp.
+          </p>
+          <a
+            href="https://wa.me/5511530433330?text=Olá%2C%20tenho%20uma%20dúvida%20sobre%20o%20Talhão"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="whitespace-nowrap rounded-full bg-[#1a5c38] px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#15472d]"
+          >
+            💬 Falar no WhatsApp
+          </a>
         </div>
 
-        <div className="flex flex-col gap-3">
+        <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
           {faqs.map((faq, i) => (
             <FAQItem
               key={i}
@@ -117,14 +106,13 @@ export default function FAQ() {
           ))}
         </div>
 
-        <p className="mt-10 text-center text-sm" style={{ color: '#9ca3af' }}>
-          Ainda tem dúvida?{' '}
+        <p className="mt-12 text-center text-sm text-gray-600">
+          📧 Para outras dúvidas:{' '}
           <a
-            href="https://wa.me/5519981150397"
-            className="font-semibold transition-colors hover:opacity-80"
-            style={{ color: '#1f5230' }}
+            href="mailto:ariel@talhao.ai"
+            className="font-medium text-[#1a5c38] underline underline-offset-2"
           >
-            Fale com a gente no WhatsApp →
+            ariel@talhao.ai
           </a>
         </p>
       </div>

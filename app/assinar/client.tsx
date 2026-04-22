@@ -32,6 +32,8 @@ export default function AssinarClient() {
   const [modalAberto, setModalAberto] = useState(false)
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('pix')
   const [cpf, setCpf] = useState('')
+  const [ddi, setDdi] = useState('+55')
+  const [phone, setPhone] = useState('')
   const [processando, setProcessando] = useState(false)
   const [erro, setErro] = useState('')
   const [resultado, setResultado] = useState<PaymentResult | null>(null)
@@ -66,9 +68,32 @@ export default function AssinarClient() {
       .replace(/(\d{3})(\d{1,2})$/, '$1-$2')
   }
 
+  const formatPhone = (v: string, selectedDdi: string) => {
+    const nums = v.replace(/\D/g, '').slice(0, selectedDdi === '+55' ? 11 : 15)
+    if (selectedDdi === '+55') {
+      // Format: (XX) XXXXX-XXXX or (XX) XXXX-XXXX
+      if (nums.length <= 2) return nums
+      if (nums.length <= 7) return `(${nums.slice(0, 2)}) ${nums.slice(2)}`
+      if (nums.length <= 11) return `(${nums.slice(0, 2)}) ${nums.slice(2, nums.length - 4)}-${nums.slice(-4)}`
+    }
+    return nums
+  }
+
+  const getPhoneForApi = () => {
+    const nums = phone.replace(/\D/g, '')
+    // Remove DDI prefix for Asaas (which handles BR numbers without +55)
+    if (ddi === '+55') return nums
+    return ddi.replace('+', '') + nums
+  }
+
   const handlePagar = async () => {
     if (!cpf || cpf.replace(/\D/g, '').length < 11) {
       setErro('CPF inválido')
+      return
+    }
+    const phoneNums = phone.replace(/\D/g, '')
+    if (!phoneNums || (ddi === '+55' && phoneNums.length < 10) || phoneNums.length < 7) {
+      setErro('Telefone inválido')
       return
     }
     setProcessando(true)
@@ -87,6 +112,7 @@ export default function AssinarClient() {
           quantidade_creditos: quantidade,
           payment_method: paymentMethod,
           cpf,
+          phone: getPhoneForApi(),
         }),
       })
 
@@ -266,7 +292,7 @@ export default function AssinarClient() {
                 </p>
 
                 {/* CPF */}
-                <div className="mb-5">
+                <div className="mb-4">
                   <label className="block text-xs font-bold text-gray-600 uppercase mb-1.5">CPF</label>
                   <input
                     type="text"
@@ -275,6 +301,35 @@ export default function AssinarClient() {
                     onChange={e => setCpf(formatCpf(e.target.value))}
                     className="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm outline-none focus:border-[#1A1A2E] transition-colors"
                   />
+                </div>
+
+                {/* Telefone */}
+                <div className="mb-5">
+                  <label className="block text-xs font-bold text-gray-600 uppercase mb-1.5">Celular</label>
+                  <div className="flex gap-2">
+                    <select
+                      value={ddi}
+                      onChange={e => { setDdi(e.target.value); setPhone('') }}
+                      className="px-2 py-2.5 border border-gray-300 rounded-lg text-sm outline-none focus:border-[#1A1A2E] transition-colors bg-white min-w-[80px]"
+                    >
+                      <option value="+55">🇧🇷 +55</option>
+                      <option value="+1">🇺🇸 +1</option>
+                      <option value="+54">🇦🇷 +54</option>
+                      <option value="+595">🇵🇾 +595</option>
+                      <option value="+598">🇺🇾 +598</option>
+                      <option value="+56">🇨🇱 +56</option>
+                      <option value="+51">🇵🇪 +51</option>
+                      <option value="+34">🇪🇸 +34</option>
+                      <option value="+351">🇵🇹 +351</option>
+                    </select>
+                    <input
+                      type="tel"
+                      placeholder={ddi === '+55' ? '(11) 99999-9999' : 'Número com DDD'}
+                      value={phone}
+                      onChange={e => setPhone(formatPhone(e.target.value, ddi))}
+                      className="flex-1 px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm outline-none focus:border-[#1A1A2E] transition-colors"
+                    />
+                  </div>
                 </div>
 
                 {/* Método */}

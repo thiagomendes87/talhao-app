@@ -7,6 +7,7 @@ type CreatePaymentBody = {
   user_id?: string
   quantidade_creditos?: number
   cpf?: string
+  phone?: string
   payment_method?: string
 }
 
@@ -112,7 +113,7 @@ async function asaasRequest<T>(path: string, init?: RequestInit): Promise<T> {
   return payload as T
 }
 
-async function getOrCreateAsaasCustomer(user: any, cpf: string) {
+async function getOrCreateAsaasCustomer(user: any, cpf: string, phone?: string) {
   const params = new URLSearchParams({
     limit: '1',
     externalReference: user.id,
@@ -132,14 +133,20 @@ async function getOrCreateAsaasCustomer(user: any, cpf: string) {
     || user.email?.split('@')[0]
     || 'Cliente Talhão'
 
+  const customerBody: Record<string, string> = {
+    name,
+    email: user.email,
+    cpfCnpj: cpf,
+    externalReference: user.id,
+  }
+
+  if (phone) {
+    customerBody.mobilePhone = phone
+  }
+
   const customer = await asaasRequest<AsaasCustomer>('/customers', {
     method: 'POST',
-    body: JSON.stringify({
-      name,
-      email: user.email,
-      cpfCnpj: cpf,
-      externalReference: user.id,
-    }),
+    body: JSON.stringify(customerBody),
   })
 
   return customer.id
@@ -232,6 +239,7 @@ export async function POST(request: NextRequest) {
   const paymentMethod = normalizePaymentMethod(body.payment_method)
   const quantidadeCreditos = Number(body.quantidade_creditos)
   const cpf = sanitizeCpf(body.cpf || '')
+  const phone = (body.phone || '').replace(/\D/g, '').slice(0, 15)
 
   if (body.user_id && body.user_id !== user.id) {
     return NextResponse.json(
@@ -281,6 +289,7 @@ export async function POST(request: NextRequest) {
     await insertPaymentRecord(supabase, {
       id: paymentId,
       user_id: user.id,
+      type: paymentMethod,
       amount: valor,
       quantidade_creditos: quantidadeCreditos,
       payment_method: paymentMethod,
@@ -298,7 +307,7 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const customerId = await getOrCreateAsaasCustomer(user, cpf)
+    const customerId = await getOrCreateAsaasCustomer(user, cpf, phone)
 
     const payment = await asaasRequest<AsaasPayment>('/payments', {
       method: 'POST',

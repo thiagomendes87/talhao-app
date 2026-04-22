@@ -88,7 +88,7 @@ export default function DashboardPage() {
 
   if (carregando) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#F7FAF8]">
+      <div className="min-h-screen flex items-center justify-center bg-[#f4f7f5]">
         <div className="text-center">
           <div className="w-8 h-8 border-4 border-[#2D6A4F] border-t-transparent rounded-full animate-spin mx-auto mb-3" />
           <p className="text-gray-500 text-sm">Carregando...</p>
@@ -107,13 +107,13 @@ export default function DashboardPage() {
   const saldoReais = Number((creditos * 3.5).toFixed(2))
 
   return (
-    <div className="min-h-screen bg-[#F7FAF8]">
+    <div className="min-h-screen bg-[#f4f7f5]">
       <AppTopbar />
 
       <main className="mx-auto max-w-5xl px-4 py-8 sm:px-10 sm:py-10">
-        <section className="rounded-[28px] border border-[rgba(28,43,24,0.08)] bg-white px-6 py-7 shadow-sm sm:px-8">
+        <section className="rounded-2xl border border-[rgba(28,43,24,0.08)] bg-white px-6 py-7 shadow-sm sm:px-8">
           <p className="text-sm text-gray-500">Olá, {nomeUsuario}.</p>
-          <h1 className="mt-2 text-3xl font-extrabold text-[#162113]">Seu dashboard</h1>
+          <h1 className="mt-2 text-2xl font-bold text-[#162113]">Seu dashboard</h1>
           <p className="mt-3 max-w-2xl text-sm leading-relaxed text-gray-600">
             Acompanhe seu saldo disponível, veja os downloads mais recentes e acesse rapidamente
             sua carteira ou os dados da sua conta.
@@ -122,7 +122,7 @@ export default function DashboardPage() {
           <div className="mt-8 grid gap-4 lg:grid-cols-[1.3fr_0.7fr_0.7fr]">
             <div className="rounded-2xl border border-[#D8E9DE] bg-[#F3FBF6] p-5">
               <p className="text-xs font-bold uppercase tracking-[0.22em] text-[#5C7C6C]">Saldo atual</p>
-              <p className="mt-3 text-4xl font-extrabold text-[#1f5230]">{creditos} <span className="text-xl font-bold">créditos</span></p>
+              <p className="mt-3 text-3xl font-bold text-[#1f5230]">{creditos} <span className="text-xl font-bold">créditos</span></p>
               <p className="mt-1 text-sm text-[#40614E]">{formatCurrency(saldoReais)} disponível</p>
             </div>
 
@@ -131,7 +131,7 @@ export default function DashboardPage() {
               className="rounded-2xl border border-gray-200 bg-white p-5 transition-colors hover:border-[#2D6A4F] hover:bg-[#FBFEFC]"
             >
               <p className="text-xs font-bold uppercase tracking-[0.22em] text-[#5C7C6C]">Atalho</p>
-              <h2 className="mt-3 text-xl font-extrabold text-[#162113]">Carteira</h2>
+              <h2 className="mt-3 text-lg font-semibold text-[#162113]">Carteira</h2>
               <p className="mt-2 text-sm text-gray-600">Recarregue créditos e acompanhe pagamentos.</p>
             </Link>
 
@@ -140,17 +140,17 @@ export default function DashboardPage() {
               className="rounded-2xl border border-gray-200 bg-white p-5 transition-colors hover:border-[#2D6A4F] hover:bg-[#FBFEFC]"
             >
               <p className="text-xs font-bold uppercase tracking-[0.22em] text-[#5C7C6C]">Atalho</p>
-              <h2 className="mt-3 text-xl font-extrabold text-[#162113]">Conta</h2>
+              <h2 className="mt-3 text-lg font-semibold text-[#162113]">Conta</h2>
               <p className="mt-2 text-sm text-gray-600">Edite seu perfil e gerencie a sessão atual.</p>
             </Link>
           </div>
         </section>
 
-        <section className="mt-8 rounded-[28px] border border-[rgba(28,43,24,0.08)] bg-white p-5 shadow-sm sm:p-6">
+        <section className="mt-8 rounded-2xl border border-[rgba(28,43,24,0.08)] bg-white p-5 shadow-sm sm:p-6">
           <div className="flex items-center justify-between gap-3 flex-wrap">
             <div>
               <p className="text-xs font-bold uppercase tracking-[0.22em] text-[#5C7C6C]">Downloads</p>
-              <h2 className="mt-1 text-xl font-extrabold text-[#162113]">Downloads recentes</h2>
+              <h2 className="mt-1 text-lg font-semibold text-[#162113]">Downloads recentes</h2>
             </div>
             <span className="rounded-full bg-[#F3FBF6] px-3 py-1 text-xs font-semibold text-[#2D6A4F]">
               Últimos 10 arquivos

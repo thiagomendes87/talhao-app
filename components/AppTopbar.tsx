@@ -26,7 +26,7 @@ export default function AppTopbar() {
   }, [pathname])
 
   return (
-    <header className="sticky top-0 z-40 border-b border-[rgba(28,43,24,0.08)] bg-white/95 backdrop-blur">
+    <header className="sticky top-0 z-40 border-b border-[rgba(28,43,24,0.12)] bg-white/95 backdrop-blur">
       <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-4 py-4 sm:px-10">
         <Link href="/" className="shrink-0">
           <Image
@@ -50,7 +50,7 @@ export default function AppTopbar() {
                 className={`border-b-2 pb-1 text-sm font-semibold transition-colors ${
                   active
                     ? 'border-[#2D6A4F] text-[#1f5230]'
-                    : 'border-transparent text-gray-500 hover:text-[#162113]'
+                    : 'border-transparent text-[#4f6347] hover:text-[#162113]'
                 }`}
               >
                 {item.label}
@@ -64,7 +64,7 @@ export default function AppTopbar() {
             href="/mapa"
             target="_blank"
             rel="noopener noreferrer"
-            className="rounded-xl bg-[#1f5230] px-4 py-2.5 text-sm font-bold text-white transition-colors hover:bg-[#163b23]"
+            className="rounded-lg bg-[#1f5230] px-4 py-2.5 text-sm font-bold text-white transition-colors hover:bg-[#163b23]"
           >
             Abrir mapa →
           </Link>
@@ -126,7 +126,7 @@ export default function AppTopbar() {
               href="/mapa"
               target="_blank"
               rel="noopener noreferrer"
-              className="mt-2 rounded-xl bg-[#1f5230] px-4 py-3 text-center text-sm font-bold text-white transition-colors hover:bg-[#163b23]"
+              className="mt-2 rounded-lg bg-[#1f5230] px-4 py-3 text-center text-sm font-bold text-white transition-colors hover:bg-[#163b23]"
             >
               Abrir mapa →
             </Link>

@@ -116,7 +116,7 @@ export default function ContaPage() {
 
   if (carregando) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#F7FAF8]">
+      <div className="min-h-screen flex items-center justify-center bg-[#f4f7f5]">
         <div className="text-center">
           <div className="w-8 h-8 border-4 border-[#2D6A4F] border-t-transparent rounded-full animate-spin mx-auto mb-3" />
           <p className="text-gray-500 text-sm">Carregando...</p>
@@ -128,13 +128,13 @@ export default function ContaPage() {
   if (!usuario) return null
 
   return (
-    <div className="min-h-screen bg-[#F7FAF8]">
+    <div className="min-h-screen bg-[#f4f7f5]">
       <AppTopbar />
 
       <main className="mx-auto max-w-5xl px-4 py-8 sm:px-10 sm:py-10">
-        <section className="rounded-[28px] border border-[rgba(28,43,24,0.08)] bg-white p-6 shadow-sm sm:p-8">
+        <section className="rounded-2xl border border-[rgba(28,43,24,0.08)] bg-white p-6 shadow-sm sm:p-8">
           <p className="text-xs font-bold uppercase tracking-[0.22em] text-[#5C7C6C]">Conta</p>
-          <h1 className="mt-2 text-3xl font-extrabold text-[#162113]">Meu perfil</h1>
+          <h1 className="mt-2 text-2xl font-bold text-[#162113]">Meu perfil</h1>
           <p className="mt-3 max-w-2xl text-sm leading-relaxed text-gray-600">
             Atualize seus dados principais e mantenha seu perfil alinhado com o uso que você faz do Talhão.
           </p>
@@ -199,7 +199,7 @@ export default function ContaPage() {
           </div>
         </section>
 
-        <section className="mt-8 rounded-[28px] border border-[rgba(28,43,24,0.08)] bg-white p-6 shadow-sm sm:p-8">
+        <section className="mt-8 rounded-2xl border border-[rgba(28,43,24,0.08)] bg-white p-6 shadow-sm sm:p-8">
           <p className="text-xs font-bold uppercase tracking-[0.22em] text-[#5C7C6C]">Minha conta</p>
           <h2 className="mt-2 text-2xl font-extrabold text-[#162113]">Sessão e acesso</h2>
           <div className="mt-6 rounded-2xl border border-gray-200 bg-gray-50 p-5">

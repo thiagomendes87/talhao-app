@@ -110,7 +110,7 @@ export default function DashboardPage() {
     <div className="min-h-screen bg-[#F7FAF8]">
       <AppTopbar />
 
-      <main className="mx-auto max-w-6xl px-4 py-8 sm:px-10 sm:py-10">
+      <main className="mx-auto max-w-5xl px-4 py-8 sm:px-10 sm:py-10">
         <section className="rounded-[28px] border border-[rgba(28,43,24,0.08)] bg-white px-6 py-7 shadow-sm sm:px-8">
           <p className="text-sm text-gray-500">Olá, {nomeUsuario}.</p>
           <h1 className="mt-2 text-3xl font-extrabold text-[#162113]">Seu dashboard</h1>

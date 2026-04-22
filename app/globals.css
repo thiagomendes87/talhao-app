@@ -1,14 +1,28 @@
+/*
+ * Paleta oficial Talhão
+ * --green-900: #162113
+ * --green-800: #1f5230
+ * --green-700: #2a6b3f
+ * --green-600: #2D6A4F
+ * --green-500: #40916C
+ * --green-100: #D8F3DC
+ * --green-50: #F0FDF4
+ * --border: rgba(22, 33, 19, 0.12)
+ */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --navy: #1A1A2E;
-  --green-dark: #1B4332;
-  --green-brand: #2D6A4F;
-  --green-light: #40916C;
-  --green-pale: #D8F3DC;
-  --green-muted: #74C69D;
+  --green-900: #162113;
+  --green-800: #1f5230;
+  --green-700: #2a6b3f;
+  --green-600: #2D6A4F;
+  --green-500: #40916C;
+  --green-100: #D8F3DC;
+  --green-50: #F0FDF4;
+  --green-primary: #1f5230;
+  --border: rgba(22, 33, 19, 0.12);
 }
 
 * {
@@ -28,22 +42,22 @@ body {
 
 @layer components {
   .btn-primary {
-    @apply bg-[#1A1A2E] text-white font-semibold px-5 py-2.5 rounded-xl text-sm transition-all
-           hover:bg-[#2d2d50] hover:shadow-md;
+    @apply rounded-xl bg-green-800 px-5 py-2.5 text-sm font-semibold text-white transition-all
+           hover:bg-green-700 hover:shadow-md;
   }
   .btn-green {
-    @apply bg-[#2D6A4F] text-white font-semibold px-5 py-2.5 rounded-xl text-sm transition-all
-           hover:bg-[#40916C] hover:shadow-md;
+    @apply rounded-xl bg-green-800 px-5 py-2.5 text-sm font-semibold text-white transition-all
+           hover:bg-green-700 hover:shadow-md;
   }
   .btn-ghost {
-    @apply text-[#1A1A2E] font-medium px-4 py-2 rounded-lg text-sm transition-colors hover:bg-gray-100;
+    @apply rounded-lg px-4 py-2 text-sm font-medium text-green-900 transition-colors hover:bg-gray-100;
   }
   .form-input {
-    @apply w-full px-4 py-3 border border-gray-200 rounded-xl text-sm text-gray-900 outline-none
-           focus:border-[#2D6A4F] focus:ring-2 focus:ring-[#2D6A4F]/10 transition-all
+    @apply w-full rounded-xl border border-gray-200 px-4 py-3 text-sm text-gray-900 outline-none
+           transition-all focus:border-green-800 focus:ring-2 focus:ring-green-800/10
            placeholder:text-gray-400;
   }
   .form-label {
-    @apply block text-xs font-bold text-gray-500 mb-1.5 uppercase tracking-wider;
+    @apply mb-1.5 block text-xs font-bold uppercase tracking-wider text-gray-500;
   }
 }

@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { usePathname } from 'next/navigation'
@@ -26,17 +27,16 @@ export default function AppTopbar() {
 
   return (
     <header className="sticky top-0 z-40 border-b border-[rgba(28,43,24,0.08)] bg-white/95 backdrop-blur">
-      <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-4 sm:px-10">
-        <Link href="/" className="flex items-center gap-3 shrink-0">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#1f5230] text-lg text-white shadow-sm">
-            🌿
-          </div>
-          <div>
-            <div className="text-lg font-extrabold text-[#162113]">Talhão</div>
-            <div className="text-[11px] uppercase tracking-[0.18em] text-[#5C7C6C]">
-              Área do cliente
-            </div>
-          </div>
+      <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-4 py-4 sm:px-10">
+        <Link href="/" className="shrink-0">
+          <Image
+            src="/logo-oficial.png"
+            alt="Talhão"
+            width={120}
+            height={32}
+            className="h-8 w-auto"
+            priority
+          />
         </Link>
 
         <nav className="hidden items-center gap-7 md:flex">
@@ -103,7 +103,7 @@ export default function AppTopbar() {
 
       {menuOpen && (
         <div className="border-t border-gray-100 bg-white px-4 py-4 shadow-sm md:hidden">
-          <div className="mx-auto flex max-w-6xl flex-col gap-2 sm:px-6">
+          <div className="mx-auto flex max-w-5xl flex-col gap-2 sm:px-6">
             {navItems.map((item) => {
               const active = pathname === item.href
 

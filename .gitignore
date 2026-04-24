@@ -21,6 +21,13 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+.codex-*
+$stdout
+.tmp/
+.codex-dom.html
+.codex-home*.png
+.codex-home.html
+.codex-lighthouse.json
 
 # local env files
 .env

@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useMemo, useState } from 'react'
+import { type ReactNode, useMemo, useState } from 'react'
 import Reveal from '@/components/ui/Reveal'
 import Section from '@/components/ui/Section'
 
@@ -91,6 +91,17 @@ function CheckBullet({ highlight = false }: { highlight?: boolean }) {
     >
       ✓
     </span>
+  )
+}
+
+function MobileField({ label, value }: { label: string; value: ReactNode }) {
+  return (
+    <div className="flex items-start justify-between gap-4 border-b border-[rgba(22,33,19,0.06)] py-3 last:border-b-0">
+      <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#9ca3af]">
+        {label}
+      </span>
+      <div className="text-right text-[13px] text-[#162113]">{value}</div>
+    </div>
   )
 }
 
@@ -259,7 +270,43 @@ export default function Pricing() {
               </div>
             </div>
 
-            <div className="overflow-x-auto rounded-2xl border border-[rgba(22,33,19,0.08)] bg-white">
+            <div className="space-y-3 lg:hidden">
+              {credits.map((credit) => (
+                <div
+                  key={credit.qty}
+                  className="rounded-2xl border border-[rgba(22,33,19,0.08)] bg-white p-4 shadow-[0_1px_3px_rgba(22,33,19,0.04)]"
+                >
+                  <MobileField
+                    label="Quantidade"
+                    value={
+                      <div>
+                        <p className="font-mono-tabular text-[22px] font-semibold text-[#162113]">
+                          {credit.qty}
+                        </p>
+                        <p className="text-[12px] text-[#4f6347]">downloads</p>
+                      </div>
+                    }
+                  />
+                  <MobileField
+                    label="Preço"
+                    value={
+                      <span className="font-mono-tabular text-[18px] font-semibold text-[#162113]">
+                        {credit.price}
+                      </span>
+                    }
+                  />
+                  <MobileField label="Por download" value={credit.unit} />
+                  <Link
+                    href="/carteira"
+                    className="mt-4 inline-flex w-full items-center justify-center rounded-xl bg-[#1f5230] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#2a6b3f]"
+                  >
+                    Comprar
+                  </Link>
+                </div>
+              ))}
+            </div>
+
+            <div className="hidden overflow-x-auto rounded-2xl border border-[rgba(22,33,19,0.08)] bg-white lg:block">
               <div className="min-w-[720px]">
                 <div className="grid grid-cols-[1.15fr_1fr_1fr_0.9fr] border-b border-[rgba(22,33,19,0.06)] bg-[#fafbfa] px-5 py-3 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#9ca3af]">
                   <span>Quantidade</span>
@@ -299,7 +346,26 @@ export default function Pricing() {
         </Reveal>
 
         <Reveal delay={0.24}>
-            <div className="mt-8 overflow-x-auto rounded-[28px] border border-[rgba(22,33,19,0.08)] bg-white shadow-[0_1px_3px_rgba(22,33,19,0.05)]">
+            <div className="mt-8 space-y-3 lg:hidden">
+              {comparisonRows.map((row) => (
+                <div
+                  key={row.feature}
+                  className="rounded-[24px] border border-[rgba(22,33,19,0.08)] bg-white p-4 shadow-[0_1px_3px_rgba(22,33,19,0.05)]"
+                >
+                  <p className="text-[13px] font-semibold text-[#162113]">{row.feature}</p>
+                  <div className="mt-3">
+                    <MobileField label="Free" value={row.free} />
+                    <MobileField
+                      label="Pro"
+                      value={<span className="font-semibold text-[#1f5230]">{row.pro}</span>}
+                    />
+                    <MobileField label="Créditos" value={row.credits} />
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-8 hidden overflow-x-auto rounded-[28px] border border-[rgba(22,33,19,0.08)] bg-white shadow-[0_1px_3px_rgba(22,33,19,0.05)] lg:block">
               <div className="min-w-[760px]">
                 <div className="grid grid-cols-[1.35fr_repeat(3,minmax(0,1fr))] border-b border-[rgba(22,33,19,0.06)] bg-[#fafbfa]">
                   <div className="px-5 py-4 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#9ca3af]">

@@ -1,5 +1,6 @@
 'use client'
 
+import { AnimatePresence, motion } from 'framer-motion'
 import { useState } from 'react'
 
 const faqs = [
@@ -30,96 +31,101 @@ const faqs = [
   {
     q: 'Tenho uma empresa com muitos downloads. Tem plano corporativo?',
     a: 'Sim. Para escritórios de consultoria, bancos e imobiliárias rurais com alto volume, montamos propostas personalizadas. Fale com a gente pelo WhatsApp.',
-  }
+  },
 ]
+
+function Chevron({ isOpen }: { isOpen: boolean }) {
+  return (
+    <svg
+      className={`h-4 w-4 flex-shrink-0 text-[#1f5230] transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="m6 9 6 6 6-6" />
+    </svg>
+  )
+}
 
 function FAQItem({
   faq,
   isOpen,
   onToggle,
 }: {
-  faq: typeof faqs[0]
+  faq: (typeof faqs)[0]
   isOpen: boolean
   onToggle: () => void
 }) {
   return (
-    <div
-      className="rounded-xl bg-white px-5 py-4 shadow-sm"
-      style={{ border: '1px solid rgba(255,255,255,0.8)' }}
-    >
+    <div className="border-b border-[rgba(22,33,19,0.08)] py-5">
       <button
+        type="button"
         onClick={onToggle}
-        className="flex w-full cursor-pointer items-center justify-between gap-4 text-left"
+        className="flex w-full items-center justify-between gap-6 text-left"
         aria-expanded={isOpen}
       >
-        <span className="text-sm font-medium text-gray-800">
-          {faq.q}
-        </span>
-        <span className="flex-shrink-0 text-lg font-bold text-[#1a5c38]">
-          {isOpen ? '×' : '+'}
-        </span>
+        <span className="text-[15px] font-semibold text-[#162113]">{faq.q}</span>
+        <Chevron isOpen={isOpen} />
       </button>
 
-      {isOpen ? (
-        <div className="mt-3 border-t border-gray-100 pt-3 text-sm leading-relaxed text-gray-600">
-          {faq.a}
-        </div>
-      ) : null}
+      <AnimatePresence initial={false}>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -6, height: 0 }}
+            animate={{ opacity: 1, y: 0, height: 'auto' }}
+            exit={{ opacity: 0, y: -6, height: 0 }}
+            transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
+            className="overflow-hidden"
+          >
+            <p className="pt-4 text-[14px] leading-relaxed text-[#4f6347]">{faq.a}</p>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }
 
 export default function FAQ() {
-  const [open, setOpen] = useState<number | null>(null)
+  const [open, setOpen] = useState<number | null>(0)
 
   return (
-    <section
-      id="faq"
-      className="bg-gradient-to-br from-[#f0faf4] via-[#d1ead9] to-[#a8d5b5] px-6 py-24"
-    >
-      <div className="mx-auto max-w-6xl">
-        <div className="mb-16 flex flex-wrap items-start justify-between gap-8">
-          <div>
-            <div className="inline-flex items-center rounded-lg border border-[rgba(28,43,24,0.15)] bg-white/70 px-3 py-1.5 mb-4">
-              <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#1f5230]">Dúvidas frequentes</span>
-            </div>
-            <h2 className="max-w-xs text-3xl font-bold text-[#162113]">
-              Perguntas frequentes
-            </h2>
+    <section id="faq" className="bg-white px-6 py-24">
+      <div className="mx-auto max-w-3xl">
+        <div className="mb-12 text-center">
+          <div className="mb-4 inline-flex items-center rounded-lg border border-[rgba(28,43,24,0.12)] bg-[#f4f7f5] px-3 py-1.5">
+            <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#1f5230]">
+              Dúvidas frequentes
+            </span>
           </div>
-          <p className="max-w-sm text-base text-gray-600">
-            Não encontrou sua resposta? Fale com a gente pelo WhatsApp.
-          </p>
-          <a
-            href="https://wa.me/5511530433330?text=Olá%2C%20tenho%20uma%20dúvida%20sobre%20o%20Talhão"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="whitespace-nowrap rounded-full bg-[#1a5c38] px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#15472d]"
-          >
-            💬 Falar no WhatsApp
-          </a>
+          <h2 className="text-3xl font-bold text-[#162113]">Perguntas frequentes</h2>
         </div>
 
-        <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-          {faqs.map((faq, i) => (
+        <div>
+          {faqs.map((faq, index) => (
             <FAQItem
-              key={i}
+              key={faq.q}
               faq={faq}
-              isOpen={open === i}
-              onToggle={() => setOpen(open === i ? null : i)}
+              isOpen={open === index}
+              onToggle={() => setOpen(open === index ? null : index)}
             />
           ))}
         </div>
 
-        <p className="mt-12 text-center text-sm text-gray-600">
-          📧 Para outras dúvidas:{' '}
+        <div className="mt-12 text-center">
+          <p className="text-[14px] text-[#4f6347]">Ainda com dúvidas?</p>
           <a
-            href="mailto:ariel@talhao.ai"
-            className="font-medium text-[#1a5c38] underline underline-offset-2"
+            href="https://wa.me/5511530433330?text=Olá%2C%20tenho%20uma%20dúvida%20sobre%20o%20Talhão"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-4 inline-flex rounded-xl bg-[#1f5230] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#2a6b3f]"
           >
-            ariel@talhao.ai
+            Falar no WhatsApp →
           </a>
-        </p>
+        </div>
       </div>
     </section>
   )

@@ -64,3 +64,28 @@ body {
     @apply mb-1.5 block text-[11px] font-semibold uppercase tracking-[0.08em] text-[#4f6347];
   }
 }
+
+@layer utilities {
+  .font-mono-tabular {
+    font-family: var(--font-mono), 'JetBrains Mono', monospace;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .bg-grid-dots {
+    background-image: radial-gradient(circle, rgba(22, 33, 19, 0.06) 1px, transparent 1px);
+    background-size: 32px 32px;
+  }
+
+  .glow-green {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+      ellipse 60% 50% at 50% 50%,
+      rgba(82, 183, 136, 0.22),
+      rgba(31, 82, 48, 0.12) 40%,
+      transparent 70%
+    );
+    filter: blur(80px);
+    pointer-events: none;
+  }
+}

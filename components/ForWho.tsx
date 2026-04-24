@@ -1,113 +1,273 @@
-const profiles = [
+'use client'
+
+import { useMemo, useState } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
+import Reveal from '@/components/ui/Reveal'
+import Section from '@/components/ui/Section'
+
+type Persona = {
+  id: string
+  label: string
+  scenarioTitle: string
+  narrative: string
+  benefits: string[]
+  previewBadge: string
+  previewMetric: string
+  previewNote: string
+  previewChips: string[]
+}
+
+const personas: Persona[] = [
   {
-    icon: (
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-        <circle cx="9" cy="7" r="4" />
-        <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-        <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-      </svg>
-    ),
+    id: 'brokers',
     label: 'Corretores & Imobiliárias',
-    desc: 'Encontre os limites exatos de qualquer fazenda antes da visita. Baixe o arquivo e mostre ao cliente no Google Earth na hora.',
-    tag: 'Mais usado',
+    scenarioTitle: 'Corretor fechando uma venda',
+    narrative:
+      'Encontre os limites exatos de qualquer fazenda antes da visita e chegue à conversa com a área aberta no mapa. Baixe o arquivo na hora e mostre ao cliente no Google Earth, sem depender de equipe técnica para preparar o material.',
+    benefits: [
+      'Mostra limites oficiais antes da visita',
+      'Abre o polígono no Google Earth em minutos',
+      'Passa mais confiança na apresentação do imóvel',
+    ],
+    previewBadge: 'Visita agendada',
+    previewMetric: 'CAR + polígono',
+    previewNote: 'Cliente vê a área com contexto visual imediato.',
+    previewChips: ['Google Earth', 'KML', 'Visita'],
   },
   {
-    icon: (
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-        <polyline points="9 22 9 12 15 12 15 22" />
-      </svg>
-    ),
+    id: 'owners',
     label: 'Proprietários Rurais',
-    desc: 'Confira os limites oficiais da sua propriedade, detecte sobreposições com vizinhos e tenha os documentos prontos para o cartório.',
-    tag: null,
+    scenarioTitle: 'Produtor organizando a regularização',
+    narrative:
+      'Confira os limites oficiais da sua propriedade com segurança antes de protocolar qualquer documento. Detecte sobreposições com vizinhos e leve os arquivos certos para o cartório ou para a regularização, sem curva de aprendizado.',
+    benefits: [
+      'Confere limites oficiais da fazenda',
+      'Identifica sobreposições com vizinhos',
+      'Leva arquivos prontos para cartório e registro',
+    ],
+    previewBadge: 'Regularização',
+    previewMetric: 'Limites oficiais',
+    previewNote: 'Sobreposição destacada para conferência rápida.',
+    previewChips: ['Cartório', 'CAR', 'Confrontantes'],
   },
   {
-    icon: (
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <line x1="12" y1="1" x2="12" y2="23" />
-        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
-      </svg>
-    ),
+    id: 'investors',
     label: 'Investidores de Terras',
-    desc: 'Analise qualquer gleba com dados reais antes de negociar. Área, documentação, topografia e localização em segundos.',
-    tag: null,
+    scenarioTitle: 'Investidor filtrando uma oportunidade',
+    narrative:
+      'Analise qualquer gleba com dados reais antes de entrar numa negociação. Área, documentação, topografia e localização aparecem em segundos para você comparar ativos com mais critério e reduzir diligência manual.',
+    benefits: [
+      'Compara áreas e localização com rapidez',
+      'Valida topografia antes da proposta',
+      'Entra na diligência com dados reais na mesa',
+    ],
+    previewBadge: 'Análise de aquisição',
+    previewMetric: '851 ha',
+    previewNote: 'Topografia e localização lado a lado na decisão.',
+    previewChips: ['Altitude', 'Declividade', 'Valuation'],
   },
   {
-    icon: (
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
-        <line x1="8" y1="21" x2="16" y2="21" />
-        <line x1="12" y1="17" x2="12" y2="21" />
-      </svg>
-    ),
+    id: 'legal',
     label: 'Advogados & Cartórios',
-    desc: 'Acesse matrículas georreferenciadas do INCRA, shapefiles e documentação oficial para processos, registros e due diligence.',
-    tag: null,
+    scenarioTitle: 'Jurídico conferindo a base espacial',
+    narrative:
+      'Acesse matrículas georreferenciadas do INCRA, shapefiles e bases oficiais sem depender de montagem manual. Isso acelera processos, registros e due diligence com uma base espacial mais confiável para conferência.',
+    benefits: [
+      'Reúne bases oficiais em poucos minutos',
+      'Apoia due diligence e registro com mais contexto',
+      'Organiza prova espacial para conferência e processo',
+    ],
+    previewBadge: 'Due diligence',
+    previewMetric: 'INCRA + matrícula',
+    previewNote: 'Base espacial pronta para registro e auditoria.',
+    previewChips: ['SIGEF', 'SNCI', 'Compliance'],
   },
 ]
 
-export default function ForWho() {
+function CheckIcon() {
   return (
-    <section className="bg-white px-6 py-28">
-      <div className="mx-auto max-w-5xl">
-        <div className="mb-16 text-center">
-          <div className="inline-flex items-center rounded-lg border border-[rgba(28,43,24,0.12)] bg-[#f4f7f5] px-3 py-1.5 mb-5">
-            <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#1f5230]">Para quem é</span>
-          </div>
-          <h2 className="mb-4 text-4xl font-extrabold leading-tight md:text-5xl" style={{ color: '#162113' }}>
-            Feito para quem trabalha{' '}
-            <span
-              style={{
-                background: 'linear-gradient(135deg, #1f5230, #52b788)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-              }}
-            >
-              com terra.
-            </span>
-          </h2>
-          <p className="mx-auto max-w-lg text-base text-gray-500">
-            Sem jargão técnico, sem curva de aprendizado. Se você precisa de dados de uma fazenda, o Talhão resolve.
-          </p>
-        </div>
+    <svg
+      width="14"
+      height="14"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M20 6 9 17l-5-5" />
+    </svg>
+  )
+}
 
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-          {profiles.map((p) => (
-            <div
-              key={p.label}
-              className="relative flex cursor-default gap-5 rounded-2xl border border-[rgba(22,33,19,0.09)] bg-white p-7 transition-all duration-300 hover:-translate-y-[3px] hover:border-[rgba(31,82,48,0.25)] hover:shadow-[0_4px_24px_rgba(31,82,48,0.10)]"
-              style={{
-                boxShadow: '0 1px 3px rgba(22,33,19,0.05)',
-              }}
-            >
-              {p.tag && (
-                <div
-                  className="absolute right-5 top-5 rounded-full px-2.5 py-1 text-xs font-bold"
-                  style={{ background: 'rgba(31,82,48,0.08)', color: '#1f5230' }}
-                >
-                  {p.tag}
-                </div>
-              )}
-              <div
-                className="mt-0.5 flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl"
-                style={{ background: 'rgba(31,82,48,0.07)', color: '#1f5230' }}
-              >
-                {p.icon}
-              </div>
-              <div>
-                <h3 className="mb-2 text-base font-bold leading-snug" style={{ color: '#162113' }}>
-                  {p.label}
-                </h3>
-                <p className="text-sm leading-relaxed" style={{ color: '#6b7280' }}>
-                  {p.desc}
-                </p>
+function PersonaMockup({ persona }: { persona: Persona }) {
+  return (
+    <div className="overflow-hidden rounded-[24px] border border-[rgba(22,33,19,0.08)] bg-white shadow-[0_1px_3px_rgba(22,33,19,0.05),0_18px_40px_rgba(22,33,19,0.07)]">
+      <div className="flex items-center gap-2 border-b border-[rgba(22,33,19,0.06)] px-4 py-3">
+        <span className="h-2.5 w-2.5 rounded-full bg-[#d1d5db]" />
+        <span className="h-2.5 w-2.5 rounded-full bg-[#bbf7d0]" />
+        <span className="h-2.5 w-2.5 rounded-full bg-[#9ca3af]" />
+        <span className="ml-2 text-[11px] font-medium text-[#6b7280]">talhao.ai/mapa</span>
+      </div>
+
+      <div className="relative overflow-hidden bg-[linear-gradient(180deg,#f8fbf9_0%,#eef5f0_100%)] p-4">
+        <div className="absolute inset-0 bg-grid-dots opacity-60" />
+        <div className="absolute right-6 top-6 h-24 w-24 rounded-full bg-[radial-gradient(circle,rgba(82,183,136,0.20),transparent_68%)] blur-2xl" />
+
+        <div className="relative grid gap-4 lg:grid-cols-[1fr_150px]">
+          <div className="overflow-hidden rounded-2xl border border-[rgba(22,33,19,0.08)] bg-[#e8efe9]">
+            <div className="flex items-center justify-between border-b border-[rgba(22,33,19,0.06)] bg-white/80 px-3 py-2">
+              <span className="text-[11px] font-medium text-[#4f6347]">{persona.previewBadge}</span>
+              <span className="rounded-full bg-[rgba(31,82,48,0.08)] px-2 py-1 font-mono-tabular text-[10px] text-[#1f5230]">
+                mapa
+              </span>
+            </div>
+
+            <div className="relative h-[210px] bg-[linear-gradient(135deg,#36543a_0%,#5c7b53_35%,#6f8c57_60%,#2a3f2c_100%)]">
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_25%,rgba(255,255,255,0.20),transparent_20%),radial-gradient(circle_at_70%_38%,rgba(255,255,255,0.10),transparent_18%),linear-gradient(45deg,rgba(255,255,255,0.05)_25%,transparent_25%,transparent_50%,rgba(255,255,255,0.05)_50%,rgba(255,255,255,0.05)_75%,transparent_75%,transparent)] bg-[length:22px_22px]" />
+              <svg viewBox="0 0 420 240" className="absolute inset-0 h-full w-full">
+                <polyline
+                  points="18,170 68,110 132,126 182,82 248,94 312,58 384,86"
+                  fill="none"
+                  stroke="rgba(255,255,255,0.28)"
+                  strokeWidth="2"
+                />
+                <polyline
+                  points="30,196 96,146 172,152 238,120 318,132 392,96"
+                  fill="none"
+                  stroke="rgba(255,255,255,0.18)"
+                  strokeWidth="2"
+                />
+                <polygon
+                  points="110,160 150,84 238,72 296,124 264,198 154,204"
+                  fill="rgba(134,239,172,0.18)"
+                  stroke="#86efac"
+                  strokeWidth="3"
+                />
+                <circle cx="212" cy="136" r="8" fill="#bbf7d0" stroke="#14532d" strokeWidth="2" />
+              </svg>
+            </div>
+          </div>
+
+          <div className="space-y-3">
+            <div className="rounded-2xl border border-[rgba(22,33,19,0.08)] bg-white/90 p-4 shadow-sm">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#4f6347]">
+                contexto
+              </p>
+              <p className="mt-2 font-mono-tabular text-[18px] font-semibold text-[#162113]">
+                {persona.previewMetric}
+              </p>
+              <p className="mt-2 text-[12px] leading-relaxed text-[#4f6347]">
+                {persona.previewNote}
+              </p>
+            </div>
+
+            <div className="rounded-2xl border border-[rgba(22,33,19,0.08)] bg-white/85 p-4 shadow-sm">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#4f6347]">
+                fluxo
+              </p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {persona.previewChips.map((chip) => (
+                  <span
+                    key={chip}
+                    className="rounded-full bg-[rgba(31,82,48,0.08)] px-2.5 py-1 text-[11px] font-medium text-[#1f5230]"
+                  >
+                    {chip}
+                  </span>
+                ))}
               </div>
             </div>
-          ))}
+          </div>
         </div>
       </div>
+    </div>
+  )
+}
+
+export default function ForWho() {
+  const [selectedId, setSelectedId] = useState(personas[0].id)
+
+  const activePersona = useMemo(() => {
+    return personas.find((persona) => persona.id === selectedId) ?? personas[0]
+  }, [selectedId])
+
+  return (
+    <section className="bg-white py-28">
+      <Section
+        eyebrow="Para quem é"
+        title="Feito para quem trabalha com terra"
+        subtitle="Sem jargão técnico. Sem curva de aprendizado."
+        contentClassName="mt-16"
+      >
+        <Reveal>
+          <div className="grid grid-cols-1 gap-10 lg:grid-cols-[280px_1fr]">
+            <div className="space-y-2">
+              {personas.map((persona) => {
+                const isActive = persona.id === activePersona.id
+
+                return (
+                  <button
+                    key={persona.id}
+                    type="button"
+                    aria-pressed={isActive}
+                    onClick={() => setSelectedId(persona.id)}
+                    className={`w-full border-l-2 px-5 py-4 text-left transition-colors duration-200 ${
+                      isActive
+                        ? 'border-[#1f5230] bg-[rgba(31,82,48,0.04)] text-[#162113]'
+                        : 'border-transparent text-[#6b7280] hover:bg-[rgba(31,82,48,0.03)] hover:text-[#162113]'
+                    }`}
+                  >
+                    <span className={`text-[15px] ${isActive ? 'font-semibold' : 'font-medium'}`}>
+                      {persona.label}
+                    </span>
+                  </button>
+                )
+              })}
+            </div>
+
+            <div className="min-h-[560px] lg:min-h-[460px]">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={activePersona.id}
+                  initial={{ opacity: 0, y: 10, x: 10 }}
+                  animate={{ opacity: 1, y: 0, x: 0 }}
+                  exit={{ opacity: 0, y: -8, x: -10 }}
+                  transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+                  className="rounded-[28px] border border-[rgba(22,33,19,0.08)] bg-[linear-gradient(180deg,#ffffff_0%,#fafcfa_100%)] p-6 shadow-[0_1px_3px_rgba(22,33,19,0.05),0_18px_44px_rgba(22,33,19,0.06)] sm:p-7"
+                >
+                  <div className="grid gap-8 lg:grid-cols-[1fr_320px] lg:items-start">
+                    <div>
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#4f6347]">
+                        cenário
+                      </p>
+                      <h3 className="mt-3 text-[24px] font-semibold leading-tight text-[#162113]">
+                        {activePersona.scenarioTitle}
+                      </h3>
+                      <p className="mt-4 max-w-2xl text-[14px] leading-relaxed text-[#4f6347]">
+                        {activePersona.narrative}
+                      </p>
+
+                      <ul className="mt-6 space-y-3">
+                        {activePersona.benefits.map((benefit) => (
+                          <li key={benefit} className="flex items-start gap-3">
+                            <span className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-[rgba(31,82,48,0.10)] text-[#1f5230]">
+                              <CheckIcon />
+                            </span>
+                            <span className="text-[13px] leading-relaxed text-[#4f6347]">{benefit}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+
+                    <PersonaMockup persona={activePersona} />
+                  </div>
+                </motion.div>
+              </AnimatePresence>
+            </div>
+          </div>
+        </Reveal>
+      </Section>
     </section>
   )
 }

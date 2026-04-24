@@ -1,85 +1,99 @@
 import Link from 'next/link'
 
-const stats = [
-  { value: '10M+', label: 'propriedades no mapa' },
-  { value: 'R$3,50', label: 'por download' },
-  { value: '3', label: 'fontes oficiais' },
-  { value: '100%', label: 'dados do governo federal' },
-]
-
 export default function CTASection() {
   return (
-    <section
-      className="relative overflow-hidden px-6 py-28"
-      style={{ background: '#0a1a0e' }}
-    >
-      <div
-        className="pointer-events-none absolute inset-0"
-        style={{
-          background:
-            'radial-gradient(ellipse 60% 70% at 50% 100%, rgba(31,82,48,0.5), transparent)',
-        }}
-      />
+    <section className="relative overflow-hidden bg-white px-6 py-32">
+      <div className="glow-green opacity-80" />
 
-      <div className="relative mx-auto max-w-4xl text-center">
-        <div className="mb-20 grid grid-cols-2 gap-6 md:grid-cols-4">
-          {stats.map((s) => (
-            <div key={s.label} className="text-center">
-              <div
-                className="mb-1 text-3xl font-extrabold"
-                style={{
-                  background: 'linear-gradient(135deg, #f0fdf4, #86efac)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                }}
-              >
-                {s.value}
-              </div>
-              <div className="text-xs" style={{ color: 'rgba(240,253,244,0.45)' }}>
-                {s.label}
-              </div>
-            </div>
-          ))}
+      <div className="pointer-events-none absolute inset-x-0 top-1/2 z-0 -translate-y-1/2">
+        <div className="mx-auto flex max-w-3xl justify-center">
+          <svg
+            viewBox="0 0 720 360"
+            className="h-auto w-full max-w-[640px] opacity-[0.16]"
+            fill="none"
+            aria-hidden="true"
+          >
+            <polygon
+              points="126,210 210,108 382,88 552,160 514,278 302,296"
+              fill="rgba(216,243,220,0.18)"
+              stroke="rgba(31,82,48,0.22)"
+              strokeWidth="2"
+            />
+            <path
+              d="M126 210 L210 108 L382 88 L552 160 L514 278 L302 296 Z"
+              stroke="rgba(31,82,48,0.38)"
+              strokeWidth="2.2"
+              strokeDasharray="10 12"
+              strokeLinecap="round"
+            >
+              <animate
+                attributeName="stroke-dashoffset"
+                from="0"
+                to="132"
+                dur="6s"
+                repeatCount="indefinite"
+              />
+            </path>
+            <path
+              d="M168 228 L244 142 L378 128 L500 176 L470 254 L314 268 Z"
+              stroke="rgba(82,183,136,0.34)"
+              strokeWidth="1.6"
+              strokeDasharray="8 10"
+              strokeLinecap="round"
+            >
+              <animate
+                attributeName="stroke-dashoffset"
+                from="118"
+                to="0"
+                dur="6s"
+                repeatCount="indefinite"
+              />
+            </path>
+            <circle cx="382" cy="88" r="6" fill="rgba(82,183,136,0.38)" />
+            <circle cx="514" cy="278" r="6" fill="rgba(82,183,136,0.28)" />
+            <circle cx="126" cy="210" r="6" fill="rgba(31,82,48,0.24)" />
+          </svg>
+        </div>
+      </div>
+
+      <div className="relative z-10 mx-auto max-w-3xl text-center">
+        <div className="mb-5 inline-flex items-center rounded-lg border border-[rgba(28,43,24,0.12)] bg-[#f4f7f5] px-3 py-1.5">
+          <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#1f5230]">
+            Comece agora
+          </span>
         </div>
 
-        <h2 className="mb-6 text-4xl font-extrabold leading-tight md:text-6xl" style={{ color: '#f0fdf4' }}>
-          Comece agora.
-          <br />
+        <h2 className="mx-auto max-w-4xl text-5xl font-extrabold leading-[0.95] tracking-[-0.03em] text-[#162113] sm:text-6xl md:text-7xl">
+          <span className="block md:block">Da pergunta</span>
+          <span className="block md:inline">ao arquivo em 30 </span>
           <span
+            className="block md:inline"
             style={{
-              background: 'linear-gradient(135deg, #52b788, #86efac)',
+              background: 'linear-gradient(135deg, #1f5230 0%, #52b788 100%)',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
             }}
           >
-            É gratuito.
+            segundos.
           </span>
         </h2>
-        <p className="mx-auto mb-10 max-w-lg text-base" style={{ color: 'rgba(240,253,244,0.55)' }}>
-          Explore o mapa sem criar conta. Cadastre-se só quando quiser baixar o primeiro arquivo.
+
+        <p className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-[#4f6347] md:text-lg">
+          Navegue grátis. Baixe quando precisar. Sem cadastro para começar.
         </p>
 
-        <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
+        <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
           <Link
             href="/mapa"
-            className="w-full rounded-xl px-8 py-4 text-center text-base font-bold text-white transition-all duration-200 sm:w-auto hover:-translate-y-[2px] hover:shadow-[0_4px_20px_rgba(31,82,48,0.65),0_0_60px_rgba(31,82,48,0.3)]"
-            style={{
-              background: 'linear-gradient(135deg, #1f5230, #2a6b3f)',
-              boxShadow: '0 2px 12px rgba(31,82,48,0.5), 0 0 40px rgba(31,82,48,0.2)',
-            }}
+            className="inline-flex min-w-[220px] items-center justify-center rounded-xl bg-[#1f5230] px-7 py-3.5 text-base font-semibold text-white shadow-[0_12px_32px_rgba(31,82,48,0.22)] transition hover:-translate-y-[1px] hover:bg-[#2a6b3f] hover:shadow-[0_18px_42px_rgba(31,82,48,0.28)]"
           >
-            Abrir mapa gratuitamente →
+            Abrir mapa grátis →
           </Link>
           <Link
-            href="/assinar"
-            className="w-full rounded-xl px-8 py-4 text-center text-base font-bold transition-all duration-200 sm:w-auto hover:bg-[rgba(255,255,255,0.10)] hover:border-[rgba(255,255,255,0.20)]"
-            style={{
-              background: 'rgba(255,255,255,0.06)',
-              color: '#f0fdf4',
-              border: '1px solid rgba(255,255,255,0.12)',
-            }}
+            href="/#precos"
+            className="inline-flex min-w-[180px] items-center justify-center rounded-xl border border-[rgba(31,82,48,0.20)] bg-white px-7 py-3.5 text-base font-semibold text-[#1f5230] transition hover:border-[rgba(31,82,48,0.32)] hover:bg-[rgba(31,82,48,0.03)]"
           >
-            Ver plano Pro — R$49/mês
+            Ver planos
           </Link>
         </div>
       </div>

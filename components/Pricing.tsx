@@ -1,6 +1,11 @@
 'use client'
 
 import Link from 'next/link'
+import { useMemo, useState } from 'react'
+import Reveal from '@/components/ui/Reveal'
+import Section from '@/components/ui/Section'
+
+type BillingMode = 'monthly' | 'annual'
 
 const credits = [
   { qty: 4, price: 'R$ 14', unit: 'R$ 3,50 / download' },
@@ -8,7 +13,12 @@ const credits = [
   { qty: 16, price: 'R$ 56', unit: 'R$ 3,50 / download' },
 ]
 
-const freeItems = ['Mapa com 10M+ propriedades', 'Busca por CAR ou município', 'Visualização de topografia']
+const freeItems = [
+  'Mapa com 10M+ propriedades',
+  'Busca por CAR ou município',
+  'Visualização de topografia',
+]
+
 const proItems = [
   'Tudo do plano gratuito',
   'Downloads ilimitados por dia',
@@ -17,35 +27,91 @@ const proItems = [
   'Suporte prioritário via WhatsApp',
 ]
 
+const comparisonRows = [
+  {
+    feature: 'Downloads/mês',
+    free: 'Explorar',
+    pro: 'Ilimitados',
+    credits: 'Sob demanda',
+  },
+  {
+    feature: 'Formatos',
+    free: 'Visualização',
+    pro: 'KML · SHP · TIF',
+    credits: 'KML · SHP · TIF',
+  },
+  {
+    feature: 'Topografia',
+    free: 'Consultar',
+    pro: 'Completa',
+    credits: 'Por download',
+  },
+  {
+    feature: 'Suporte',
+    free: 'Base',
+    pro: 'Prioritário',
+    credits: 'Padrão',
+  },
+  {
+    feature: 'Validade',
+    free: 'Sem prazo',
+    pro: 'Assinatura ativa',
+    credits: '12 meses',
+  },
+]
+
+const planByMode = {
+  monthly: {
+    price: 'R$49',
+    period: '/mês',
+    note: '= R$3,50/download a partir de 14 downloads/mês',
+    kicker: 'mensal',
+    strike: null,
+  },
+  annual: {
+    price: 'R$39',
+    period: '/mês',
+    note: 'cobrado em R$468/ano · 20% off ilustrativo',
+    kicker: 'anual',
+    strike: 'R$49',
+  },
+} satisfies Record<
+  BillingMode,
+  { price: string; period: string; note: string; kicker: string; strike: string | null }
+>
+
+function CheckBullet({ highlight = false }: { highlight?: boolean }) {
+  return (
+    <span
+      className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full text-xs font-bold"
+      style={{
+        background: highlight ? 'rgba(134,239,172,0.16)' : 'rgba(31,82,48,0.10)',
+        color: highlight ? '#86efac' : '#1f5230',
+      }}
+    >
+      ✓
+    </span>
+  )
+}
+
 export default function Pricing() {
+  const [billingMode, setBillingMode] = useState<BillingMode>('monthly')
+
+  const proPlan = useMemo(() => planByMode[billingMode], [billingMode])
+
   return (
     <section
       id="precos"
-      className="relative overflow-hidden px-6 py-28"
-      style={{ background: '#ffffff' }}
+      className="relative overflow-hidden bg-white py-28"
     >
-      <div
-        className="pointer-events-none absolute inset-0"
-        style={{
-          backgroundImage:
-            'linear-gradient(rgba(31,82,48,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(31,82,48,0.04) 1px, transparent 1px)',
-          backgroundSize: '40px 40px',
-        }}
-      />
-      <div
-        className="pointer-events-none absolute inset-0"
-        style={{
-          background:
-            'radial-gradient(ellipse 80% 60% at 50% 50%, transparent 40%, white 100%)',
-        }}
-      />
+      <div className="pointer-events-none absolute inset-0 bg-grid-dots opacity-60" />
+      <div className="pointer-events-none absolute inset-x-0 top-14 mx-auto h-72 max-w-4xl rounded-full bg-[radial-gradient(circle,rgba(82,183,136,0.14),transparent_70%)] blur-3xl" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_45%,transparent_42%,white_100%)]" />
 
-      <div className="relative mx-auto max-w-5xl">
-        <div className="mb-16 text-center">
-          <div className="inline-flex items-center rounded-lg border border-[rgba(28,43,24,0.12)] bg-[#f4f7f5] px-3 py-1.5 mb-5">
-            <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#1f5230]">Preços</span>
-          </div>
-          <h2 className="mb-4 text-3xl font-bold leading-tight md:text-4xl" style={{ color: '#162113' }}>
+      <Section
+        eyebrow="Preços"
+        title={
+          <>
             Simples. Transparente.{' '}
             <span
               style={{
@@ -56,194 +122,215 @@ export default function Pricing() {
             >
               Sem surpresas.
             </span>
-          </h2>
-          <p className="mx-auto max-w-lg text-base text-gray-500">
-            Explore o mapa gratuitamente. Pague só quando precisar baixar — ou assine o Pro e baixe à vontade.
-          </p>
-        </div>
-
-        <div className="mb-12 grid grid-cols-1 gap-6 md:grid-cols-2">
-          <div
-            className="flex flex-col rounded-2xl p-8 transition-all duration-300"
-            style={{
-              background: '#ffffff',
-              border: '1px solid rgba(22,33,19,0.10)',
-              boxShadow: '0 1px 3px rgba(22,33,19,0.06), 0 8px 32px rgba(22,33,19,0.05)',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.boxShadow = '0 4px 8px rgba(22,33,19,0.08), 0 16px 48px rgba(22,33,19,0.10)'
-              e.currentTarget.style.transform = 'translateY(-3px)'
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.boxShadow = '0 1px 3px rgba(22,33,19,0.06), 0 8px 32px rgba(22,33,19,0.05)'
-              e.currentTarget.style.transform = 'translateY(0)'
-            }}
-          >
-            <p className="mb-3 text-xs font-bold uppercase tracking-widest" style={{ color: '#9ca3af' }}>
-              Gratuito
-            </p>
-            <div className="mb-1 flex items-end gap-2">
-              <span className="text-5xl font-extrabold" style={{ color: '#162113' }}>R$0</span>
-            </div>
-            <p className="mb-8 text-sm" style={{ color: '#9ca3af' }}>para sempre, sem cartão</p>
-            <ul className="mb-10 flex-1 space-y-3">
-              {freeItems.map((item) => (
-                <li key={item} className="flex items-center gap-3 text-sm" style={{ color: '#4f6347' }}>
-                  <span
-                    className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full text-xs"
-                    style={{ background: 'rgba(31,82,48,0.10)', color: '#1f5230' }}
-                  >
-                    ✓
-                  </span>
-                  {item}
-                </li>
-              ))}
-            </ul>
-            <Link
-              href="/mapa"
-              className="block w-full rounded-xl py-3 text-center text-sm font-semibold transition-all duration-200"
-              style={{
-                background: 'rgba(31,82,48,0.07)',
-                color: '#1f5230',
-                border: '1px solid rgba(31,82,48,0.15)',
-              }}
-              onMouseEnter={(e) => {
-                const el = e.currentTarget as HTMLAnchorElement
-                el.style.background = 'rgba(31,82,48,0.13)'
-              }}
-              onMouseLeave={(e) => {
-                const el = e.currentTarget as HTMLAnchorElement
-                el.style.background = 'rgba(31,82,48,0.07)'
-              }}
+          </>
+        }
+        subtitle="Explore o mapa gratuitamente. Pague só quando precisar baixar — ou assine o Pro e baixe à vontade."
+        className="relative z-10"
+        contentClassName="mt-14"
+      >
+        <Reveal className="flex justify-center">
+          <div className="inline-flex items-center gap-1 rounded-full border border-[rgba(22,33,19,0.08)] bg-white p-1 shadow-[0_8px_24px_rgba(22,33,19,0.05)]">
+            <button
+              type="button"
+              onClick={() => setBillingMode('monthly')}
+              className={`rounded-full px-4 py-2 text-sm font-semibold transition ${
+                billingMode === 'monthly'
+                  ? 'bg-[#1f5230] text-white'
+                  : 'text-[#4f6347] hover:bg-[rgba(31,82,48,0.05)]'
+              }`}
             >
-              Abrir mapa grátis →
-            </Link>
+              Mensal
+            </button>
+            <button
+              type="button"
+              onClick={() => setBillingMode('annual')}
+              className={`rounded-full px-4 py-2 text-sm font-semibold transition ${
+                billingMode === 'annual'
+                  ? 'bg-[#1f5230] text-white'
+                  : 'text-[#4f6347] hover:bg-[rgba(31,82,48,0.05)]'
+              }`}
+            >
+              Anual
+            </button>
+            <span className="rounded-full bg-[rgba(31,82,48,0.08)] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#1f5230]">
+              20% off
+            </span>
           </div>
+        </Reveal>
 
-          <div
-            className="relative flex flex-col rounded-2xl p-8 transition-all duration-300"
-            style={{
-              background: 'linear-gradient(160deg, #0f2d1a 0%, #0a1a0e 100%)',
-              border: '1px solid rgba(82,183,136,0.25)',
-              boxShadow: '0 0 0 1px rgba(82,183,136,0.08), 0 8px 32px rgba(31,82,48,0.35), 0 0 80px rgba(31,82,48,0.15)',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.boxShadow = '0 0 0 1px rgba(82,183,136,0.15), 0 12px 48px rgba(31,82,48,0.5), 0 0 100px rgba(31,82,48,0.2)'
-              e.currentTarget.style.transform = 'translateY(-3px)'
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.boxShadow = '0 0 0 1px rgba(82,183,136,0.08), 0 8px 32px rgba(31,82,48,0.35), 0 0 80px rgba(31,82,48,0.15)'
-              e.currentTarget.style.transform = 'translateY(0)'
-            }}
-          >
-            <div
-              className="absolute left-1/2 top-[-0.875rem] -translate-x-1/2 whitespace-nowrap rounded-full px-4 py-1.5 text-xs font-bold uppercase tracking-wide"
-              style={{
-                background: 'linear-gradient(135deg, #52b788, #1f5230)',
-                color: '#ffffff',
-                boxShadow: '0 2px 12px rgba(31,82,48,0.5)',
-              }}
-            >
-              ✦ Mais popular
-            </div>
-
-            <p className="mb-3 text-xs font-bold uppercase tracking-widest" style={{ color: 'rgba(82,183,136,0.7)' }}>
-              Pro
-            </p>
-            <div className="mb-1 flex items-end gap-2">
-              <span className="text-5xl font-extrabold" style={{ color: '#f0fdf4' }}>R$49</span>
-              <span className="mb-2 text-base" style={{ color: 'rgba(255,255,255,0.4)' }}>/mês</span>
-            </div>
-            <p className="mb-8 text-xs font-medium" style={{ color: '#52b788' }}>
-              = R$3,50/download a partir de 14 downloads/mês
-            </p>
-            <ul className="mb-10 flex-1 space-y-3">
-              {proItems.map((item, i) => (
-                <li
-                  key={item}
-                  className="flex items-center gap-3 text-sm"
-                  style={{ color: i === 1 ? '#86efac' : 'rgba(240,253,244,0.75)' }}
-                >
-                  <span
-                    className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full text-xs font-bold"
-                    style={{ background: 'rgba(82,183,136,0.2)', color: '#52b788' }}
-                  >
-                    ✓
-                  </span>
-                  {i === 1 ? <strong style={{ color: '#86efac' }}>{item}</strong> : item}
-                </li>
-              ))}
-            </ul>
-            <Link
-              href="/assinar"
-              className="block w-full rounded-xl py-3.5 text-center text-sm font-bold transition-all duration-200"
-              style={{
-                background: 'linear-gradient(135deg, #1f5230, #2a6b3f)',
-                color: '#ffffff',
-                boxShadow: '0 2px 8px rgba(31,82,48,0.5), 0 0 24px rgba(31,82,48,0.25)',
-              }}
-              onMouseEnter={(e) => {
-                const el = e.currentTarget as HTMLAnchorElement
-                el.style.boxShadow = '0 4px 16px rgba(31,82,48,0.6), 0 0 32px rgba(31,82,48,0.35)'
-                el.style.transform = 'translateY(-1px)'
-              }}
-              onMouseLeave={(e) => {
-                const el = e.currentTarget as HTMLAnchorElement
-                el.style.boxShadow = '0 2px 8px rgba(31,82,48,0.5), 0 0 24px rgba(31,82,48,0.25)'
-                el.style.transform = 'translateY(0)'
-              }}
-            >
-              Assinar Pro — R$49/mês →
-            </Link>
-          </div>
-        </div>
-
-        <div
-          className="rounded-2xl px-8 py-7"
-          style={{
-            background: 'rgba(31,82,48,0.04)',
-            border: '1px solid rgba(31,82,48,0.10)',
-          }}
-        >
-          <div className="flex flex-col gap-6 sm:flex-row sm:items-center">
-            <div className="flex-1">
-              <p className="mb-1.5 text-xs font-bold uppercase tracking-widest" style={{ color: '#1f5230' }}>
-                Prefere pagar por download?
+        <div className="mt-16 grid grid-cols-1 gap-6 lg:grid-cols-2">
+          <Reveal delay={0}>
+            <div className="flex h-full flex-col rounded-[28px] border border-[rgba(22,33,19,0.10)] bg-white p-8 shadow-[0_1px_3px_rgba(22,33,19,0.06),0_12px_36px_rgba(22,33,19,0.05)] transition duration-300 hover:-translate-y-[3px] hover:border-[rgba(31,82,48,0.18)] hover:shadow-[0_8px_18px_rgba(22,33,19,0.08),0_24px_60px_rgba(22,33,19,0.08)]">
+              <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#9ca3af]">
+                Gratuito
               </p>
-              <p className="text-sm" style={{ color: '#4f6347' }}>
-                Carregue créditos e use quando precisar. <strong style={{ color: '#162113' }}>R$3,50 por arquivo.</strong> Válidos por 1 ano. Sem mensalidade.
-              </p>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {credits.map((c) => (
-                <div
-                  key={c.qty}
-                  className="rounded-xl px-4 py-2.5 text-center"
-                  style={{
-                    background: '#ffffff',
-                    border: '1px solid rgba(22,33,19,0.10)',
-                    minWidth: '90px',
-                  }}
-                >
-                  <div className="text-base font-extrabold" style={{ color: '#162113' }}>{c.price}</div>
-                  <div className="text-xs" style={{ color: '#9ca3af' }}>{c.qty} downloads</div>
-                </div>
-              ))}
+              <div className="mb-1 flex items-end gap-2">
+                <span className="font-mono-tabular text-5xl font-extrabold text-[#162113]">R$0</span>
+              </div>
+              <p className="mb-8 text-sm text-[#9ca3af]">para sempre, sem cartão</p>
+
+              <ul className="mb-10 flex-1 space-y-3">
+                {freeItems.map((item) => (
+                  <li key={item} className="flex items-center gap-3 text-sm text-[#4f6347]">
+                    <CheckBullet />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+
               <Link
-                href="/carteira"
-                className="flex items-center gap-1.5 rounded-xl px-5 py-2.5 text-sm font-bold transition-all duration-200"
-                style={{
-                  background: '#1f5230',
-                  color: '#ffffff',
-                  boxShadow: '0 2px 8px rgba(31,82,48,0.3)',
-                }}
+                href="/mapa"
+                className="block w-full rounded-xl border border-[rgba(31,82,48,0.15)] bg-[rgba(31,82,48,0.07)] py-3 text-center text-sm font-semibold text-[#1f5230] transition hover:bg-[rgba(31,82,48,0.13)]"
               >
-                Comprar créditos →
+                Abrir mapa grátis →
               </Link>
             </div>
-          </div>
+          </Reveal>
+
+          <Reveal delay={0.08}>
+            <div className="relative rounded-[28px] p-px">
+              <span className="absolute inset-0 rounded-[28px] bg-[conic-gradient(from_180deg_at_50%_50%,rgba(82,183,136,0.04),rgba(134,239,172,0.95),rgba(31,82,48,0.45),rgba(82,183,136,0.04))] animate-[spin_8s_linear_infinite]" />
+              <span className="absolute inset-0 rounded-[28px] shadow-[inset_0_0_40px_rgba(134,239,172,0.12)]" />
+
+              <div className="relative m-px flex h-full flex-col rounded-[27px] bg-[linear-gradient(160deg,#0f2d1a_0%,#0a1a0e_100%)] p-8 shadow-[0_0_0_1px_rgba(82,183,136,0.08),0_8px_32px_rgba(31,82,48,0.35),0_0_80px_rgba(31,82,48,0.15)] transition duration-300 hover:-translate-y-[3px] hover:shadow-[0_0_0_1px_rgba(82,183,136,0.16),0_12px_48px_rgba(31,82,48,0.5),0_0_100px_rgba(31,82,48,0.22)]">
+                <div className="absolute left-1/2 top-[-0.875rem] -translate-x-1/2 whitespace-nowrap rounded-full bg-[linear-gradient(135deg,#52b788,#1f5230)] px-4 py-1.5 text-xs font-bold uppercase tracking-wide text-white shadow-[0_2px_12px_rgba(31,82,48,0.5)]">
+                  ✦ Mais popular
+                </div>
+
+                <div className="flex items-start justify-between gap-4">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[rgba(82,183,136,0.72)]">
+                    Pro
+                  </p>
+                  <span className="rounded-full bg-[rgba(82,183,136,0.12)] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.08em] text-[#86efac]">
+                    {proPlan.kicker}
+                  </span>
+                </div>
+
+                <div className="mt-3 flex items-end gap-2">
+                  <span className="font-mono-tabular text-5xl font-extrabold text-[#f0fdf4]">
+                    {proPlan.price}
+                  </span>
+                  <span className="mb-2 text-base text-[rgba(255,255,255,0.42)]">
+                    {proPlan.period}
+                  </span>
+                </div>
+                {proPlan.strike && (
+                  <p className="mt-2 text-sm text-[rgba(255,255,255,0.35)] line-through">
+                    {proPlan.strike}/mês
+                  </p>
+                )}
+                <p className="mb-8 mt-2 text-xs font-medium text-[#52b788]">{proPlan.note}</p>
+
+                <ul className="mb-10 flex-1 space-y-3">
+                  {proItems.map((item, index) => (
+                    <li
+                      key={item}
+                      className={`flex items-center gap-3 text-sm ${
+                        index === 1 ? 'text-[#86efac]' : 'text-[rgba(240,253,244,0.78)]'
+                      }`}
+                    >
+                      <CheckBullet highlight={index === 1} />
+                      {index === 1 ? <strong>{item}</strong> : item}
+                    </li>
+                  ))}
+                </ul>
+
+                <Link
+                  href="/assinar"
+                  className="block w-full rounded-xl bg-[linear-gradient(135deg,#1f5230,#2a6b3f)] py-3.5 text-center text-sm font-bold text-white shadow-[0_2px_8px_rgba(31,82,48,0.5),0_0_24px_rgba(31,82,48,0.25)] transition hover:-translate-y-[1px] hover:shadow-[0_4px_16px_rgba(31,82,48,0.6),0_0_32px_rgba(31,82,48,0.35)]"
+                >
+                  Assinar Pro — {proPlan.price}/{billingMode === 'annual' ? 'mês no anual' : 'mês'} →
+                </Link>
+              </div>
+            </div>
+          </Reveal>
         </div>
-      </div>
+
+        <Reveal delay={0.16}>
+          <div className="mt-8 rounded-[28px] border border-[rgba(31,82,48,0.10)] bg-[rgba(31,82,48,0.04)] p-4 sm:p-5">
+            <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#1f5230]">
+                  Créditos sob demanda
+                </p>
+                <p className="mt-2 text-sm text-[#4f6347]">
+                  Carregue créditos e use quando precisar. <strong className="text-[#162113]">R$3,50 por arquivo.</strong> Válidos por 1 ano. Sem mensalidade.
+                </p>
+              </div>
+            </div>
+
+            <div className="overflow-x-auto rounded-2xl border border-[rgba(22,33,19,0.08)] bg-white">
+              <div className="min-w-[720px]">
+                <div className="grid grid-cols-[1.15fr_1fr_1fr_0.9fr] border-b border-[rgba(22,33,19,0.06)] bg-[#fafbfa] px-5 py-3 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#9ca3af]">
+                  <span>Quantidade</span>
+                  <span>Preço</span>
+                  <span>Por download</span>
+                  <span className="text-right">Ação</span>
+                </div>
+
+                {credits.map((credit) => (
+                  <div
+                    key={credit.qty}
+                    className="grid grid-cols-[1.15fr_1fr_1fr_0.9fr] items-center border-b border-[rgba(22,33,19,0.06)] px-5 py-4 transition last:border-b-0 hover:bg-[#f7faf8]"
+                  >
+                    <div>
+                      <p className="font-mono-tabular text-[22px] font-semibold text-[#162113]">
+                        {credit.qty}
+                      </p>
+                      <p className="text-[12px] text-[#4f6347]">downloads</p>
+                    </div>
+                    <p className="font-mono-tabular text-[18px] font-semibold text-[#162113]">
+                      {credit.price}
+                    </p>
+                    <p className="text-[13px] text-[#4f6347]">{credit.unit}</p>
+                    <div className="flex justify-end">
+                      <Link
+                        href="/carteira"
+                        className="rounded-xl bg-[#1f5230] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#2a6b3f]"
+                      >
+                        Comprar
+                      </Link>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </Reveal>
+
+        <Reveal delay={0.24}>
+            <div className="mt-8 overflow-x-auto rounded-[28px] border border-[rgba(22,33,19,0.08)] bg-white shadow-[0_1px_3px_rgba(22,33,19,0.05)]">
+              <div className="min-w-[760px]">
+                <div className="grid grid-cols-[1.35fr_repeat(3,minmax(0,1fr))] border-b border-[rgba(22,33,19,0.06)] bg-[#fafbfa]">
+                  <div className="px-5 py-4 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#9ca3af]">
+                  Comparativo rápido
+                </div>
+                <div className="px-5 py-4 text-center text-[11px] font-semibold uppercase tracking-[0.08em] text-[#4f6347]">
+                  Free
+                </div>
+                <div className="px-5 py-4 text-center text-[11px] font-semibold uppercase tracking-[0.08em] text-[#1f5230]">
+                  Pro
+                </div>
+                <div className="px-5 py-4 text-center text-[11px] font-semibold uppercase tracking-[0.08em] text-[#4f6347]">
+                  Créditos
+                </div>
+              </div>
+
+              {comparisonRows.map((row) => (
+                <div
+                  key={row.feature}
+                  className="grid grid-cols-[1.35fr_repeat(3,minmax(0,1fr))] border-b border-[rgba(22,33,19,0.06)] last:border-b-0"
+                >
+                  <div className="px-5 py-4 text-[13px] font-medium text-[#162113]">{row.feature}</div>
+                  <div className="px-5 py-4 text-center text-[13px] text-[#4f6347]">{row.free}</div>
+                  <div className="px-5 py-4 text-center text-[13px] font-semibold text-[#1f5230]">{row.pro}</div>
+                  <div className="px-5 py-4 text-center text-[13px] text-[#4f6347]">{row.credits}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </Reveal>
+      </Section>
     </section>
   )
 }

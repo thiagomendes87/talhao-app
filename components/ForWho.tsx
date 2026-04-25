@@ -193,11 +193,14 @@ export default function ForWho() {
   }, [selectedId])
 
   return (
-    <section className="bg-white py-28">
+    <section className="relative overflow-hidden bg-white py-28">
+      <div className="glow-green-left" />
+
       <Section
         eyebrow="Para quem é"
         title="Feito para quem trabalha com terra"
         subtitle="Sem jargão técnico. Sem curva de aprendizado."
+        className="relative z-10"
         contentClassName="mt-16"
       >
         <Reveal>

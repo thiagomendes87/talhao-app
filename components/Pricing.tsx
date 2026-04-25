@@ -115,6 +115,7 @@ export default function Pricing() {
       id="precos"
       className="relative overflow-hidden bg-white py-28"
     >
+      <div className="glow-green-right" />
       <div className="pointer-events-none absolute inset-0 bg-grid-dots opacity-60" />
       <div className="pointer-events-none absolute inset-x-0 top-14 mx-auto h-72 max-w-4xl rounded-full bg-[radial-gradient(circle,rgba(82,183,136,0.14),transparent_70%)] blur-3xl" />
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_45%,transparent_42%,white_100%)]" />

@@ -67,11 +67,14 @@ const steps = [
 
 export default function HowItWorks() {
   return (
-    <section className="bg-white py-24">
+    <section className="relative overflow-hidden bg-white py-24">
+      <div className="glow-green-corners" />
+
       <Section
         eyebrow="Como funciona"
         title="De pesquisa a arquivo em 30 segundos"
         subtitle="Três passos, um clique cada. Sem cadastro para começar."
+        className="relative z-10"
         contentClassName="mt-16"
       >
         <div className="grid grid-cols-1 gap-6 md:grid-cols-3 md:gap-8">

@@ -45,6 +45,7 @@ export default function TrustStrip() {
         <div className="marquee-track">
           <TrustRow />
           <TrustRow ariaHidden />
+          <TrustRow ariaHidden />
         </div>
       </div>
     </section>

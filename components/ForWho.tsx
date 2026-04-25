@@ -64,7 +64,7 @@ const personas: Persona[] = [
     previewBadge: 'Análise de aquisição',
     previewMetric: '851 ha',
     previewNote: 'Topografia e localização lado a lado na decisão.',
-    previewChips: ['Altitude', 'Declividade', 'Valuation'],
+    previewChips: ['Altitude', 'Declividade', 'Diligência'],
   },
   {
     id: 'legal',

@@ -145,7 +145,7 @@ export default function Footer() {
       <div className="relative z-10 mx-auto max-w-6xl">
         <div className="grid grid-cols-1 gap-12 pb-14 md:grid-cols-[2fr_1fr_1fr_1fr]">
           <div className="max-w-md">
-            <Link href="/" className="-mt-3 inline-flex items-center gap-2">
+            <Link href="/" className="-mt-7 inline-flex items-center gap-2">
               <img
                 src="/logo-oficial-branco.png"
                 alt="Talhão"
@@ -153,8 +153,8 @@ export default function Footer() {
               />
             </Link>
 
-            <p className="-mt-1 text-[14px] leading-relaxed text-[rgba(240,253,244,0.7)]">
-              Dados geoespaciais oficiais do Brasil em segundos.
+            <p className="-mt-5 text-[14px] leading-relaxed text-[rgba(240,253,244,0.7)]">
+              Tenha informações valiosas sobre qualquer fazenda do Brasil em poucos segundos.
             </p>
 
             <a

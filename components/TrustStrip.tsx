@@ -1,33 +1,52 @@
-import Reveal from '@/components/ui/Reveal'
+const TRUST_ITEMS = [
+  'Dados oficiais de SICAR',
+  'Dados oficiais de SIGEF',
+  'Dados oficiais de SNCI',
+  'Dados oficiais do INPE',
+]
 
-const sources = ['SICAR', 'SIGEF', 'SNCI', 'TOPODATA']
+function TrustRow({ ariaHidden = false }: { ariaHidden?: boolean }) {
+  return (
+    <div
+      aria-hidden={ariaHidden || undefined}
+      className="flex shrink-0 items-center gap-8 pr-8 md:gap-10 md:pr-10"
+    >
+      {TRUST_ITEMS.map((item, index) => (
+        <div key={`${item}-${index}`} className="flex items-center gap-8 md:gap-10">
+          {index > 0 && (
+            <span
+              aria-hidden="true"
+              className="font-mono-tabular text-[13px] font-light text-[rgba(22,33,19,0.20)]"
+            >
+              |
+            </span>
+          )}
+          <span className="whitespace-nowrap font-mono-tabular text-[13px] font-medium text-[#4f6347]">
+            {item}
+          </span>
+        </div>
+      ))}
+      <span
+        aria-hidden="true"
+        className="font-mono-tabular text-[13px] font-light text-[rgba(22,33,19,0.20)]"
+      >
+        |
+      </span>
+    </div>
+  )
+}
 
 export default function TrustStrip() {
   return (
-    <section className="border-y border-[rgba(22,33,19,0.06)] bg-white py-10">
-      <Reveal className="mx-auto max-w-6xl px-6">
-        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <p className="text-[11px] font-semibold uppercase tracking-wide text-[#9ca3af]">
-            Dados oficiais de
-          </p>
+    <section className="relative overflow-hidden border-y border-[rgba(22,33,19,0.06)] bg-white py-8">
+      <div className="glow-green-soft" />
 
-          <div className="flex flex-wrap items-center gap-y-2 text-[13px] text-[#4f6347] md:justify-end">
-            {sources.map((source, index) => (
-              <div key={source} className="flex items-center">
-                {index > 0 && (
-                  <span
-                    aria-hidden="true"
-                    className="mx-3 h-4 w-px bg-[rgba(22,33,19,0.08)]"
-                  />
-                )}
-                <span className="font-mono-tabular transition-colors duration-200 hover:text-[#1f5230]">
-                  {source}
-                </span>
-              </div>
-            ))}
-          </div>
+      <div className="relative z-10 marquee-mask overflow-hidden">
+        <div className="marquee-track">
+          <TrustRow />
+          <TrustRow ariaHidden />
         </div>
-      </Reveal>
+      </div>
     </section>
   )
 }

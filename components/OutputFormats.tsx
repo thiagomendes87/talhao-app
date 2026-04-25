@@ -117,6 +117,41 @@ function DeclividadePreview() {
   )
 }
 
+function AltitudePreview() {
+  return (
+    <div className="relative h-full w-full overflow-hidden rounded-[10px] bg-[linear-gradient(180deg,#fbfcfb_0%,#f4f7f5_100%)]">
+      <svg viewBox="0 0 200 120" preserveAspectRatio="none" className="absolute inset-0 h-full w-full">
+        <defs>
+          <linearGradient id="alt-grad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="rgba(82,183,136,0.40)" />
+            <stop offset="100%" stopColor="rgba(82,183,136,0.04)" />
+          </linearGradient>
+        </defs>
+        <line x1="0" y1="30" x2="200" y2="30" stroke="rgba(22,33,19,0.06)" strokeWidth="0.5" strokeDasharray="2 2" />
+        <line x1="0" y1="60" x2="200" y2="60" stroke="rgba(22,33,19,0.06)" strokeWidth="0.5" strokeDasharray="2 2" />
+        <line x1="0" y1="90" x2="200" y2="90" stroke="rgba(22,33,19,0.06)" strokeWidth="0.5" strokeDasharray="2 2" />
+        <path
+          d="M0,90 L20,72 L40,55 L60,68 L80,42 L100,30 L120,38 L140,50 L160,62 L180,70 L200,80 L200,120 L0,120 Z"
+          fill="url(#alt-grad)"
+        />
+        <path
+          d="M0,90 L20,72 L40,55 L60,68 L80,42 L100,30 L120,38 L140,50 L160,62 L180,70 L200,80"
+          fill="none"
+          stroke="#1f5230"
+          strokeWidth="1.6"
+          strokeLinejoin="round"
+          strokeLinecap="round"
+        />
+        <circle cx="100" cy="30" r="2.4" fill="#1f5230" />
+        <circle cx="80" cy="42" r="1.6" fill="#52b788" />
+        <circle cx="140" cy="50" r="1.6" fill="#52b788" />
+      </svg>
+      <span className="absolute left-3 top-2 font-mono-tabular text-[10px] font-medium text-[#1f5230]">1.240 m</span>
+      <span className="absolute bottom-2 right-3 font-mono-tabular text-[10px] font-medium text-[#4f6347]">0 → 2.5 km</span>
+    </div>
+  )
+}
+
 const formats: FormatCard[] = [
   {
     extension: '.kml',
@@ -147,6 +182,12 @@ const formats: FormatCard[] = [
     title: 'Declividade',
     description: 'Mapa de declividade em % ou graus',
     preview: <DeclividadePreview />,
+  },
+  {
+    extension: '.dem',
+    title: 'Altitude',
+    description: 'Pontos de altitude e curvas de nível',
+    preview: <AltitudePreview />,
   },
 ]
 

@@ -6,7 +6,6 @@ import HowItWorks from '@/components/HowItWorks'
 import OutputFormats from '@/components/OutputFormats'
 import ForWho from '@/components/ForWho'
 import Pricing from '@/components/Pricing'
-import CoverageHeatmap from '@/components/CoverageHeatmap'
 import FAQ from '@/components/FAQ'
 import CTASection from '@/components/CTASection'
 import Footer from '@/components/Footer'
@@ -22,7 +21,6 @@ export default function Home() {
       <OutputFormats />
       <ForWho />
       <Pricing />
-      <CoverageHeatmap />
       <FAQ />
       <CTASection />
       <Footer />

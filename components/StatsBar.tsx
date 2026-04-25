@@ -7,7 +7,7 @@ import useCountUp from '@/hooks/useCountUp'
 const stats = [
   {
     value: 10.2,
-    suffix: 'M+',
+    suffix: 'Mi+',
     label: 'propriedades rurais mapeadas',
     decimals: 1,
     locale: 'en-US',
@@ -21,7 +21,7 @@ const stats = [
   },
   {
     value: 851,
-    suffix: 'M ha',
+    suffix: 'Mi ha',
     label: 'área total mapeada',
     decimals: 0,
     locale: 'en-US',

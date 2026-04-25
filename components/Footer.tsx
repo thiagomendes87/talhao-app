@@ -1,4 +1,7 @@
+'use client'
+
 import Link from 'next/link'
+import { useEffect, useState } from 'react'
 
 const productLinks = [
   { label: 'Mapa', href: '/mapa' },
@@ -10,38 +13,33 @@ const productLinks = [
 const companyLinks = [
   { label: 'Sobre', href: '#' },
   { label: 'Blog', href: '#' },
-  { label: 'Contato', href: 'mailto:contato@talhao.ai' },
+  { label: 'ariel@talhao.ai', href: 'mailto:ariel@talhao.ai' },
 ]
 
-const legalLinks = [
-  { label: 'Termos', href: '#' },
-  { label: 'Privacidade', href: '#' },
-  { label: 'Cookies', href: '#' },
+type LegalModalKey = 'terms' | 'privacy' | 'cookies'
+
+const legalLinks: Array<{ label: string; modalKey: LegalModalKey }> = [
+  { label: 'Termos', modalKey: 'terms' },
+  { label: 'Privacidade', modalKey: 'privacy' },
+  { label: 'Cookies', modalKey: 'cookies' },
 ]
+
+const LEGAL_CONTENT: Record<LegalModalKey, { title: string; body: string }> = {
+  terms: {
+    title: 'Termos de uso',
+    body: 'Em construção. Os termos de uso completos serão publicados em breve. Para qualquer dúvida sobre como usamos a plataforma ou seus dados, fale com a gente em ariel@talhao.ai.',
+  },
+  privacy: {
+    title: 'Política de privacidade',
+    body: 'Em construção. Nossa política de privacidade completa será publicada em breve. Coletamos apenas os dados necessários para operação da plataforma e cumprimento da LGPD. Para dúvidas: ariel@talhao.ai.',
+  },
+  cookies: {
+    title: 'Política de cookies',
+    body: 'Em construção. Utilizamos apenas cookies essenciais para autenticação e preferências do usuário. A política completa de cookies será publicada em breve. Dúvidas: ariel@talhao.ai.',
+  },
+}
 
 const socialLinks = [
-  {
-    label: 'LinkedIn',
-    href: '#',
-    icon: (
-      <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-        <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6Z" />
-        <rect x="2" y="9" width="4" height="12" />
-        <circle cx="4" cy="4" r="2" />
-      </svg>
-    ),
-  },
-  {
-    label: 'Instagram',
-    href: '#',
-    icon: (
-      <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-        <rect x="3" y="3" width="18" height="18" rx="5" />
-        <circle cx="12" cy="12" r="4" />
-        <circle cx="17.5" cy="6.5" r="0.75" fill="currentColor" stroke="none" />
-      </svg>
-    ),
-  },
   {
     label: 'WhatsApp',
     href: 'https://wa.me/5511530433330?text=Olá%2C%20gostaria%20de%20saber%20mais%20sobre%20o%20Talhão',
@@ -64,13 +62,13 @@ function FooterLink({
   badge?: string
 }) {
   const classes =
-    'inline-flex items-center gap-2 text-[13px] text-[#4f6347] transition-colors hover:text-[#1f5230]'
+    'inline-flex items-center gap-2 text-[13px] text-white/55 transition-colors hover:text-white'
 
   const content = (
     <>
       <span>{label}</span>
       {badge && (
-        <span className="rounded-full bg-[rgba(31,82,48,0.08)] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-[#1f5230]">
+        <span className="rounded-full border border-[rgba(82,183,136,0.30)] bg-[rgba(82,183,136,0.15)] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-[#86efac]">
           {badge}
         </span>
       )}
@@ -97,39 +95,90 @@ function FooterLink({
   )
 }
 
-export default function Footer() {
+function LegalButton({
+  label,
+  modalKey,
+  onClick,
+}: {
+  label: string
+  modalKey: LegalModalKey
+  onClick: (modalKey: LegalModalKey) => void
+}) {
   return (
-    <footer className="border-t border-[rgba(22,33,19,0.08)] bg-white px-6 pt-16">
-      <div className="mx-auto max-w-6xl">
+    <button
+      type="button"
+      onClick={() => onClick(modalKey)}
+      className="inline-flex items-center gap-2 text-[13px] text-white/55 transition-colors hover:text-white"
+    >
+      {label}
+    </button>
+  )
+}
+
+export default function Footer() {
+  const [openModal, setOpenModal] = useState<LegalModalKey | null>(null)
+
+  useEffect(() => {
+    if (!openModal) return
+
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setOpenModal(null)
+    }
+
+    window.addEventListener('keydown', onKey)
+    document.body.style.overflow = 'hidden'
+
+    return () => {
+      window.removeEventListener('keydown', onKey)
+      document.body.style.overflow = ''
+    }
+  }, [openModal])
+
+  return (
+    <footer
+      className="relative overflow-hidden border-t border-white/5 px-6 pt-16"
+      style={{ background: 'linear-gradient(165deg, #0f2d1a 0%, #0a1410 55%, #060807 100%)' }}
+    >
+      <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-40 bg-[radial-gradient(ellipse_at_top,rgba(82,183,136,0.15),transparent_70%)]" />
+
+      <div className="relative z-10 mx-auto max-w-6xl">
         <div className="grid grid-cols-1 gap-12 pb-14 md:grid-cols-[2fr_1fr_1fr_1fr]">
           <div className="max-w-md">
-            <Link href="/" className="inline-flex items-center gap-2">
+            <Link href="/" className="inline-flex">
               <img
-                src="/logo-oficial.png"
+                src="/logo-oficial-branco.png"
                 alt="Talhão"
-                className="h-16 w-16 object-contain"
+                className="h-20 w-20 object-contain"
               />
-              <span className="text-[22px] font-semibold tracking-[-0.02em] text-[#162113]">
-                Talhão
-              </span>
             </Link>
 
-            <p className="mt-4 text-[14px] leading-relaxed text-[#4f6347]">
+            <p className="mt-4 text-[14px] leading-relaxed text-[rgba(240,253,244,0.7)]">
               Dados geoespaciais oficiais do Brasil em segundos.
             </p>
 
+            <a
+              href="mailto:ariel@talhao.ai"
+              className="mt-4 inline-flex items-center gap-2 font-mono-tabular text-[13px] text-[#86efac] transition-colors hover:text-white"
+            >
+              <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <rect x="3" y="5" width="18" height="14" rx="2" />
+                <path d="M3 7l9 6 9-6" />
+              </svg>
+              ariel@talhao.ai
+            </a>
+
             <div className="mt-5 flex flex-wrap items-center gap-2">
-              <span className="rounded-full bg-[rgba(31,82,48,0.08)] px-3 py-1.5 font-mono-tabular text-[11px] text-[#1f5230]">
+              <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 font-mono-tabular text-[11px] text-[#86efac]">
                 Fontes oficiais: SICAR · SIGEF · SNCI · INPE
               </span>
-              <span className="rounded-full border border-[rgba(31,82,48,0.12)] bg-[#f4f7f5] px-3 py-1.5 text-[11px] font-semibold text-[#1f5230]">
+              <span className="rounded-full border border-[rgba(82,183,136,0.30)] bg-[rgba(82,183,136,0.15)] px-3 py-1.5 text-[11px] font-semibold text-[#f0fdf4]">
                 LGPD ✓
               </span>
             </div>
           </div>
 
           <div>
-            <h3 className="text-[12px] font-semibold uppercase tracking-[0.08em] text-[#9ca3af]">
+            <h3 className="text-[12px] font-semibold uppercase tracking-[0.08em] text-white/40">
               Produto
             </h3>
             <div className="mt-4 flex flex-col gap-3">
@@ -140,7 +189,7 @@ export default function Footer() {
           </div>
 
           <div>
-            <h3 className="text-[12px] font-semibold uppercase tracking-[0.08em] text-[#9ca3af]">
+            <h3 className="text-[12px] font-semibold uppercase tracking-[0.08em] text-white/40">
               Empresa
             </h3>
             <div className="mt-4 flex flex-col gap-3">
@@ -151,19 +200,24 @@ export default function Footer() {
           </div>
 
           <div>
-            <h3 className="text-[12px] font-semibold uppercase tracking-[0.08em] text-[#9ca3af]">
+            <h3 className="text-[12px] font-semibold uppercase tracking-[0.08em] text-white/40">
               Legal
             </h3>
             <div className="mt-4 flex flex-col gap-3">
               {legalLinks.map((link) => (
-                <FooterLink key={link.label} {...link} />
+                <LegalButton
+                  key={link.label}
+                  label={link.label}
+                  modalKey={link.modalKey}
+                  onClick={setOpenModal}
+                />
               ))}
             </div>
           </div>
         </div>
 
-        <div className="flex flex-col gap-4 border-t border-[rgba(22,33,19,0.08)] py-6 md:flex-row md:items-center md:justify-between">
-          <p className="text-[13px] text-[#4f6347]">© 2026 Talhão.ai</p>
+        <div className="flex flex-col gap-4 border-t border-white/5 py-6 md:flex-row md:items-center md:justify-between">
+          <p className="text-[13px] text-white/45">© 2026 Talhão.ai</p>
 
           <div className="flex items-center gap-4">
             {socialLinks.map((social) => (
@@ -173,7 +227,7 @@ export default function Footer() {
                 aria-label={social.label}
                 target={social.href.startsWith('http') ? '_blank' : undefined}
                 rel={social.href.startsWith('http') ? 'noopener noreferrer' : undefined}
-                className="text-[#9ca3af] transition-colors hover:text-[#1f5230]"
+                className="text-white/40 transition-colors hover:text-[#86efac]"
               >
                 {social.icon}
               </a>
@@ -181,6 +235,43 @@ export default function Footer() {
           </div>
         </div>
       </div>
+
+      {openModal && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="legal-modal-title"
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 px-6 backdrop-blur-sm"
+          onClick={() => setOpenModal(null)}
+        >
+          <div
+            className="relative w-full max-w-md rounded-2xl border border-white/10 bg-[#0f2d1a] p-8 shadow-[0_24px_64px_rgba(0,0,0,0.5)]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 id="legal-modal-title" className="text-[18px] font-semibold text-white">
+              {LEGAL_CONTENT[openModal].title}
+            </h3>
+            <p className="mt-4 text-[14px] leading-relaxed text-white/70">
+              {LEGAL_CONTENT[openModal].body}
+            </p>
+            <button
+              type="button"
+              onClick={() => setOpenModal(null)}
+              className="mt-6 inline-flex items-center justify-center rounded-xl bg-[#1f5230] px-5 py-2.5 text-[13px] font-semibold text-white transition-colors hover:bg-[#2a6b3f]"
+            >
+              Fechar
+            </button>
+            <button
+              type="button"
+              onClick={() => setOpenModal(null)}
+              aria-label="Fechar"
+              className="absolute right-4 top-4 text-white/50 transition-colors hover:text-white"
+            >
+              <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M18 6 6 18" /><path d="m6 6 12 12" /></svg>
+            </button>
+          </div>
+        </div>
+      )}
     </footer>
   )
 }

@@ -71,8 +71,8 @@ export default function CTASection() {
         </div>
 
         <h2 className="mx-auto max-w-4xl text-5xl font-extrabold leading-[0.95] tracking-[-0.03em] text-[#162113] sm:text-6xl md:text-7xl">
-          <span className="block md:block">Da pergunta</span>
-          <span className="block md:inline">ao arquivo em 30 </span>
+          <span className="block md:block">Acesse qualquer talhão</span>
+          <span className="block md:inline">do seu interesse em 30 </span>
           <span
             className="block md:inline"
             style={{

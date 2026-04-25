@@ -2,8 +2,14 @@
 
 .mapIframe {
   display: block;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   width: 100vw;
   height: 100vh;
+  height: 100dvh;
   border: none;
   background: #f0f0f0;
 }
@@ -11,11 +17,17 @@
 /* Loading state antes do src ser resolvido */
 .loadingWrapper {
   display: flex;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   width: 100vw;
   height: 100vh;
+  height: 100dvh;
   background: #f9fafb;
   gap: 12px;
 }

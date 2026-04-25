@@ -76,16 +76,124 @@ body {
     background-size: 32px 32px;
   }
 
-  .glow-green {
+  .glow-green,
+  .glow-green-soft,
+  .glow-green-strong,
+  .glow-green-top,
+  .glow-green-bottom,
+  .glow-green-left,
+  .glow-green-right,
+  .glow-green-corners {
     position: absolute;
     inset: 0;
+    pointer-events: none;
+    filter: blur(80px);
+  }
+
+  .glow-green {
     background: radial-gradient(
       ellipse 60% 50% at 50% 50%,
       rgba(82, 183, 136, 0.22),
       rgba(31, 82, 48, 0.12) 40%,
       transparent 70%
     );
-    filter: blur(80px);
-    pointer-events: none;
+  }
+
+  .glow-green-soft {
+    background: radial-gradient(
+      ellipse 50% 40% at 50% 50%,
+      rgba(82, 183, 136, 0.10),
+      transparent 70%
+    );
+  }
+
+  .glow-green-strong {
+    background: radial-gradient(
+      ellipse 70% 60% at 50% 50%,
+      rgba(82, 183, 136, 0.30),
+      rgba(31, 82, 48, 0.18) 40%,
+      transparent 70%
+    );
+  }
+
+  .glow-green-top {
+    background: radial-gradient(
+      ellipse 60% 50% at 50% 0%,
+      rgba(82, 183, 136, 0.18),
+      rgba(31, 82, 48, 0.10) 40%,
+      transparent 70%
+    );
+  }
+
+  .glow-green-bottom {
+    background: radial-gradient(
+      ellipse 60% 50% at 50% 100%,
+      rgba(82, 183, 136, 0.18),
+      rgba(31, 82, 48, 0.10) 40%,
+      transparent 70%
+    );
+  }
+
+  .glow-green-left {
+    background: radial-gradient(
+      ellipse 40% 70% at 0% 50%,
+      rgba(82, 183, 136, 0.20),
+      rgba(31, 82, 48, 0.10) 40%,
+      transparent 70%
+    );
+  }
+
+  .glow-green-right {
+    background: radial-gradient(
+      ellipse 40% 70% at 100% 50%,
+      rgba(82, 183, 136, 0.20),
+      rgba(31, 82, 48, 0.10) 40%,
+      transparent 70%
+    );
+  }
+
+  .glow-green-corners {
+    background-image:
+      radial-gradient(ellipse 30% 30% at 0% 0%, rgba(82, 183, 136, 0.18), transparent 60%),
+      radial-gradient(ellipse 30% 30% at 100% 100%, rgba(82, 183, 136, 0.18), transparent 60%);
+    filter: blur(60px);
+  }
+
+  .marquee-track {
+    display: flex;
+    width: max-content;
+    animation: marquee-x 32s linear infinite;
+    will-change: transform;
+  }
+
+  .marquee-track:hover {
+    animation-play-state: paused;
+  }
+
+  .marquee-mask {
+    -webkit-mask-image: linear-gradient(
+      to right,
+      transparent 0,
+      black 64px,
+      black calc(100% - 64px),
+      transparent 100%
+    );
+    mask-image: linear-gradient(
+      to right,
+      transparent 0,
+      black 64px,
+      black calc(100% - 64px),
+      transparent 100%
+    );
+  }
+}
+
+@keyframes marquee-x {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-50%);
   }
 }

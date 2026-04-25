@@ -91,15 +91,18 @@ export default function MapHero() {
         <div
           onClick={(e) => e.stopPropagation()}
           style={{
-            background: 'rgba(255, 255, 255, 0.13)',
-            backdropFilter: 'blur(24px) saturate(180%)',
-            WebkitBackdropFilter: 'blur(24px) saturate(180%)',
-            border: '1px solid rgba(255,255,255,0.28)',
+            background: 'rgba(255, 255, 255, 0.08)',
+            backdropFilter: 'blur(20px) saturate(170%)',
+            WebkitBackdropFilter: 'blur(20px) saturate(170%)',
+            border: '1px solid rgba(255,255,255,0.20)',
           }}
           className="mx-auto w-full max-w-[92vw] rounded-3xl px-6 py-8 md:max-w-3xl md:px-10 md:py-12"
         >
-          <span className="mb-4 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-[#74C69D]">
-            <span className="inline-block h-2 w-2 flex-shrink-0 rounded-full bg-[#74C69D] animate-pulse" />
+          <span className="mb-5 inline-flex items-center gap-2.5 text-sm font-extrabold uppercase tracking-[0.18em] text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.35)]">
+            <span className="relative inline-flex h-3 w-3 flex-shrink-0">
+              <span aria-hidden="true" className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#74C69D] opacity-75" />
+              <span className="relative inline-flex h-3 w-3 rounded-full bg-[#74C69D] shadow-[0_0_12px_rgba(116,198,157,0.8)]" />
+            </span>
             Procure na talhão você também
           </span>
 

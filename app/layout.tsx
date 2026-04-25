@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import { Inter, JetBrains_Mono } from 'next/font/google'
 import './globals.css'
 
@@ -25,6 +25,10 @@ export const metadata: Metadata = {
     shortcut: '/logo-oficial-4.png?v=4',
     apple: '/logo-oficial-4.png?v=4',
   },
+}
+
+export const viewport: Viewport = {
+  themeColor: '#0a1410',
 }
 
 export default function RootLayout({

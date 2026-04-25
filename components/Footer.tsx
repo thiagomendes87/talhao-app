@@ -168,11 +168,6 @@ export default function Footer() {
               ariel@talhao.ai
             </a>
 
-            <div className="mt-5 flex flex-wrap items-center gap-2">
-              <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 font-mono-tabular text-[11px] text-[#86efac]">
-                Fontes oficiais: SICAR · SIGEF · SNCI · INPE
-              </span>
-            </div>
           </div>
 
           <div>
@@ -214,7 +209,7 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="mb-10 overflow-hidden rounded-3xl border border-[rgba(82,183,136,0.30)] bg-[linear-gradient(135deg,rgba(31,82,48,0.55)_0%,rgba(82,183,136,0.18)_100%)] p-1">
+        <div className="-mt-4 mb-10 overflow-hidden rounded-3xl border border-[rgba(82,183,136,0.30)] bg-[linear-gradient(135deg,rgba(31,82,48,0.55)_0%,rgba(82,183,136,0.18)_100%)] p-1">
           <div className="relative flex flex-col gap-5 rounded-[22px] bg-[linear-gradient(135deg,#0f2d1a_0%,#0a1a10_100%)] px-7 py-6 sm:flex-row sm:items-center sm:justify-between">
             <div
               aria-hidden="true"

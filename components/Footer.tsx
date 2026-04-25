@@ -149,7 +149,7 @@ export default function Footer() {
               <img
                 src="/logo-oficial-branco.png"
                 alt="Talhão"
-                className="h-60 w-60 object-contain"
+                className="h-28 w-28 object-contain"
               />
             </Link>
 

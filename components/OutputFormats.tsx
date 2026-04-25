@@ -153,6 +153,7 @@ const formats: FormatCard[] = [
 export default function OutputFormats() {
   return (
     <section className="relative overflow-hidden bg-white py-24">
+      <div className="glow-green-bottom" />
       <div className="pointer-events-none absolute inset-0 bg-grid-dots opacity-60" />
       <div className="pointer-events-none absolute inset-x-0 top-16 mx-auto h-64 max-w-5xl rounded-full bg-[radial-gradient(circle,rgba(82,183,136,0.12),transparent_68%)] blur-3xl" />
 

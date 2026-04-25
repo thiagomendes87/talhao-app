@@ -3,7 +3,7 @@ import Link from 'next/link'
 export default function CTASection() {
   return (
     <section className="relative overflow-hidden bg-white px-6 py-32">
-      <div className="glow-green opacity-80" />
+      <div className="glow-green-strong" />
 
       <div className="pointer-events-none absolute inset-x-0 top-1/2 z-0 -translate-y-1/2">
         <div className="mx-auto flex max-w-3xl justify-center">
@@ -57,8 +57,15 @@ export default function CTASection() {
       </div>
 
       <div className="relative z-10 mx-auto max-w-3xl text-center">
-        <div className="mb-5 inline-flex items-center rounded-lg border border-[rgba(28,43,24,0.12)] bg-[#f4f7f5] px-3 py-1.5">
-          <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#1f5230]">
+        <div
+          className="mb-5 inline-flex items-center gap-2 rounded-full border border-[rgba(31,82,48,0.18)] bg-[linear-gradient(135deg,#f0faf4,#e3f5e9)] px-4 py-2"
+          style={{
+            boxShadow:
+              '0 1px 2px rgba(31,82,48,0.08), 0 4px 16px rgba(31,82,48,0.06)',
+          }}
+        >
+          <span className="inline-block h-1.5 w-1.5 rounded-full bg-[#1f5230] animate-pulse" />
+          <span className="text-[12px] font-semibold uppercase tracking-[0.14em] text-[#1f5230]">
             Comece agora
           </span>
         </div>

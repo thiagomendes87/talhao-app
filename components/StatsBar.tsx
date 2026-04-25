@@ -86,7 +86,7 @@ export default function StatsBar() {
 
   return (
     <section ref={ref} className="relative overflow-hidden bg-white py-24">
-      <div className="glow-green opacity-50" />
+      <div className="glow-green-top" />
 
       <div className="relative z-10 mx-auto max-w-6xl px-6">
         <div className="grid grid-cols-1 gap-8 md:grid-cols-4">

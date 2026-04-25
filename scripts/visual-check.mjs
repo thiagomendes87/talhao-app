@@ -19,6 +19,8 @@ const requestedViewports = process.env.VISUAL_VIEWPORTS
     )
   : null
 
+const pageScreenshotPrefix = process.env.PAGE_SCREENSHOT_PREFIX?.trim() || null
+
 const personas = [
   'Corretores & Imobiliárias',
   'Proprietários Rurais',
@@ -47,6 +49,10 @@ function serializeConsoleMessage(viewport, message) {
       columnNumber: location.columnNumber ?? null,
     },
   }
+}
+
+function getPageScreenshotName(viewportName) {
+  return pageScreenshotPrefix ? `${pageScreenshotPrefix}-${viewportName}.png` : `${viewportName}.png`
 }
 
 async function waitForSettled(page) {
@@ -178,7 +184,7 @@ async function runViewport(browser, viewport) {
   await scrollToBottom(page)
 
   await page.screenshot({
-    path: path.join(outputDir, `${viewport.name}.png`),
+    path: path.join(outputDir, getPageScreenshotName(viewport.name)),
     fullPage: true,
   })
 

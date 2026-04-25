@@ -145,7 +145,7 @@ export default function Footer() {
       <div className="relative z-10 mx-auto max-w-6xl">
         <div className="grid grid-cols-1 gap-12 pb-14 md:grid-cols-[2fr_1fr_1fr_1fr]">
           <div className="max-w-md">
-            <Link href="/" className="inline-flex">
+            <Link href="/" className="-mt-3 inline-flex items-center gap-2">
               <img
                 src="/logo-oficial-branco.png"
                 alt="Talhão"
@@ -153,7 +153,7 @@ export default function Footer() {
               />
             </Link>
 
-            <p className="mt-4 text-[14px] leading-relaxed text-[rgba(240,253,244,0.7)]">
+            <p className="-mt-1 text-[14px] leading-relaxed text-[rgba(240,253,244,0.7)]">
               Dados geoespaciais oficiais do Brasil em segundos.
             </p>
 
@@ -171,9 +171,6 @@ export default function Footer() {
             <div className="mt-5 flex flex-wrap items-center gap-2">
               <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 font-mono-tabular text-[11px] text-[#86efac]">
                 Fontes oficiais: SICAR · SIGEF · SNCI · INPE
-              </span>
-              <span className="rounded-full border border-[rgba(82,183,136,0.30)] bg-[rgba(82,183,136,0.15)] px-3 py-1.5 text-[11px] font-semibold text-[#f0fdf4]">
-                LGPD ✓
               </span>
             </div>
           </div>

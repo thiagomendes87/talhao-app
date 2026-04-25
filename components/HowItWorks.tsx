@@ -67,7 +67,7 @@ const steps = [
 
 export default function HowItWorks() {
   return (
-    <section className="relative overflow-hidden bg-white py-24">
+    <section id="como-funciona" className="relative overflow-hidden bg-white py-24">
       <div className="glow-green-corners" />
 
       <Section

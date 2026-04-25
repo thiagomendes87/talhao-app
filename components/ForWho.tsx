@@ -193,7 +193,7 @@ export default function ForWho() {
   }, [selectedId])
 
   return (
-    <section className="relative overflow-hidden bg-white py-28">
+    <section id="para-quem-e" className="relative overflow-hidden bg-white py-28">
       <div className="glow-green-left" />
 
       <Section

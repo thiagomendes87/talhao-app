@@ -11,9 +11,10 @@ const productLinks = [
 ]
 
 const companyLinks = [
-  { label: 'Sobre', href: '#' },
-  { label: 'Blog', href: '#' },
-  { label: 'ariel@talhao.ai', href: 'mailto:ariel@talhao.ai' },
+  { label: 'Como funciona', href: '/#como-funciona' },
+  { label: 'Para quem é', href: '/#para-quem-e' },
+  { label: 'Formatos de saída', href: '/#formatos-de-saida' },
+  { label: 'Contato', href: 'mailto:ariel@talhao.ai' },
 ]
 
 type LegalModalKey = 'terms' | 'privacy' | 'cookies'
@@ -148,7 +149,7 @@ export default function Footer() {
               <img
                 src="/logo-oficial-branco.png"
                 alt="Talhão"
-                className="h-20 w-20 object-contain"
+                className="h-60 w-60 object-contain"
               />
             </Link>
 
@@ -213,6 +214,47 @@ export default function Footer() {
                 />
               ))}
             </div>
+          </div>
+        </div>
+
+        <div className="mb-10 overflow-hidden rounded-3xl border border-[rgba(82,183,136,0.30)] bg-[linear-gradient(135deg,rgba(31,82,48,0.55)_0%,rgba(82,183,136,0.18)_100%)] p-1">
+          <div className="relative flex flex-col gap-5 rounded-[22px] bg-[linear-gradient(135deg,#0f2d1a_0%,#0a1a10_100%)] px-7 py-6 sm:flex-row sm:items-center sm:justify-between">
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute -right-12 -top-12 h-48 w-48 rounded-full bg-[radial-gradient(circle,rgba(82,183,136,0.22),transparent_70%)] blur-2xl"
+            />
+            <div className="relative flex items-center gap-4">
+              <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-2xl bg-[#25D366] shadow-[0_8px_24px_rgba(37,211,102,0.35)]">
+                <svg viewBox="0 0 24 24" className="h-7 w-7" fill="none" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M20 11.5A8.5 8.5 0 0 1 7.6 19l-3.6 1 1.1-3.5A8.5 8.5 0 1 1 20 11.5Z" />
+                  <path d="M9.5 9.5c.4-.9.8-.9 1.1-.9.2 0 .4 0 .6.5l.5 1.3c.1.3 0 .5-.2.7l-.4.4c-.2.2-.2.4-.1.6.4.8 1.1 1.5 1.9 1.9.2.1.4.1.6-.1l.4-.4c.2-.2.4-.3.7-.2l1.3.5c.5.2.5.4.5.6 0 .3 0 .7-.9 1.1-.7.3-1.4.3-2.1 0a8.2 8.2 0 0 1-4.1-4.1c-.3-.7-.3-1.4 0-2.1Z" />
+                </svg>
+              </div>
+              <div>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#86efac]">
+                  Atendimento direto
+                </p>
+                <p className="mt-1 text-[18px] font-semibold leading-tight text-white">
+                  Fale com a Talhão no WhatsApp
+                </p>
+                <p className="mt-1 text-[13px] text-white/65">
+                  Resposta rápida durante o horário comercial.
+                </p>
+              </div>
+            </div>
+
+            <a
+              href="https://wa.me/5511530433330?text=Olá%2C%20gostaria%20de%20saber%20mais%20sobre%20o%20Talhão"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="relative inline-flex items-center justify-center gap-2 self-start rounded-xl bg-[#25D366] px-6 py-3 text-[14px] font-semibold text-white shadow-[0_8px_24px_rgba(37,211,102,0.35)] transition-all duration-200 hover:bg-[#1ebe5b] hover:shadow-[0_12px_32px_rgba(37,211,102,0.5)] sm:self-auto"
+            >
+              Iniciar conversa
+              <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M5 12h14" />
+                <path d="m13 6 6 6-6 6" />
+              </svg>
+            </a>
           </div>
         </div>
 

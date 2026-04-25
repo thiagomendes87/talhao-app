@@ -28,8 +28,8 @@ const personas = [
 
 const heatmapIndexes = {
   AM: 2,
-  MT: 16,
-  SP: 23,
+  MT: 11,
+  SP: 20,
 }
 
 const consoleEntries = []
@@ -121,22 +121,49 @@ async function screenshotForWhoPanel(page) {
 
 async function screenshotHeatmapTooltips(page) {
   const section = page.locator('section').filter({ hasText: 'Presentes em todo o Brasil' }).first()
-  const paths = section.locator('svg path')
+  const labels = section.locator('svg text')
 
   await section.scrollIntoViewIfNeeded()
   await page.waitForTimeout(400)
 
   for (const [uf, index] of Object.entries(heatmapIndexes)) {
-    await paths.nth(index).hover()
+    const label = labels.nth(index)
+    const box = await label.boundingBox()
+
+    if (!box) {
+      throw new Error(`Nao foi possivel localizar o hex de ${uf}.`)
+    }
+
+    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2)
     await page.waitForTimeout(500)
 
-    const tooltipText = section.locator('p').filter({ hasText: 'propriedades mapeadas' }).first()
-    const tooltip = tooltipText.locator('xpath=ancestor::div[1]')
+    const tooltip = section.locator('div.pointer-events-none.absolute').last()
 
     await tooltip.screenshot({
       path: path.join(outputDir, `heatmap-${uf}.png`),
     })
   }
+}
+
+async function screenshotCoverageBlock(page, viewportName) {
+  const section = page.locator('section').filter({ hasText: 'Presentes em todo o Brasil' }).first()
+
+  await section.scrollIntoViewIfNeeded()
+  await page.waitForTimeout(400)
+
+  if (viewportName === '1440x900') {
+    const label = section.locator('svg text').filter({ hasText: 'MT' }).first()
+    const box = await label.boundingBox()
+
+    if (box) {
+      await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2)
+      await page.waitForTimeout(350)
+    }
+  }
+
+  await section.screenshot({
+    path: path.join(outputDir, `coverage-${viewportName}.png`),
+  })
 }
 
 async function screenshotPricingBlock(page, viewportName) {
@@ -183,6 +210,7 @@ async function runViewport(browser, viewport) {
   })
 
   await screenshotPricingBlock(page, viewport.name)
+  await screenshotCoverageBlock(page, viewport.name)
 
   if (viewport.name === '1440x900') {
     await screenshotForWhoPanel(page)

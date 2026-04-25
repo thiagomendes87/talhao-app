@@ -50,7 +50,7 @@ const comparisonRows = [
     feature: 'Suporte',
     free: 'Base',
     pro: 'Prioritário',
-    credits: 'Padrão',
+    credits: 'Prioritário',
   },
   {
     feature: 'Validade',
@@ -360,7 +360,10 @@ export default function Pricing() {
                       label="Pro"
                       value={<span className="font-semibold text-[#1f5230]">{row.pro}</span>}
                     />
-                    <MobileField label="Créditos" value={row.credits} />
+                    <MobileField
+                      label="Créditos"
+                      value={<span className="font-semibold text-[#162113]">{row.credits}</span>}
+                    />
                   </div>
                 </div>
               ))}
@@ -391,7 +394,7 @@ export default function Pricing() {
                   <div className="px-5 py-4 text-[13px] font-medium text-[#162113]">{row.feature}</div>
                   <div className="px-5 py-4 text-center text-[13px] text-[#4f6347]">{row.free}</div>
                   <div className="px-5 py-4 text-center text-[13px] font-semibold text-[#1f5230]">{row.pro}</div>
-                  <div className="px-5 py-4 text-center text-[13px] text-[#4f6347]">{row.credits}</div>
+                  <div className="px-5 py-4 text-center text-[13px] font-semibold text-[#162113]">{row.credits}</div>
                 </div>
               ))}
             </div>

@@ -1,8 +1,9 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { useEffect, useState } from 'react'
 import { buildLoginPath, supabase } from '@/lib/supabase'
 
 const perfis = [
@@ -21,21 +22,25 @@ export default function OnboardingPage() {
   const router = useRouter()
 
   useEffect(() => {
-    // Listener em tempo real — captura sessão mesmo com delay do OAuth
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
       if (session) {
         setUsuario(session.user)
       } else if (event === 'SIGNED_OUT') {
-        router.replace(buildLoginPath('/onboarding', 'Entre com sua conta Google para concluir seu perfil.'))
+        router.replace(
+          buildLoginPath(
+            '/onboarding',
+            'Entre com sua conta Google para concluir seu perfil.',
+          ),
+        )
       }
     })
 
-    // Verifica sessão já existente imediatamente
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
         setUsuario(session.user)
       }
-      // Se null, aguarda o onAuthStateChange acima resolver
     })
 
     return () => subscription.unsubscribe()
@@ -43,14 +48,13 @@ export default function OnboardingPage() {
 
   const handleContinuar = async () => {
     setCarregando(true)
-    const perfilEscolhido = perfilIdx === perfis.length - 1 ? outroPerfil : perfis[perfilIdx].nome
+    const perfilEscolhido =
+      perfilIdx === perfis.length - 1 ? outroPerfil : perfis[perfilIdx].nome
 
-    // Salva no Auth metadata
     const { error } = await supabase.auth.updateUser({
       data: { perfil: perfilEscolhido },
     })
 
-    // Salva na tabela perfis para análise
     if (usuario) {
       await supabase
         .from('perfis')
@@ -66,62 +70,119 @@ export default function OnboardingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#1A1A2E] to-[#2D6A4F] flex items-center justify-center p-6">
-      <div className="bg-white rounded-3xl shadow-2xl max-w-2xl w-full p-12">
+    <div className="h-screen overflow-hidden bg-white">
+      <div className="grid h-full grid-cols-1 bg-white lg:grid-cols-2">
+        <section className="relative hidden h-full overflow-hidden lg:flex">
+          <Image
+            src="/foto-lp1.png"
+            alt="Vista de satélite de uma propriedade rural"
+            fill
+            className="object-cover object-center"
+            priority
+          />
+          <div className="absolute inset-0 bg-[#162113]/70" />
 
-        <Link href="/" className="inline-flex items-center gap-2 mb-8">
-          <div className="w-8 h-8 bg-[#2D6A4F] rounded-lg flex items-center justify-center text-lg">🌿</div>
-          <span className="font-extrabold text-[#1A1A2E]">Talhão</span>
-        </Link>
+          <div className="relative z-10 flex h-full w-full flex-col justify-between p-10">
+            <div className="space-y-5">
+              <Link href="/" className="inline-flex">
+                <Image
+                  src="/logo-oficial-branco.png"
+                  width={120}
+                  height={32}
+                  alt="Talhão"
+                />
+              </Link>
 
-        <h1 className="text-3xl font-extrabold text-[#1A1A2E] mb-2">Bem-vindo!</h1>
-        <p className="text-gray-600 mb-8">
-          Para personalizar sua experiência, nos diga qual é o seu perfil no setor agrícola.
-        </p>
-
-        {/* Seletor de perfis */}
-        <div className="space-y-3 mb-8">
-          {perfis.map((p, i) => (
-            <button
-              key={p.nome}
-              onClick={() => setPerfilIdx(i)}
-              className={`w-full flex items-start gap-4 p-4 rounded-xl border-2 transition-all text-left ${
-                perfilIdx === i ? 'border-[#2D6A4F] bg-[#F0FDF4]' : 'border-gray-200 hover:border-gray-300'
-              }`}
-            >
-              <span className="text-3xl">{p.icon}</span>
-              <div>
-                <h3 className="font-bold text-[#1A1A2E]">{p.nome}</h3>
-                <p className="text-sm text-gray-500">{p.desc}</p>
+              <div className="inline-flex items-center gap-2 rounded-full border border-[#40916C]/60 bg-[#40916C]/20 px-4 py-2 text-xs font-semibold text-[#B7E4C7]">
+                <span className="h-2.5 w-2.5 rounded-full bg-[#52b788] animate-pulse" />
+                Sistema da Talhão está ativo
               </div>
-            </button>
-          ))}
-        </div>
+            </div>
 
-        {/* Campo "Outro" */}
-        {perfilIdx === perfis.length - 1 && (
-          <div className="mb-8">
-            <label className="form-label">Qual é seu perfil?</label>
-            <input
-              className="form-input"
-              placeholder="Ex: Agrônomo, Analista de Dados, etc"
-              value={outroPerfil}
-              onChange={(e) => setOutroPerfil(e.target.value)}
-            />
+            <div className="max-w-xl rounded-2xl border border-white/20 bg-white/10 p-6 backdrop-blur-md">
+              <p className="text-xl font-semibold leading-relaxed text-white">
+                &quot;Acesse dados de qualquer fazenda do Brasil em segundos —
+                diretamente do satélite.&quot;
+              </p>
+
+              <div className="mt-6 flex flex-wrap gap-5 text-sm text-white/80">
+                <span>🛰 Satélite atualizado diariamente</span>
+                <span>⚡ Resultados em menos de 30s</span>
+                <span>📍 100% do território brasileiro</span>
+              </div>
+            </div>
           </div>
-        )}
+        </section>
 
-        <button
-          onClick={handleContinuar}
-          disabled={carregando || (perfilIdx === perfis.length - 1 && !outroPerfil)}
-          className="btn-primary w-full py-4 rounded-xl text-lg font-bold disabled:opacity-50"
-        >
-          {carregando ? 'Salvando...' : 'Continuar →'}
-        </button>
+        <section className="flex h-full flex-col justify-center bg-white px-6 py-10 lg:px-16 lg:py-12">
+          <div className="mx-auto w-full max-w-xl">
+            <div className="rounded-full border border-[#D8F3DC] bg-[#F0FDF4] px-4 py-2 text-xs font-semibold uppercase tracking-wide text-[#2D6A4F] inline-flex">
+              Passo 1 de 1 — Seu perfil
+            </div>
+            <div className="mt-2 mb-6 h-0.5 w-8 bg-[#2D6A4F]" />
 
-        <p className="text-center text-xs text-gray-500 mt-6">
-          Você pode mudar isso depois em suas configurações de perfil.
-        </p>
+            <h1 className="text-4xl font-extrabold leading-tight text-[#162113]">
+              Bem-vindo ao <span className="text-[#2D6A4F]">talhão</span> 👋
+            </h1>
+
+            <p className="mt-3 mb-8 text-sm leading-relaxed text-gray-500">
+              Para personalizar sua experiência, nos diga qual é o seu perfil no
+              setor agrícola.
+            </p>
+
+            <div className="space-y-2">
+              {perfis.map((p, i) => {
+                const selecionado = perfilIdx === i
+
+                return (
+                  <button
+                    key={p.nome}
+                    onClick={() => setPerfilIdx(i)}
+                    className={`w-full cursor-pointer rounded-xl border px-5 py-4 text-left transition-all ${
+                      selecionado
+                        ? 'border-[#2D6A4F] bg-[#F0FDF4]'
+                        : 'border-gray-200 hover:border-[#2D6A4F]/40 hover:bg-[#F0FDF4]/60'
+                    }`}
+                  >
+                    <div className="flex items-center gap-4">
+                      <span className="text-2xl">{p.icon}</span>
+                      <div>
+                        <p className="text-sm font-semibold text-[#162113]">
+                          {p.nome}
+                        </p>
+                        <p className="text-xs text-gray-400">{p.desc}</p>
+                      </div>
+                    </div>
+                  </button>
+                )
+              })}
+            </div>
+
+            {perfilIdx === perfis.length - 1 && (
+              <div className="mt-4">
+                <label className="form-label">Qual é seu perfil?</label>
+                <input
+                  className="form-input"
+                  placeholder="Ex: Agrônomo, Analista de Dados, etc"
+                  value={outroPerfil}
+                  onChange={(e) => setOutroPerfil(e.target.value)}
+                />
+              </div>
+            )}
+
+            <button
+              onClick={handleContinuar}
+              disabled={carregando || (perfilIdx === perfis.length - 1 && !outroPerfil)}
+              className="mt-6 w-full rounded-xl bg-[#162113] py-4 text-base font-bold text-white transition-colors hover:bg-[#1f5230] disabled:opacity-40"
+            >
+              {carregando ? 'Salvando...' : 'Continuar →'}
+            </button>
+
+            <p className="mt-4 text-center text-xs text-gray-400">
+              Você pode mudar isso depois nas configurações de perfil.
+            </p>
+          </div>
+        </section>
       </div>
     </div>
   )

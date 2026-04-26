@@ -1,7 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import Image from 'next/image'
 import Link from 'next/link'
+import { useState } from 'react'
 import { buildAuthCallbackUrl, supabase } from '@/lib/supabase'
 
 export default function CadastroPage() {
@@ -76,69 +77,36 @@ export default function CadastroPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F7FAF8] px-6 py-10">
-      <div className="mx-auto flex min-h-[calc(100vh-80px)] max-w-5xl items-center">
-        <div className="grid w-full overflow-hidden rounded-[32px] border border-[rgba(28,43,24,0.10)] bg-white shadow-[0_30px_80px_rgba(16,24,20,0.08)] lg:grid-cols-[1.05fr_0.95fr]">
-          <div
-            className="hidden lg:flex flex-col justify-between p-10"
-            style={{ background: 'linear-gradient(145deg, #1B4332 0%, #2D6A4F 60%, #40916C 100%)' }}
-          >
-            <Link href="/" className="flex items-center gap-2 text-white">
-              <div className="w-9 h-9 rounded-xl bg-white/15 flex items-center justify-center text-lg">🌿</div>
-              <span className="text-xl font-extrabold">Talhão</span>
-            </Link>
-
-            <div>
-              <p className="text-xs font-bold uppercase tracking-[0.24em] text-[#B7E4C7]">Cadastro</p>
-              <h1 className="mt-4 text-4xl font-extrabold leading-tight text-white">
-                Crie sua conta e acesse o Talhão do seu jeito.
-              </h1>
-              <p className="mt-4 text-sm leading-relaxed text-white/80">
-                Cadastre-se com email e senha ou siga com Google. Depois da autenticação, você volta para o mapa.
-              </p>
+    <div className="h-screen overflow-hidden bg-white">
+      <div className="grid h-full grid-cols-1 bg-white lg:grid-cols-2">
+        <section className="relative flex h-full flex-col justify-center overflow-hidden bg-white px-6 py-10 lg:px-16 lg:py-12">
+          <div className="glow-green-strong" />
+          <div className="relative z-10 mx-auto w-full max-w-xl">
+            <div className="inline-flex rounded-full border border-[#D8F3DC] bg-[#F0FDF4] px-4 py-2 text-xs font-semibold uppercase tracking-wide text-[#2D6A4F]">
+              Cadastro
             </div>
+            <div className="mt-2 mb-6 h-0.5 w-8 bg-[#2D6A4F]" />
 
-            <div className="grid grid-cols-3 gap-4 text-white/80">
-              {[
-                ['10M+', 'polígonos'],
-                ['Google', 'login social'],
-                ['1 clique', 'para abrir o mapa'],
-              ].map(([valor, label]) => (
-                <div key={label}>
-                  <div className="text-2xl font-extrabold text-white">{valor}</div>
-                  <div className="mt-1 text-xs uppercase tracking-[0.18em]">{label}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="p-8 sm:p-10">
-            <Link href="/" className="inline-flex items-center gap-2 text-sm font-semibold text-[#1f5230] hover:text-[#162113] lg:hidden">
-              <span className="text-base">←</span>
-              Voltar para o início
-            </Link>
-
-            <div className="mt-4 lg:mt-0">
-              <p className="text-xs font-bold uppercase tracking-[0.24em] text-[#5C7C6C]">Sua conta</p>
-              <h2 className="mt-3 text-3xl font-extrabold text-[#162113]">Criar conta</h2>
-              <p className="mt-3 text-sm leading-relaxed text-gray-600">
-                Use o formulário abaixo ou continue com Google.
-              </p>
-            </div>
+            <h1 className="text-4xl font-extrabold leading-tight text-[#162113]">
+              Crie sua conta na <span className="text-[#2D6A4F]">Talhão</span> 🌿
+            </h1>
+            <p className="mt-3 mb-8 text-sm leading-relaxed text-gray-500">
+              Use o formulário abaixo ou continue com Google.
+            </p>
 
             {erro && (
-              <div className="mt-6 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+              <div className="mb-6 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
                 {erro}
               </div>
             )}
 
             {sucesso && (
-              <div className="mt-6 rounded-2xl border border-[#D8E9DE] bg-[#F3FBF6] px-4 py-3 text-sm text-[#24503B]">
+              <div className="mb-6 rounded-2xl border border-[#D8E9DE] bg-[#F3FBF6] px-4 py-3 text-sm text-[#24503B]">
                 {sucesso}
               </div>
             )}
 
-            <form onSubmit={handleSignup} className="mt-8 space-y-4">
+            <form onSubmit={handleSignup} className="space-y-4">
               <div>
                 <label className="form-label">Nome</label>
                 <input
@@ -190,7 +158,7 @@ export default function CadastroPage() {
               <button
                 type="submit"
                 disabled={carregandoCadastro || carregandoGoogle}
-                className="btn-primary w-full py-3 rounded-2xl text-base disabled:opacity-60"
+                className="btn-primary w-full rounded-2xl py-3 text-base disabled:opacity-60"
               >
                 {carregandoCadastro ? 'Criando conta...' : 'Criar conta'}
               </button>
@@ -206,7 +174,7 @@ export default function CadastroPage() {
               type="button"
               onClick={handleGoogle}
               disabled={carregandoCadastro || carregandoGoogle}
-              className="flex w-full items-center justify-center gap-3 rounded-2xl border border-[rgba(22,33,19,0.12)] px-4 py-3 text-sm font-semibold text-[#162113] transition-colors hover:bg-gray-50 disabled:opacity-60"
+              className="flex w-full items-center justify-center gap-3 rounded-xl border border-[rgba(22,33,19,0.12)] bg-white px-4 py-4 text-sm font-semibold text-[#162113] shadow-sm transition-colors hover:bg-gray-50 disabled:opacity-60"
             >
               <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
                 <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
@@ -219,12 +187,56 @@ export default function CadastroPage() {
 
             <p className="mt-6 text-center text-sm text-gray-600">
               Já tenho conta?{' '}
-              <Link href="/entrar" className="font-semibold text-[#1f5230] hover:text-[#162113]">
+              <Link
+                href="/entrar"
+                className="font-semibold text-[#2D6A4F] hover:text-[#162113]"
+              >
                 Entrar
               </Link>
             </p>
           </div>
-        </div>
+        </section>
+
+        <section className="relative hidden h-full overflow-hidden lg:flex">
+          <Image
+            src="/foto-lp3.png"
+            alt="Vista de satélite de uma propriedade rural"
+            fill
+            className="object-cover object-center"
+            priority
+          />
+          <div className="absolute inset-0 bg-[#162113]/70" />
+
+          <div className="relative z-10 flex h-full w-full flex-col p-10">
+            <Link href="/" className="inline-flex">
+              <Image
+                src="/logo-oficial-branco.png"
+                width={360}
+                height={96}
+                alt="Talhão"
+              />
+            </Link>
+
+            <div className="flex flex-1 items-center justify-center">
+              <div className="w-full max-w-lg rounded-2xl border border-white/20 bg-white/10 p-8 backdrop-blur-md">
+                <p className="text-xl font-semibold leading-relaxed text-white">
+                  &ldquo;Acesse dados de qualquer fazenda do Brasil em segundos —
+                  diretamente do satélite.&rdquo;
+                </p>
+                <div className="mt-6 flex flex-wrap gap-6 whitespace-nowrap text-sm text-white/80">
+                  <span>🛰 Satélite atualizado semanalmente</span>
+                  <span>⚡ Resultados em menos de 30s</span>
+                  <span>📍 100% do território brasileiro</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="absolute bottom-6 right-6 z-20 inline-flex items-center gap-2 rounded-full border border-[#40916C]/60 bg-[#40916C]/20 px-4 py-2 text-xs font-semibold text-[#B7E4C7] backdrop-blur-sm">
+            <span className="h-2.5 w-2.5 rounded-full bg-[#52b788] animate-pulse" />
+            Sistema da Talhão está ativo
+          </div>
+        </section>
       </div>
     </div>
   )

@@ -120,12 +120,9 @@ export default function OnboardingPage() {
             </div>
             <div className="mt-2 mb-6 h-0.5 w-8 bg-[#2D6A4F]" />
 
-            <div className="relative inline-block">
-              <div className="absolute -inset-3 rounded-2xl bg-gradient-to-r from-[#F0FDF4] via-[#D8F3DC]/60 to-transparent blur-sm" />
-              <h1 className="relative text-4xl font-extrabold leading-tight text-[#162113]">
-                Bem-vinda à <span className="text-[#2D6A4F]">Talhão</span> 👋
-              </h1>
-            </div>
+            <h1 className="text-4xl font-extrabold leading-tight text-[#162113]">
+              É um prazer te receber na <span className="text-[#2D6A4F]">Talhão</span> 🤝
+            </h1>
 
             <p className="mt-3 mb-8 text-sm leading-relaxed text-gray-500">
               Para personalizar sua experiência, nos diga qual é o seu perfil no

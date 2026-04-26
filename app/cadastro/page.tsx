@@ -87,8 +87,13 @@ export default function CadastroPage() {
             </div>
             <div className="mt-2 mb-6 h-0.5 w-8 bg-[#2D6A4F]" />
 
-            <h1 className="text-4xl font-extrabold leading-tight text-[#162113]">
-              Crie sua conta na <span className="text-[#2D6A4F]">Talhão</span> 🌿
+            <h1 className="flex flex-wrap items-center gap-3 text-4xl font-extrabold leading-tight text-[#162113]">
+              Crie sua conta na
+              <img
+                src="/logo-oficial.png"
+                alt="Talhão"
+                className="inline-block h-12 w-12 rounded-xl object-contain align-middle"
+              />
             </h1>
             <p className="mt-3 mb-8 text-sm leading-relaxed text-gray-500">
               Use o formulário abaixo ou continue com Google.

@@ -14,59 +14,6 @@ const perfis = [
   { icon: '✏️', nome: 'Outro', desc: 'Especificar abaixo' },
 ]
 
-const frases = [
-  'Acesse dados de qualquer fazenda do Brasil em segundos — diretamente do satélite.',
-  'Analise NDVI, cobertura vegetal e histórico de qualquer talhão do país.',
-  'Exporte KML, Shapefile e PDF com um clique — compatível com qualquer sistema.',
-  'Busque por CPF, CNPJ, coordenada ou nome da propriedade — resultado em 30s.',
-]
-
-function TypewriterText() {
-  const [displayed, setDisplayed] = useState('')
-  const [fraseIdx, setFraseIdx] = useState(0)
-  const [deletando, setDeletando] = useState(false)
-  const [pausado, setPausado] = useState(false)
-
-  useEffect(() => {
-    if (pausado) {
-      const t = setTimeout(() => {
-        setPausado(false)
-        setDeletando(true)
-      }, 2200)
-      return () => clearTimeout(t)
-    }
-
-    const frase = frases[fraseIdx]
-    const velocidade = deletando ? 18 : 38
-
-    const t = setTimeout(() => {
-      if (!deletando) {
-        const next = frase.slice(0, displayed.length + 1)
-        setDisplayed(next)
-        if (next === frase) setPausado(true)
-      } else {
-        const next = displayed.slice(0, -1)
-        setDisplayed(next)
-        if (next === '') {
-          setDeletando(false)
-          setFraseIdx((i) => (i + 1) % frases.length)
-        }
-      }
-    }, velocidade)
-
-    return () => clearTimeout(t)
-  }, [displayed, deletando, fraseIdx, pausado])
-
-  return (
-    <span>
-      {displayed}
-      <span className="ml-0.5 inline-block w-0.5 animate-pulse bg-white align-middle">
-        &nbsp;
-      </span>
-    </span>
-  )
-}
-
 export default function OnboardingPage() {
   const [perfilIdx, setPerfilIdx] = useState(0)
   const [outroPerfil, setOutroPerfil] = useState('')
@@ -147,8 +94,8 @@ export default function OnboardingPage() {
 
             <div className="flex flex-1 items-center justify-center">
               <div className="w-full max-w-lg rounded-2xl border border-white/20 bg-white/10 p-8 backdrop-blur-md">
-                <p className="min-h-[84px] text-xl font-semibold leading-relaxed text-white">
-                  &ldquo;<TypewriterText />&rdquo;
+                <p className="text-xl font-semibold leading-relaxed text-white">
+                  &ldquo;Acesse dados de qualquer fazenda do Brasil em segundos — diretamente do satélite.&rdquo;
                 </p>
                 <div className="mt-6 flex flex-wrap gap-6 whitespace-nowrap text-sm text-white/80">
                   <span>🛰 Satélite atualizado semanalmente</span>
@@ -165,7 +112,8 @@ export default function OnboardingPage() {
           </div>
         </section>
 
-        <section className="flex h-full flex-col justify-center bg-white px-6 py-10 lg:px-16 lg:py-12">
+        <section className="relative flex h-full flex-col justify-center overflow-hidden bg-white px-6 py-10 lg:px-16 lg:py-12">
+          <div className="glow-green-strong" />
           <div className="mx-auto w-full max-w-xl">
             <div className="rounded-full border border-[#D8F3DC] bg-[#F0FDF4] px-4 py-2 text-xs font-semibold uppercase tracking-wide text-[#2D6A4F] inline-flex">
               Passo 1 de 1 — Seu perfil

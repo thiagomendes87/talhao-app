@@ -4,6 +4,7 @@ import Image from 'next/image'
 import { useState, useEffect } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
+import AppTopbar from '@/components/AppTopbar'
 import { buildLoginPath, supabase } from '@/lib/supabase'
 
 type PaymentMethod = 'pix' | 'boleto' | 'cartao'
@@ -210,24 +211,9 @@ export default function AssinarClient() {
       </aside>
 
       <main className="flex-1 bg-white lg:h-screen lg:overflow-y-auto">
-        {/* Navbar */}
-        <nav className="bg-white border-b border-gray-200 px-4 sm:px-10 py-3 sm:py-4">
-          <div className="flex items-center justify-between">
-            <Link href="/" className="flex items-center gap-2">
-              <img
-                src="/logo-oficial.png"
-                alt="Talhão"
-                className="w-[126px] h-[126px] object-contain"
-                style={{ borderRadius: '10px' }}
-              />
-            </Link>
-            <div className="bg-[#D8F3DC] text-[#2D6A4F] text-xs font-bold px-3 py-1.5 rounded-xl">
-              {creditos} créditos
-            </div>
-          </div>
-        </nav>
+        <AppTopbar />
 
-        <div className="max-w-6xl mx-auto py-6 sm:py-10 px-4 sm:px-8">
+        <div className="mx-auto max-w-6xl px-6 py-8">
           {/* Abas */}
           <div className="flex gap-2 sm:gap-4 mb-6 sm:mb-8 border-b-2 border-gray-200">
             {[['pro', 'Plano Pro'], ['downloads', 'Comprar Créditos']].map(([tab, label]) => (

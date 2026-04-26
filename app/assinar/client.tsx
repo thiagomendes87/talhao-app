@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { useState, useEffect } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
@@ -166,115 +167,157 @@ export default function AssinarClient() {
   const totalDownloads = quantidade * 3.5
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Navbar */}
-      <nav className="bg-white border-b border-gray-200 px-4 sm:px-10 py-3 sm:py-4">
-        <div className="flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="w-7 h-7 bg-[#2D6A4F] rounded-md flex items-center justify-center">🌿</div>
-            <span className="font-extrabold text-[#1A1A2E] text-lg">Talhão</span>
+    <div className="flex min-h-screen">
+      <aside className="sticky top-0 hidden h-screen w-1/3 shrink-0 overflow-hidden lg:flex">
+        <Image
+          src="/foto-lp4.png"
+          alt="Vista aérea de propriedade rural"
+          fill
+          className="object-cover object-center"
+          priority
+        />
+        <div className="absolute inset-0 bg-[#162113]/70" />
+
+        <div className="relative z-10 flex h-full w-full flex-col p-10">
+          <Link href="/" className="inline-flex">
+            <Image
+              src="/logo-oficial-branco.png"
+              width={360}
+              height={96}
+              alt="Talhão"
+            />
           </Link>
-          <div className="bg-[#D8F3DC] text-[#2D6A4F] text-xs font-bold px-3 py-1.5 rounded-lg">
-            {creditos} créditos
-          </div>
-        </div>
-      </nav>
 
-      <div className="max-w-6xl mx-auto py-6 sm:py-10 px-4 sm:px-8">
-
-        {/* Abas */}
-        <div className="flex gap-2 sm:gap-4 mb-6 sm:mb-8 border-b-2 border-gray-200">
-          {[['pro', 'Plano Pro'], ['downloads', 'Comprar Créditos']].map(([tab, label]) => (
-            <button key={tab} onClick={() => setTipoCompra(tab as any)}
-              className={`pb-3 px-3 sm:px-6 font-bold text-sm sm:text-lg transition-all border-b-2 whitespace-nowrap ${
-                tipoCompra === tab ? 'text-[#1A1A2E] border-[#1A1A2E]' : 'text-gray-500 border-transparent'
-              }`}>
-              {label}
-            </button>
-          ))}
-        </div>
-
-        {tipoCompra === 'pro' ? (
-          /* ── PLANO PRO ── */
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
-            <div className="space-y-6">
-              <div>
-                <p className="text-xs font-bold text-gray-500 uppercase mb-2">Plano Pro</p>
-                <h1 className="text-3xl sm:text-4xl font-extrabold text-[#1A1A2E] mb-3">R$ 49,00/mês</h1>
-                <p className="text-gray-600">Downloads ilimitados · Cancele quando quiser</p>
-              </div>
-              <div className="bg-[#F0FDF4] border border-[#2D6A4F] rounded-xl p-5 space-y-3">
-                <h3 className="font-bold text-[#2D6A4F] mb-3">Incluso:</h3>
-                {['KML (CAR/SICAR)', 'SIGEF e Topografia', 'Todas as análises da Talhão', 'Downloads ilimitados', 'Suporte por email e WhatsApp', 'Sem compromisso anual'].map(f => (
-                  <div key={f} className="flex gap-3 text-sm text-gray-700">
-                    <span className="text-[#2D6A4F] font-bold">✓</span> {f}
-                  </div>
-                ))}
+          <div className="flex flex-1 items-center justify-center">
+            <div className="w-full max-w-sm rounded-2xl border border-white/20 bg-white/10 p-8 backdrop-blur-md">
+              <p className="text-xl font-semibold leading-relaxed text-white">
+                &ldquo;Acesse dados de qualquer fazenda do Brasil em segundos —
+                diretamente do satélite.&rdquo;
+              </p>
+              <div className="mt-6 flex flex-col gap-3 text-sm text-white/80">
+                <span>🛰 Satélite atualizado semanalmente</span>
+                <span>⚡ Resultados em menos de 30s</span>
+                <span>📍 100% do território brasileiro</span>
               </div>
             </div>
-            <div className="bg-white rounded-xl border border-gray-200 p-5 lg:h-fit lg:sticky lg:top-8 space-y-5">
-              <div className="flex justify-between items-end">
-                <div>
-                  <p className="text-sm text-gray-600">Plano Pro (1 mês)</p>
-                  <p className="text-xs text-gray-500">Renova automaticamente</p>
-                </div>
-                <p className="text-2xl font-extrabold text-[#1A1A2E]">R$ 49,00</p>
-              </div>
-              <button
-                onClick={() => abrirModal(14)}
-                className="w-full bg-[#2D6A4F] hover:bg-[#1A5C3A] text-white font-bold py-3 rounded-lg transition-colors text-lg">
-                Assinar Pro →
+          </div>
+        </div>
+
+        <div className="absolute bottom-6 right-6 z-20 inline-flex items-center gap-2 rounded-full border border-[#40916C]/60 bg-[#40916C]/20 px-4 py-2 text-xs font-semibold text-[#B7E4C7] backdrop-blur-sm">
+          <span className="h-2.5 w-2.5 animate-pulse rounded-full bg-[#52b788]" />
+          Sistema da Talhão está ativo
+        </div>
+      </aside>
+
+      <main className="flex-1 bg-gray-50 lg:h-screen lg:overflow-y-auto">
+        {/* Navbar */}
+        <nav className="bg-white border-b border-gray-200 px-4 sm:px-10 py-3 sm:py-4">
+          <div className="flex items-center justify-between">
+            <Link href="/" className="flex items-center gap-2">
+              <div className="w-7 h-7 bg-[#2D6A4F] rounded-md flex items-center justify-center">🌿</div>
+              <span className="font-extrabold text-[#1A1A2E] text-lg">Talhão</span>
+            </Link>
+            <div className="bg-[#D8F3DC] text-[#2D6A4F] text-xs font-bold px-3 py-1.5 rounded-lg">
+              {creditos} créditos
+            </div>
+          </div>
+        </nav>
+
+        <div className="max-w-6xl mx-auto py-6 sm:py-10 px-4 sm:px-8">
+          {/* Abas */}
+          <div className="flex gap-2 sm:gap-4 mb-6 sm:mb-8 border-b-2 border-gray-200">
+            {[['pro', 'Plano Pro'], ['downloads', 'Comprar Créditos']].map(([tab, label]) => (
+              <button key={tab} onClick={() => setTipoCompra(tab as any)}
+                className={`pb-3 px-3 sm:px-6 font-bold text-sm sm:text-lg transition-all border-b-2 whitespace-nowrap ${
+                  tipoCompra === tab ? 'text-[#1A1A2E] border-[#1A1A2E]' : 'text-gray-500 border-transparent'
+                }`}>
+                {label}
               </button>
-              <p className="text-xs text-gray-500 text-center">PIX · Boleto · Cartão</p>
-            </div>
+            ))}
           </div>
-        ) : (
-          /* ── CRÉDITOS AVULSOS ── */
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
-            <div className="space-y-6">
-              <div>
-                <p className="text-xs font-bold text-gray-500 uppercase mb-2">Créditos Avulsos</p>
-                <h1 className="text-3xl sm:text-4xl font-extrabold text-[#1A1A2E] mb-1">R$ 3,50 por crédito</h1>
-                <p className="text-gray-600">Pague só quando precisar</p>
-              </div>
-              <div className="space-y-3">
-                <p className="text-sm font-bold text-gray-700">Escolha a quantidade:</p>
-                <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
-                  {pacotes.map(qty => (
-                    <button key={qty} onClick={() => setQuantidade(qty)}
-                      className={`p-3 rounded-lg border-2 transition-all text-center ${
-                        quantidade === qty
-                          ? 'border-[#2D6A4F] bg-[#F0FDF4] text-[#1A1A2E]'
-                          : 'border-gray-200 bg-white text-gray-700 hover:border-gray-400'
-                      }`}>
-                      <div className="font-bold text-sm">{qty} créditos</div>
-                      <div className="text-xs text-gray-500 mt-0.5">R$ {(qty * 3.5).toFixed(2)}</div>
-                    </button>
+
+          {tipoCompra === 'pro' ? (
+            /* ── PLANO PRO ── */
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
+              <div className="space-y-6">
+                <div>
+                  <p className="text-xs font-bold text-gray-500 uppercase mb-2">Plano Pro</p>
+                  <h1 className="text-3xl sm:text-4xl font-extrabold text-[#1A1A2E] mb-3">R$ 49,00/mês</h1>
+                  <p className="text-gray-600">Downloads ilimitados · Cancele quando quiser</p>
+                </div>
+                <div className="bg-[#F0FDF4] border border-[#2D6A4F] rounded-xl p-5 space-y-3">
+                  <h3 className="font-bold text-[#2D6A4F] mb-3">Incluso:</h3>
+                  {['KML (CAR/SICAR)', 'SIGEF e Topografia', 'Todas as análises da Talhão', 'Downloads ilimitados', 'Suporte por email e WhatsApp', 'Sem compromisso anual'].map(f => (
+                    <div key={f} className="flex gap-3 text-sm text-gray-700">
+                      <span className="text-[#2D6A4F] font-bold">✓</span> {f}
+                    </div>
                   ))}
                 </div>
               </div>
-              <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-sm text-amber-800">
-                <strong>💡 Dica:</strong> A partir de 14 créditos (R$ 49), o Plano Pro é mais vantajoso.
-              </div>
-            </div>
-            <div className="bg-white rounded-xl border border-gray-200 p-5 lg:h-fit lg:sticky lg:top-8 space-y-5">
-              <div className="flex justify-between items-end">
-                <div>
-                  <p className="text-sm text-gray-600">{quantidade} créditos</p>
-                  <p className="text-xs text-gray-500">R$ 3,50 cada</p>
+              <div className="bg-white rounded-xl border border-gray-200 p-5 lg:h-fit lg:sticky lg:top-8 space-y-5">
+                <div className="flex justify-between items-end">
+                  <div>
+                    <p className="text-sm text-gray-600">Plano Pro (1 mês)</p>
+                    <p className="text-xs text-gray-500">Renova automaticamente</p>
+                  </div>
+                  <p className="text-2xl font-extrabold text-[#1A1A2E]">R$ 49,00</p>
                 </div>
-                <p className="text-2xl font-extrabold text-[#1A1A2E]">R$ {totalDownloads.toFixed(2)}</p>
+                <button
+                  onClick={() => abrirModal(14)}
+                  className="w-full bg-[#2D6A4F] hover:bg-[#1A5C3A] text-white font-bold py-3 rounded-lg transition-colors text-lg">
+                  Assinar Pro →
+                </button>
+                <p className="text-xs text-gray-500 text-center">PIX · Boleto · Cartão</p>
               </div>
-              <button
-                onClick={() => abrirModal(quantidade)}
-                className="w-full bg-[#2D6A4F] hover:bg-[#1A5C3A] text-white font-bold py-3 rounded-lg transition-colors text-lg">
-                Comprar {quantidade} créditos →
-              </button>
-              <p className="text-xs text-gray-500 text-center">PIX · Boleto · Cartão</p>
             </div>
-          </div>
-        )}
-      </div>
+          ) : (
+            /* ── CRÉDITOS AVULSOS ── */
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
+              <div className="space-y-6">
+                <div>
+                  <p className="text-xs font-bold text-gray-500 uppercase mb-2">Créditos Avulsos</p>
+                  <h1 className="text-3xl sm:text-4xl font-extrabold text-[#1A1A2E] mb-1">R$ 3,50 por crédito</h1>
+                  <p className="text-gray-600">Pague só quando precisar</p>
+                </div>
+                <div className="space-y-3">
+                  <p className="text-sm font-bold text-gray-700">Escolha a quantidade:</p>
+                  <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+                    {pacotes.map(qty => (
+                      <button key={qty} onClick={() => setQuantidade(qty)}
+                        className={`p-3 rounded-lg border-2 transition-all text-center ${
+                          quantidade === qty
+                            ? 'border-[#2D6A4F] bg-[#F0FDF4] text-[#1A1A2E]'
+                            : 'border-gray-200 bg-white text-gray-700 hover:border-gray-400'
+                        }`}>
+                        <div className="font-bold text-sm">{qty} créditos</div>
+                        <div className="text-xs text-gray-500 mt-0.5">R$ {(qty * 3.5).toFixed(2)}</div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-sm text-amber-800">
+                  <strong>💡 Dica:</strong> A partir de 14 créditos (R$ 49), o Plano Pro é mais vantajoso.
+                </div>
+              </div>
+              <div className="bg-white rounded-xl border border-gray-200 p-5 lg:h-fit lg:sticky lg:top-8 space-y-5">
+                <div className="flex justify-between items-end">
+                  <div>
+                    <p className="text-sm text-gray-600">{quantidade} créditos</p>
+                    <p className="text-xs text-gray-500">R$ 3,50 cada</p>
+                  </div>
+                  <p className="text-2xl font-extrabold text-[#1A1A2E]">R$ {totalDownloads.toFixed(2)}</p>
+                </div>
+                <button
+                  onClick={() => abrirModal(quantidade)}
+                  className="w-full bg-[#2D6A4F] hover:bg-[#1A5C3A] text-white font-bold py-3 rounded-lg transition-colors text-lg">
+                  Comprar {quantidade} créditos →
+                </button>
+                <p className="text-xs text-gray-500 text-center">PIX · Boleto · Cartão</p>
+              </div>
+            </div>
+          )}
+        </div>
+      </main>
 
       {/* ── MODAL DE PAGAMENTO ── */}
       {modalAberto && (

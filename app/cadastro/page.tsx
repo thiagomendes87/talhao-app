@@ -92,7 +92,8 @@ export default function CadastroPage() {
               <img
                 src="/logo-oficial.png"
                 alt="Talhão"
-                className="inline-block h-12 w-12 rounded-xl object-contain align-middle"
+                className="inline-block h-24 w-24 rounded-xl object-contain align-middle"
+                style={{ verticalAlign: 'middle', marginBottom: '4px' }}
               />
             </h1>
             <p className="mt-3 mb-8 text-sm leading-relaxed text-gray-500">

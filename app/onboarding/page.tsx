@@ -14,6 +14,59 @@ const perfis = [
   { icon: '✏️', nome: 'Outro', desc: 'Especificar abaixo' },
 ]
 
+const frases = [
+  'Acesse dados de qualquer fazenda do Brasil em segundos — diretamente do satélite.',
+  'Analise NDVI, cobertura vegetal e histórico de qualquer talhão do país.',
+  'Exporte KML, Shapefile e PDF com um clique — compatível com qualquer sistema.',
+  'Busque por CPF, CNPJ, coordenada ou nome da propriedade — resultado em 30s.',
+]
+
+function TypewriterText() {
+  const [displayed, setDisplayed] = useState('')
+  const [fraseIdx, setFraseIdx] = useState(0)
+  const [deletando, setDeletando] = useState(false)
+  const [pausado, setPausado] = useState(false)
+
+  useEffect(() => {
+    if (pausado) {
+      const t = setTimeout(() => {
+        setPausado(false)
+        setDeletando(true)
+      }, 2200)
+      return () => clearTimeout(t)
+    }
+
+    const frase = frases[fraseIdx]
+    const velocidade = deletando ? 18 : 38
+
+    const t = setTimeout(() => {
+      if (!deletando) {
+        const next = frase.slice(0, displayed.length + 1)
+        setDisplayed(next)
+        if (next === frase) setPausado(true)
+      } else {
+        const next = displayed.slice(0, -1)
+        setDisplayed(next)
+        if (next === '') {
+          setDeletando(false)
+          setFraseIdx((i) => (i + 1) % frases.length)
+        }
+      }
+    }, velocidade)
+
+    return () => clearTimeout(t)
+  }, [displayed, deletando, fraseIdx, pausado])
+
+  return (
+    <span>
+      {displayed}
+      <span className="ml-0.5 inline-block w-0.5 animate-pulse bg-white align-middle">
+        &nbsp;
+      </span>
+    </span>
+  )
+}
+
 export default function OnboardingPage() {
   const [perfilIdx, setPerfilIdx] = useState(0)
   const [outroPerfil, setOutroPerfil] = useState('')
@@ -82,35 +135,33 @@ export default function OnboardingPage() {
           />
           <div className="absolute inset-0 bg-[#162113]/70" />
 
-          <div className="relative z-10 flex h-full w-full flex-col justify-between p-10">
-            <div className="space-y-5">
-              <Link href="/" className="inline-flex">
-                <Image
-                  src="/logo-oficial-branco.png"
-                  width={120}
-                  height={32}
-                  alt="Talhão"
-                />
-              </Link>
+          <div className="relative z-10 flex h-full w-full flex-col p-10">
+            <Link href="/" className="inline-flex">
+              <Image
+                src="/logo-oficial-branco.png"
+                width={360}
+                height={96}
+                alt="Talhão"
+              />
+            </Link>
 
-              <div className="inline-flex items-center gap-2 rounded-full border border-[#40916C]/60 bg-[#40916C]/20 px-4 py-2 text-xs font-semibold text-[#B7E4C7]">
-                <span className="h-2.5 w-2.5 rounded-full bg-[#52b788] animate-pulse" />
-                Sistema da Talhão está ativo
+            <div className="flex flex-1 items-center justify-center">
+              <div className="w-full max-w-lg rounded-2xl border border-white/20 bg-white/10 p-8 backdrop-blur-md">
+                <p className="min-h-[84px] text-xl font-semibold leading-relaxed text-white">
+                  &ldquo;<TypewriterText />&rdquo;
+                </p>
+                <div className="mt-6 flex flex-wrap gap-6 whitespace-nowrap text-sm text-white/80">
+                  <span>🛰 Satélite atualizado semanalmente</span>
+                  <span>⚡ Resultados em menos de 30s</span>
+                  <span>📍 100% do território brasileiro</span>
+                </div>
               </div>
             </div>
+          </div>
 
-            <div className="max-w-xl rounded-2xl border border-white/20 bg-white/10 p-6 backdrop-blur-md">
-              <p className="text-xl font-semibold leading-relaxed text-white">
-                &quot;Acesse dados de qualquer fazenda do Brasil em segundos —
-                diretamente do satélite.&quot;
-              </p>
-
-              <div className="mt-6 flex flex-wrap gap-5 text-sm text-white/80">
-                <span>🛰 Satélite atualizado diariamente</span>
-                <span>⚡ Resultados em menos de 30s</span>
-                <span>📍 100% do território brasileiro</span>
-              </div>
-            </div>
+          <div className="absolute bottom-6 right-6 z-20 inline-flex items-center gap-2 rounded-full border border-[#40916C]/60 bg-[#40916C]/20 px-4 py-2 text-xs font-semibold text-[#B7E4C7] backdrop-blur-sm">
+            <span className="h-2.5 w-2.5 rounded-full bg-[#52b788] animate-pulse" />
+            Sistema da Talhão está ativo
           </div>
         </section>
 
@@ -121,9 +172,12 @@ export default function OnboardingPage() {
             </div>
             <div className="mt-2 mb-6 h-0.5 w-8 bg-[#2D6A4F]" />
 
-            <h1 className="text-4xl font-extrabold leading-tight text-[#162113]">
-              Bem-vindo ao <span className="text-[#2D6A4F]">talhão</span> 👋
-            </h1>
+            <div className="relative inline-block">
+              <div className="absolute -inset-3 rounded-2xl bg-gradient-to-r from-[#F0FDF4] via-[#D8F3DC]/60 to-transparent blur-sm" />
+              <h1 className="relative text-4xl font-extrabold leading-tight text-[#162113]">
+                Bem-vinda à <span className="text-[#2D6A4F]">Talhão</span> 👋
+              </h1>
+            </div>
 
             <p className="mt-3 mb-8 text-sm leading-relaxed text-gray-500">
               Para personalizar sua experiência, nos diga qual é o seu perfil no

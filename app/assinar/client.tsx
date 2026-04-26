@@ -209,15 +209,19 @@ export default function AssinarClient() {
         </div>
       </aside>
 
-      <main className="flex-1 bg-gray-50 lg:h-screen lg:overflow-y-auto">
+      <main className="flex-1 bg-white lg:h-screen lg:overflow-y-auto">
         {/* Navbar */}
         <nav className="bg-white border-b border-gray-200 px-4 sm:px-10 py-3 sm:py-4">
           <div className="flex items-center justify-between">
             <Link href="/" className="flex items-center gap-2">
-              <div className="w-7 h-7 bg-[#2D6A4F] rounded-md flex items-center justify-center">🌿</div>
-              <span className="font-extrabold text-[#1A1A2E] text-lg">Talhão</span>
+              <img
+                src="/logo-oficial.png"
+                alt="Talhão"
+                className="w-[126px] h-[126px] object-contain"
+                style={{ borderRadius: '10px' }}
+              />
             </Link>
-            <div className="bg-[#D8F3DC] text-[#2D6A4F] text-xs font-bold px-3 py-1.5 rounded-lg">
+            <div className="bg-[#D8F3DC] text-[#2D6A4F] text-xs font-bold px-3 py-1.5 rounded-xl">
               {creditos} créditos
             </div>
           </div>
@@ -229,7 +233,7 @@ export default function AssinarClient() {
             {[['pro', 'Plano Pro'], ['downloads', 'Comprar Créditos']].map(([tab, label]) => (
               <button key={tab} onClick={() => setTipoCompra(tab as any)}
                 className={`pb-3 px-3 sm:px-6 font-bold text-sm sm:text-lg transition-all border-b-2 whitespace-nowrap ${
-                  tipoCompra === tab ? 'text-[#1A1A2E] border-[#1A1A2E]' : 'text-gray-500 border-transparent'
+                  tipoCompra === tab ? 'text-[#162113] border-[#162113]' : 'text-gray-400 border-transparent'
                 }`}>
                 {label}
               </button>
@@ -240,11 +244,11 @@ export default function AssinarClient() {
             /* ── PLANO PRO ── */
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
               <div className="space-y-6">
-                <div>
-                  <p className="text-xs font-bold text-gray-500 uppercase mb-2">Plano Pro</p>
-                  <h1 className="text-3xl sm:text-4xl font-extrabold text-[#1A1A2E] mb-3">R$ 49,00/mês</h1>
-                  <p className="text-gray-600">Downloads ilimitados · Cancele quando quiser</p>
-                </div>
+              <div>
+                <p className="text-xs font-bold text-gray-500 uppercase mb-2">Plano Pro</p>
+                <h1 className="text-3xl sm:text-4xl font-extrabold text-[#162113] mb-3">R$ 49,00/mês</h1>
+                <p className="text-gray-600">Downloads ilimitados · Cancele quando quiser</p>
+              </div>
                 <div className="bg-[#F0FDF4] border border-[#2D6A4F] rounded-xl p-5 space-y-3">
                   <h3 className="font-bold text-[#2D6A4F] mb-3">Incluso:</h3>
                   {['KML (CAR/SICAR)', 'SIGEF e Topografia', 'Todas as análises da Talhão', 'Downloads ilimitados', 'Suporte por email e WhatsApp', 'Sem compromisso anual'].map(f => (
@@ -260,11 +264,11 @@ export default function AssinarClient() {
                     <p className="text-sm text-gray-600">Plano Pro (1 mês)</p>
                     <p className="text-xs text-gray-500">Renova automaticamente</p>
                   </div>
-                  <p className="text-2xl font-extrabold text-[#1A1A2E]">R$ 49,00</p>
+                  <p className="text-2xl font-extrabold text-[#162113]">R$ 49,00</p>
                 </div>
                 <button
                   onClick={() => abrirModal(14)}
-                  className="w-full bg-[#2D6A4F] hover:bg-[#1A5C3A] text-white font-bold py-3 rounded-lg transition-colors text-lg">
+                  className="w-full rounded-xl bg-[#1f5230] px-5 py-3 text-base font-semibold text-white shadow-[0_12px_32px_rgba(31,82,48,0.22)] transition hover:-translate-y-[1px] hover:bg-[#2a6b3f] hover:shadow-[0_18px_42px_rgba(31,82,48,0.28)]">
                   Assinar Pro →
                 </button>
                 <p className="text-xs text-gray-500 text-center">PIX · Boleto · Cartão</p>
@@ -274,21 +278,21 @@ export default function AssinarClient() {
             /* ── CRÉDITOS AVULSOS ── */
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
               <div className="space-y-6">
-                <div>
-                  <p className="text-xs font-bold text-gray-500 uppercase mb-2">Créditos Avulsos</p>
-                  <h1 className="text-3xl sm:text-4xl font-extrabold text-[#1A1A2E] mb-1">R$ 3,50 por crédito</h1>
-                  <p className="text-gray-600">Pague só quando precisar</p>
-                </div>
+              <div>
+                <p className="text-xs font-bold text-gray-500 uppercase mb-2">Créditos Avulsos</p>
+                <h1 className="text-3xl sm:text-4xl font-extrabold text-[#162113] mb-1">R$ 3,50 por crédito</h1>
+                <p className="text-gray-600">Pague só quando precisar</p>
+              </div>
                 <div className="space-y-3">
                   <p className="text-sm font-bold text-gray-700">Escolha a quantidade:</p>
                   <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
                     {pacotes.map(qty => (
-                      <button key={qty} onClick={() => setQuantidade(qty)}
-                        className={`p-3 rounded-lg border-2 transition-all text-center ${
-                          quantidade === qty
-                            ? 'border-[#2D6A4F] bg-[#F0FDF4] text-[#1A1A2E]'
-                            : 'border-gray-200 bg-white text-gray-700 hover:border-gray-400'
-                        }`}>
+                    <button key={qty} onClick={() => setQuantidade(qty)}
+                      className={`p-3 rounded-lg border-2 transition-all text-center ${
+                        quantidade === qty
+                          ? 'border-[#2D6A4F] bg-[#F0FDF4] text-[#162113]'
+                          : 'border-gray-200 bg-white text-gray-700 hover:border-gray-400'
+                      }`}>
                         <div className="font-bold text-sm">{qty} créditos</div>
                         <div className="text-xs text-gray-500 mt-0.5">R$ {(qty * 3.5).toFixed(2)}</div>
                       </button>
@@ -305,11 +309,11 @@ export default function AssinarClient() {
                     <p className="text-sm text-gray-600">{quantidade} créditos</p>
                     <p className="text-xs text-gray-500">R$ 3,50 cada</p>
                   </div>
-                  <p className="text-2xl font-extrabold text-[#1A1A2E]">R$ {totalDownloads.toFixed(2)}</p>
+                  <p className="text-2xl font-extrabold text-[#162113]">R$ {totalDownloads.toFixed(2)}</p>
                 </div>
                 <button
                   onClick={() => abrirModal(quantidade)}
-                  className="w-full bg-[#2D6A4F] hover:bg-[#1A5C3A] text-white font-bold py-3 rounded-lg transition-colors text-lg">
+                  className="w-full rounded-xl bg-[#1f5230] px-5 py-3 text-base font-semibold text-white shadow-[0_12px_32px_rgba(31,82,48,0.22)] transition hover:-translate-y-[1px] hover:bg-[#2a6b3f] hover:shadow-[0_18px_42px_rgba(31,82,48,0.28)]">
                   Comprar {quantidade} créditos →
                 </button>
                 <p className="text-xs text-gray-500 text-center">PIX · Boleto · Cartão</p>
@@ -329,31 +333,31 @@ export default function AssinarClient() {
 
             {!resultado ? (
               <>
-            <h2 className="text-xl font-extrabold text-[#1A1A2E] mb-1">Finalizar pagamento</h2>
+            <h2 className="text-xl font-extrabold text-[#162113] mb-1">Finalizar pagamento</h2>
                 <p className="text-sm text-gray-500 mb-5">
                   {quantidade} créditos · <strong>R$ {(quantidade * 3.5).toFixed(2)}</strong>
                 </p>
 
                 {/* CPF */}
                 <div className="mb-4">
-                  <label className="block text-xs font-bold text-gray-600 uppercase mb-1.5">CPF</label>
+                  <label className="form-label">CPF</label>
                   <input
                     type="text"
                     placeholder="000.000.000-00"
                     value={cpf}
                     onChange={e => setCpf(formatCpf(e.target.value))}
-                    className="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm outline-none focus:border-[#1A1A2E] transition-colors"
+                    className="form-input rounded-xl"
                   />
                 </div>
 
                 {/* Telefone */}
                 <div className="mb-5">
-                  <label className="block text-xs font-bold text-gray-600 uppercase mb-1.5">Celular</label>
+                  <label className="form-label">Celular</label>
                   <div className="flex gap-2">
                     <select
                       value={ddi}
                       onChange={e => { setDdi(e.target.value); setPhone('') }}
-                      className="px-2 py-2.5 border border-gray-300 rounded-lg text-sm outline-none focus:border-[#1A1A2E] transition-colors bg-white min-w-[80px]"
+                      className="form-input min-w-[80px] rounded-xl bg-white"
                     >
                       <option value="+55">🇧🇷 +55</option>
                       <option value="+1">🇺🇸 +1</option>
@@ -370,14 +374,14 @@ export default function AssinarClient() {
                       placeholder={ddi === '+55' ? '(11) 99999-9999' : 'Número com DDD'}
                       value={phone}
                       onChange={e => setPhone(formatPhone(e.target.value, ddi))}
-                      className="flex-1 px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm outline-none focus:border-[#1A1A2E] transition-colors"
+                      className="form-input flex-1 rounded-xl"
                     />
                   </div>
                 </div>
 
                 {/* Método */}
                 <div className="mb-5">
-                  <label className="block text-xs font-bold text-gray-600 uppercase mb-2">Forma de pagamento</label>
+                  <label className="form-label">Forma de pagamento</label>
                   <div className="grid grid-cols-3 gap-2">
                     {[
                       { id: 'pix', label: 'PIX', icon: '⚡', desc: 'Instantâneo' },
@@ -389,7 +393,7 @@ export default function AssinarClient() {
                           paymentMethod === m.id ? 'border-[#2D6A4F] bg-[#F0FDF4]' : 'border-gray-200 hover:border-gray-300'
                         }`}>
                         <div className="text-xl mb-1">{m.icon}</div>
-                        <div className="font-bold text-xs text-[#1A1A2E]">{m.label}</div>
+                        <div className="font-bold text-xs text-[#162113]">{m.label}</div>
                         <div className="text-xs text-gray-400">{m.desc}</div>
                       </button>
                     ))}
@@ -403,7 +407,7 @@ export default function AssinarClient() {
                 )}
 
                 <button onClick={handlePagar} disabled={processando}
-                  className="w-full bg-[#2D6A4F] hover:bg-[#1A5C3A] disabled:opacity-50 text-white font-bold py-3 rounded-xl transition-colors text-base">
+                  className="w-full rounded-xl bg-[#1f5230] px-5 py-3 text-base font-semibold text-white shadow-[0_12px_32px_rgba(31,82,48,0.22)] transition hover:-translate-y-[1px] hover:bg-[#2a6b3f] hover:shadow-[0_18px_42px_rgba(31,82,48,0.28)] disabled:opacity-50">
                   {processando ? 'Processando...' : `Pagar R$ ${(quantidade * 3.5).toFixed(2)}`}
                 </button>
 
@@ -415,7 +419,7 @@ export default function AssinarClient() {
                 {paymentMethod === 'pix' && resultado.pix_qr_code && (
                   <div className="text-center">
                     <div className="text-3xl mb-2">⚡</div>
-                    <h2 className="text-lg font-extrabold text-[#1A1A2E] mb-1">Pague com PIX</h2>
+                    <h2 className="text-lg font-extrabold text-[#162113] mb-1">Pague com PIX</h2>
                     <p className="text-sm text-gray-500 mb-4">Escaneie o QR code ou copie o código</p>
                     <img
                       src={`data:image/png;base64,${resultado.pix_qr_code}`}
@@ -426,7 +430,7 @@ export default function AssinarClient() {
                       className={`w-full py-3 rounded-xl font-bold text-sm transition-colors mb-3 ${
                         pixCopiado
                           ? 'bg-green-100 text-green-700 border border-green-300'
-                          : 'bg-[#1A1A2E] text-white hover:bg-[#2d2d50]'
+                          : 'bg-[#162113] text-white hover:bg-[#2d2d50]'
                       }`}>
                       {pixCopiado ? '✅ Código copiado!' : '📋 Copiar código PIX'}
                     </button>
@@ -438,10 +442,10 @@ export default function AssinarClient() {
                 {paymentMethod === 'boleto' && resultado.boleto_url && (
                   <div className="text-center">
                     <div className="text-3xl mb-2">📄</div>
-                    <h2 className="text-lg font-extrabold text-[#1A1A2E] mb-1">Boleto gerado!</h2>
+                    <h2 className="text-lg font-extrabold text-[#162113] mb-1">Boleto gerado!</h2>
                     <p className="text-sm text-gray-500 mb-4">Vencimento em 3 dias úteis</p>
                     <a href={resultado.boleto_url} target="_blank" rel="noopener noreferrer"
-                      className="block w-full bg-[#1A1A2E] text-white font-bold py-3 rounded-xl text-sm hover:bg-[#2d2d50] transition-colors mb-3">
+                      className="block w-full bg-[#162113] text-white font-bold py-3 rounded-xl text-sm hover:bg-[#2d2d50] transition-colors mb-3">
                       Abrir boleto →
                     </a>
                     <p className="text-xs text-gray-400">Os créditos serão adicionados após a compensação.</p>
@@ -452,13 +456,13 @@ export default function AssinarClient() {
                 {paymentMethod === 'cartao' && (
                   <div className="text-center">
                     <div className="text-3xl mb-2">💳</div>
-                    <h2 className="text-lg font-extrabold text-[#1A1A2E] mb-1">Página de pagamento aberta</h2>
+                    <h2 className="text-lg font-extrabold text-[#162113] mb-1">Página de pagamento aberta</h2>
                     <p className="text-sm text-gray-500 mb-4">
                       Uma nova aba foi aberta com a página segura do Asaas para inserir os dados do cartão.
                     </p>
                     {resultado.invoice_url && (
                       <a href={resultado.invoice_url} target="_blank" rel="noopener noreferrer"
-                        className="block w-full bg-[#1A1A2E] text-white font-bold py-3 rounded-xl text-sm hover:bg-[#2d2d50] transition-colors mb-3">
+                        className="block w-full bg-[#162113] text-white font-bold py-3 rounded-xl text-sm hover:bg-[#2d2d50] transition-colors mb-3">
                         Abrir novamente →
                       </a>
                     )}

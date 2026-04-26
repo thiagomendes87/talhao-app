@@ -343,7 +343,7 @@ export default function AssinarClient() {
                     <select
                       value={ddi}
                       onChange={e => { setDdi(e.target.value); setPhone('') }}
-                      className="form-input min-w-[80px] rounded-xl bg-white"
+                      className="form-input w-24 shrink-0 rounded-xl bg-white"
                     >
                       <option value="+55">🇧🇷 +55</option>
                       <option value="+1">🇺🇸 +1</option>

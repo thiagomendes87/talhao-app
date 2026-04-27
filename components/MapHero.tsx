@@ -69,6 +69,15 @@ export default function MapHero() {
         aria-hidden="true"
       />
 
+      {/* Intercepta wheel events que o iframe estaria capturando */}
+      <div
+        className="absolute inset-0 z-[3]"
+        aria-hidden="true"
+        onWheel={(e) => {
+          window.scrollBy({ top: e.deltaY, left: 0 })
+        }}
+      />
+
       <div
         className="absolute inset-0 z-10 pointer-events-none transition-opacity duration-300 group-hover:opacity-80"
         style={{

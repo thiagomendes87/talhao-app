@@ -56,8 +56,17 @@ export default function MapHero() {
       <iframe
         src={`${GEO_API_URL}/?cleanmode=1`}
         title="Mapa Talhão"
-        className="absolute inset-0 z-0 h-full w-full border-none pointer-events-none"
+        tabIndex={-1}
+        aria-hidden="true"
+        className="absolute inset-0 z-0 h-full w-full border-none"
+        style={{ pointerEvents: 'none' }}
         loading="lazy"
+      />
+
+      <div
+        className="absolute inset-0 z-[1]"
+        style={{ pointerEvents: 'none' }}
+        aria-hidden="true"
       />
 
       <div

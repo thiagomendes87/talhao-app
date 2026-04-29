@@ -1,0 +1,1980 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Relatório Técnico — Fazenda Três Barras</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<script src="deck-stage.js"></script>
+<style>
+  :root {
+    --bg: #0b1510;
+    --bg2: #0f1e14;
+    --bg3: #152318;
+    --green: #4eff8c;
+    --green2: #2ecf68;
+    --green3: #1a7a3f;
+    --text: #e8f0eb;
+    --muted: #6b8a72;
+    --border: #1e3324;
+    --card: #111f16;
+    --accent2: #ffe066;
+    --red: #ff6b6b;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #000; font-family: 'Space Grotesk', sans-serif; color: var(--text); }
+  section { width: 1920px; height: 1080px; background: var(--bg); position: relative; overflow: hidden; display: flex; flex-direction: column; }
+  .grid-bg { position: absolute; inset: 0; background-image: linear-gradient(rgba(78,255,140,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(78,255,140,0.03) 1px, transparent 1px); background-size: 60px 60px; pointer-events: none; }
+  .top-bar { display: flex; align-items: center; justify-content: space-between; padding: 28px 60px; border-bottom: 1px solid var(--border); flex-shrink: 0; position: relative; z-index: 10; }
+  .logo-mark { display: flex; align-items: center; gap: 14px; }
+  .logo-icon { height: 36px; width: auto; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .logo-icon img { width: auto; height: 100%; display: block; }
+  .logo-text { font-size: 13px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+  .slide-tag { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; }
+  .slide-content { flex: 1; padding: 50px 60px; position: relative; z-index: 5; }
+  .slide-title { font-size: 14px; font-weight: 500; letter-spacing: 0.15em; text-transform: uppercase; color: var(--green); margin-bottom: 16px; }
+  .slide-h1 { font-size: 72px; font-weight: 700; line-height: 1.0; color: var(--text); }
+  .slide-h2 { font-size: 44px; font-weight: 700; line-height: 1.1; }
+  .slide-h3 { font-size: 30px; font-weight: 600; }
+  .stat-grid { display: grid; gap: 16px; }
+  .stat-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 24px 28px; position: relative; overflow: hidden; }
+  .stat-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--green), transparent); }
+  .stat-label { font-size: 11px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+  .stat-value { font-size: 38px; font-weight: 700; color: var(--text); line-height: 1; font-family: 'Space Mono', monospace; }
+  .stat-unit { font-size: 14px; color: var(--muted); font-family: 'Space Grotesk', sans-serif; font-weight: 400; margin-left: 4px; }
+  .stat-sub { font-size: 13px; color: var(--muted); margin-top: 6px; }
+  .pill { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 100px; font-size: 11px; font-weight: 600; letter-spacing: 0.10em; text-transform: uppercase; }
+  .pill-green { background: rgba(78,255,140,0.12); color: var(--green); border: 1px solid rgba(78,255,140,0.25); }
+  .pill-yellow { background: rgba(255,224,102,0.12); color: var(--accent2); border: 1px solid rgba(255,224,102,0.25); }
+  .pill-red { background: rgba(255,107,107,0.12); color: var(--red); border: 1px solid rgba(255,107,107,0.25); }
+  .pill-muted { background: rgba(107,138,114,0.15); color: var(--muted); border: 1px solid var(--border); }
+  .dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+  .map-placeholder { border-radius: 12px; overflow: hidden; border: 1px solid var(--border); position: relative; background: #0a1a0e; }
+  .map-inner { width: 100%; height: 100%; position: relative; background: repeating-linear-gradient(45deg, rgba(78,255,140,0.03) 0px, rgba(78,255,140,0.03) 1px, transparent 1px, transparent 12px), linear-gradient(#0a1a0e, #0d2415); }
+  .map-label { position: absolute; bottom: 16px; left: 16px; font-family: 'Space Mono', monospace; font-size: 11px; color: var(--muted); background: rgba(0,0,0,0.6); padding: 4px 10px; border-radius: 4px; }
+  .data-table { width: 100%; border-collapse: collapse; }
+  .data-table tr { border-bottom: 1px solid var(--border); }
+  .data-table tr:last-child { border-bottom: none; }
+  .data-table td { padding: 14px 0; font-size: 15px; }
+  .data-table td:first-child { color: var(--muted); font-size: 12px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; width: 45%; }
+  .data-table td:last-child { font-weight: 500; color: var(--text); text-align: right; }
+  .bar-chart { display: flex; flex-direction: column; gap: 16px; }
+  .bar-row { display: flex; flex-direction: column; gap: 5px; }
+  .bar-meta { display: flex; justify-content: space-between; align-items: center; }
+  .bar-name { font-size: 13px; color: var(--text); font-weight: 500; }
+  .bar-pct { font-family: 'Space Mono', monospace; font-size: 13px; color: var(--muted); }
+  .bar-track { height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 4px; background: var(--green); }
+  .vdivider { width: 1px; background: var(--border); align-self: stretch; margin: 0 32px; flex-shrink: 0; }
+  .info-block { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 28px 32px; }
+  .checklist { display: flex; flex-direction: column; gap: 12px; }
+  .check-item { display: flex; align-items: flex-start; gap: 12px; }
+  .check-icon { width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 11px; margin-top: 1px; }
+  .check-ok { background: rgba(78,255,140,0.15); color: var(--green); }
+  .check-warn { background: rgba(255,224,102,0.15); color: var(--accent2); }
+  .check-no { background: rgba(255,107,107,0.15); color: var(--red); }
+  .check-text { font-size: 14px; color: var(--text); line-height: 1.4; }
+  .check-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .legend { display: flex; flex-direction: column; gap: 10px; }
+  .legend-item { display: flex; align-items: center; gap: 12px; }
+  .legend-dot { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; }
+  .legend-label { font-size: 14px; color: var(--text); }
+  .legend-val { font-family: 'Space Mono', monospace; font-size: 13px; color: var(--muted); margin-left: auto; }
+  .price-card { background: linear-gradient(135deg, rgba(78,255,140,0.1), rgba(46,207,104,0.05)); border: 1px solid rgba(78,255,140,0.3); border-radius: 16px; padding: 40px; }
+  .section-label { font-size: 11px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--green); margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+  .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+  .prog-bar { height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; margin-top: 10px; }
+  .prog-fill { height: 100%; background: linear-gradient(90deg, var(--green2), var(--green)); border-radius: 2px; }
+  .topo-bar { display: flex; height: 36px; border-radius: 6px; overflow: hidden; margin-bottom: 8px; }
+  .slide-footer { padding: 18px 60px; border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; position: relative; z-index: 10; }
+  .footer-prop { font-size: 12px; color: var(--muted); letter-spacing: 0.06em; }
+  .footer-conf { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--border); letter-spacing: 0.08em; text-transform: uppercase; }
+  .risk-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; }
+  .risk-item { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 18px; }
+  .risk-level { font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 6px; }
+  .risk-title { font-size: 14px; font-weight: 600; margin-bottom: 5px; }
+  .risk-desc { font-size: 12px; color: var(--muted); line-height: 1.5; }
+  .timeline { display: flex; flex-direction: column; }
+  .timeline-item { display: grid; grid-template-columns: 100px 36px 1fr; gap: 0 16px; align-items: start; min-height: 64px; }
+  .tl-year { font-family: 'Space Mono', monospace; font-size: 13px; color: var(--green); font-weight: 700; padding-top: 3px; text-align: right; }
+  .tl-line { display: flex; flex-direction: column; align-items: center; }
+  .tl-dot { width: 10px; height: 10px; background: var(--green); border-radius: 50%; flex-shrink: 0; margin-top: 4px; }
+  .tl-connector { width: 2px; flex: 1; background: var(--border); margin-top: 4px; }
+  .tl-content { padding-top: 1px; padding-bottom: 16px; }
+  .tl-title { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 3px; }
+  .tl-desc { font-size: 12px; color: var(--muted); line-height: 1.5; }
+  .history-gallery { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; }
+  .history-photo-card { height: 198px; background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 6px; overflow: hidden; position: relative; }
+  .history-photo-card img { width: 100%; height: 100%; display: block; object-fit: cover; object-position: center; border-radius: 8px; }
+  .history-photo-year { position: absolute; top: 14px; left: 14px; padding: 5px 10px; border-radius: 999px; background: rgba(7,17,12,0.82); border: 1px solid rgba(78,255,140,0.18); color: var(--green); font-family: 'Space Mono', monospace; font-size: 11px; letter-spacing: 0.06em; }
+  .watermark { position: absolute; bottom: 70px; right: 60px; font-family: 'Space Mono', monospace; font-size: 11px; color: rgba(107,138,114,0.3); text-align: right; letter-spacing: 0.06em; z-index: 3; }
+  .lightbox-thumb { position: relative; cursor: zoom-in; transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease; }
+  .lightbox-thumb:hover { transform: translateY(-1px); border-color: rgba(78,255,140,0.26); box-shadow: 0 14px 30px rgba(0,0,0,0.22); }
+  .lightbox-thumb:focus-visible { outline: 2px solid rgba(78,255,140,0.7); outline-offset: 2px; }
+  .lightbox-overlay { position: fixed; inset: 0; display: none; align-items: center; justify-content: center; padding: 36px; background: rgba(3,8,6,0.92); backdrop-filter: blur(8px); z-index: 9999; }
+  .lightbox-overlay.is-open { display: flex; }
+  .lightbox-dialog { position: relative; max-width: min(96vw, 1800px); max-height: 94vh; }
+  .lightbox-image { max-width: 100%; max-height: 94vh; display: block; object-fit: contain; border-radius: 14px; box-shadow: 0 30px 90px rgba(0,0,0,0.45); background: #08110d; }
+  .lightbox-close { position: absolute; top: -16px; right: -16px; width: 42px; height: 42px; border: 1px solid rgba(78,255,140,0.18); border-radius: 999px; background: rgba(8,17,13,0.92); color: var(--text); font-size: 24px; line-height: 1; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 12px 30px rgba(0,0,0,0.35); }
+  .lightbox-close:hover { border-color: rgba(78,255,140,0.34); color: var(--green); }
+</style>
+</head>
+<body>
+<deck-stage>
+
+<!-- ═══ 01 CAPA ═══ -->
+<section data-screen-label="01 Capa">
+  <div class="grid-bg"></div>
+  <div style="position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 75% 50%, #0d3020 0%, var(--bg) 70%);"></div>
+
+  <div style="position:absolute;left:0;top:0;bottom:0;width:1100px;display:flex;flex-direction:column;padding:64px 80px;z-index:10;">
+    <div class="logo-mark" style="margin-bottom:auto;">
+      <div class="logo-icon"><img src="uploads/logo-oficial-branco.png" alt="Talhão"></div>
+      <span class="logo-text">Relatório Técnico de Propriedade Rural</span>
+    </div>
+
+    <div style="margin-bottom:44px;">
+      <div style="display:flex;gap:10px;margin-bottom:28px;flex-wrap:wrap;">
+        <span class="pill pill-green"><span class="dot" style="background:var(--green)"></span>SIGEF Certificado</span>
+        <span class="pill pill-muted">Caldas · Sul de Minas Gerais</span>
+        <span class="pill pill-yellow">À Venda</span>
+        <span class="pill pill-muted">Região Vulcânica</span>
+      </div>
+
+      <div style="font-size:13px;color:var(--muted);letter-spacing:0.18em;text-transform:uppercase;margin-bottom:14px;font-weight:600;">Fazenda</div>
+      <h1 style="font-size:90px;font-weight:700;line-height:0.92;color:var(--text);margin-bottom:22px;letter-spacing:-0.02em;">Três<br>Barras</h1>
+      <div style="width:80px;height:3px;background:var(--green);margin-bottom:28px;"></div>
+      <p style="font-size:19px;color:var(--muted);max-width:520px;line-height:1.6;font-weight:400;">Propriedade rural de <strong style="color:var(--text)">205 hectares</strong> localizada em Caldas, Sul de Minas Gerais. Altitude acima de 1.400 m — aptidão para culturas de alto valor agregado e grãos.</p>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:12px;overflow:hidden;">
+      <div style="background:var(--card);padding:18px 22px;">
+        <div class="stat-label">Área Total</div>
+        <div style="font-family:'Space Mono',monospace;font-size:26px;font-weight:700;color:var(--text);">205<span style="font-size:13px;color:var(--muted);font-family:'Space Grotesk',sans-serif;"> ha</span></div>
+      </div>
+      <div style="background:var(--card);padding:18px 22px;">
+        <div class="stat-label">Município</div>
+        <div style="font-size:17px;font-weight:600;color:var(--text);margin-top:3px;">Caldas</div>
+      </div>
+      <div style="background:var(--card);padding:18px 22px;">
+        <div class="stat-label">Preço Pedido</div>
+        <div style="font-size:17px;font-weight:600;color:var(--green);margin-top:3px;">R$ 9,84M</div>
+      </div>
+      <div style="background:var(--card);padding:18px 22px;">
+        <div class="stat-label">Elaborado em</div>
+        <div style="font-size:17px;font-weight:600;color:var(--text);margin-top:3px;">Abril / 2026</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- right cover image -->
+  <div style="position:absolute;right:0;top:0;bottom:0;width:860px;overflow:hidden;">
+    <div style="position:absolute;inset:88px 104px 88px 72px;border-radius:24px;overflow:hidden;background:#08110d;border:1px solid rgba(78,255,140,0.12);box-shadow:0 30px 80px rgba(0,0,0,0.35);">
+      <img src="uploads/talhao-ai_mapa.png" alt="Vista aérea da Fazenda Três Barras" style="width:100%;height:100%;display:block;object-fit:cover;object-position:center;filter:saturate(1.01) contrast(1.01) brightness(1.02);">
+    </div>
+    <div style="position:absolute;inset:0;background:linear-gradient(90deg, var(--bg) 0%, transparent 24%, transparent 84%, var(--bg) 100%);pointer-events:none;"></div>
+  </div>
+
+  <div class="watermark">CONFIDENCIAL<br>Uso restrito ao adquirente</div>
+</section>
+
+
+<!-- ═══ 02 SUMÁRIO ═══ -->
+<section data-screen-label="02 Sumário">
+  <div class="grid-bg"></div>
+  <div class="top-bar">
+    <div class="logo-mark"><div class="logo-icon"><img src="uploads/logo-oficial-branco.png" alt="Talhão"></div><span class="logo-text">Fazenda Três Barras</span></div>
+    <span class="slide-tag">02 — Índice</span>
+  </div>
+  <div class="slide-content">
+    <div class="slide-title">Sumário</div>
+    <div class="slide-h2" style="margin-bottom:44px;">Conteúdo do Relatório</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;">
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div style="font-size:11px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);padding-bottom:8px;border-bottom:1px solid var(--border);">I — Identificação</div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div style="display:flex;align-items:center;gap:12px;"><span style="font-family:'Space Mono',monospace;font-size:12px;color:var(--green);min-width:28px;">03</span><span style="font-size:15px;">Dados Cadastrais</span></div>
+          <div style="display:flex;align-items:center;gap:12px;"><span style="font-family:'Space Mono',monospace;font-size:12px;color:var(--green);min-width:28px;">04</span><span style="font-size:15px;">Localização e Região</span></div>
+          <div style="display:flex;align-items:center;gap:12px;"><span style="font-family:'Space Mono',monospace;font-size:12px;color:var(--green);min-width:28px;">05</span><span style="font-size:15px;">Perímetro e Limites</span></div>
+          <div style="display:flex;align-items:center;gap:12px;"><span style="font-family:'Space Mono',monospace;font-size:12px;color:var(--green);min-width:28px;">06</span><span style="font-size:15px;">Topografia e Relevo</span></div>
+          <div style="display:flex;align-items:center;gap:12px;"><span style="font-family:'Space Mono',monospace;font-size:12px;color:var(--green);min-width:28px;">07</span><span style="font-size:15px;">Histórico de Uso do Solo</span></div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div style="font-size:11px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);padding-bottom:8px;border-bottom:1px solid var(--border);">II — Técnico e Ambiental</div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div style="display:flex;align-items:center;gap:12px;"><span style="font-family:'Space Mono',monospace;font-size:12px;color:var(--green);min-width:28px;">08</span><span style="font-size:15px;">Aptidão Agrícola</span></div>
+          <div style="display:flex;align-items:center;gap:12px;"><span style="font-family:'Space Mono',monospace;font-size:12px;color:var(--green);min-width:28px;">09</span><span style="font-size:15px;">Solo e Manejo</span></div>
+          <div style="display:flex;align-items:center;gap:12px;"><span style="font-family:'Space Mono',monospace;font-size:12px;color:var(--green);min-width:28px;">10</span><span style="font-size:15px;">Recursos Hídricos</span></div>
+          <div style="display:flex;align-items:center;gap:12px;"><span style="font-family:'Space Mono',monospace;font-size:12px;color:var(--green);min-width:28px;">11</span><span style="font-size:15px;">Clima e Temperatura</span></div>
+          <div style="display:flex;align-items:center;gap:12px;"><span style="font-family:'Space Mono',monospace;font-size:12px;color:var(--green);min-width:28px;">12</span><span style="font-size:15px;">Riscos Climáticos</span></div>
+          <div style="display:flex;align-items:center;gap:12px;"><span style="font-family:'Space Mono',monospace;font-size:12px;color:var(--green);min-width:28px;">13</span><span style="font-size:15px;">Reserva Legal e APP</span></div>
+          <div style="display:flex;align-items:center;gap:12px;"><span style="font-family:'Space Mono',monospace;font-size:12px;color:var(--green);min-width:28px;">14</span><span style="font-size:15px;">Regularidade Ambiental</span></div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div style="font-size:11px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);padding-bottom:8px;border-bottom:1px solid var(--border);">III — Jurídico e Conclusão</div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div style="display:flex;align-items:center;gap:12px;"><span style="font-family:'Space Mono',monospace;font-size:12px;color:var(--green);min-width:28px;">15</span><span style="font-size:15px;">Regularidade Fundiária</span></div>
+          <div style="display:flex;align-items:center;gap:12px;"><span style="font-family:'Space Mono',monospace;font-size:12px;color:var(--green);min-width:28px;">16</span><span style="font-size:15px;">Infraestrutura</span></div>
+          <div style="display:flex;align-items:center;gap:12px;"><span style="font-family:'Space Mono',monospace;font-size:12px;color:var(--green);min-width:28px;">17</span><span style="font-size:15px;">Acesso e Logística</span></div>
+          <div style="display:flex;align-items:center;gap:12px;"><span style="font-family:'Space Mono',monospace;font-size:12px;color:var(--green);min-width:28px;">18</span><span style="font-size:15px;">Contexto Regional</span></div>
+          <div style="display:flex;align-items:center;gap:12px;"><span style="font-family:'Space Mono',monospace;font-size:12px;color:var(--green);min-width:28px;">19</span><span style="font-size:15px;">Potencial de Expansão</span></div>
+          <div style="display:flex;align-items:center;gap:12px;"><span style="font-family:'Space Mono',monospace;font-size:12px;color:var(--green);min-width:28px;">20</span><span style="font-size:15px;">Análise de Risco</span></div>
+          <div style="display:flex;align-items:center;gap:12px;"><span style="font-family:'Space Mono',monospace;font-size:12px;color:var(--green);min-width:28px;">21</span><span style="font-size:15px;">Análise SWOT</span></div>
+          <div style="display:flex;align-items:center;gap:12px;"><span style="font-family:'Space Mono',monospace;font-size:12px;color:var(--green);min-width:28px;">22–27</span><span style="font-size:15px;">Valuation e Conclusão</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer"><span class="footer-prop">Fazenda Três Barras — Caldas / MG</span><span class="footer-conf">CONFIDENCIAL · Abril 2026</span></div>
+</section>
+
+
+<!-- ═══ 03 DADOS CADASTRAIS ═══ -->
+<section data-screen-label="03 Dados Cadastrais">
+  <div class="grid-bg"></div>
+  <div class="top-bar"><div class="logo-mark"><div class="logo-icon"><img src="uploads/logo-oficial-branco.png" alt="Talhão"></div><span class="logo-text">Fazenda Três Barras</span></div><span class="slide-tag">03 — Dados Cadastrais</span></div>
+  <div class="slide-content">
+    <div class="slide-title">Ficha Técnica</div>
+    <div class="slide-h2" style="margin-bottom:36px;">Dados Cadastrais e Documentação</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:28px;">
+      <div style="display:flex;flex-direction:column;gap:18px;">
+        <div class="info-block">
+          <div class="section-label">Identificação da Propriedade</div>
+          <table class="data-table">
+            <tr><td>Nome do Imóvel</td><td>Fazenda Três Barras</td></tr>
+            <tr><td>Código SIGEF</td><td style="font-family:'Space Mono',monospace;font-size:13px;">9500849473501</td></tr>
+            <tr><td>Matrícula</td><td>8.389</td></tr>
+            <tr><td>Município</td><td>Caldas</td></tr>
+            <tr><td>UF</td><td>Minas Gerais</td></tr>
+            <tr><td>Coordenadas (centroide)</td><td style="font-family:'Space Mono',monospace;font-size:13px;">21°55'19"S / 46°23'14"W</td></tr>
+          </table>
+        </div>
+        <div class="info-block">
+          <div class="section-label">Situação Cadastral</div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;">
+            <span class="pill pill-green"><span class="dot" style="background:var(--green)"></span>SIGEF Certificado</span>
+            <span class="pill pill-green"><span class="dot" style="background:var(--green)"></span>CAR Ativo</span>
+            <span class="pill pill-green"><span class="dot" style="background:var(--green)"></span>ITR Quitado</span>
+            <span class="pill pill-green"><span class="dot" style="background:var(--green)"></span>CCIR Regular</span>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:18px;">
+        <div class="info-block">
+          <div class="section-label">Dimensões e Área</div>
+          <table class="data-table">
+            <tr><td>Área Total SIGEF</td><td>205,0 ha</td></tr>
+            <tr><td>Área Aproveitável</td><td>157,2 ha (76,4%)</td></tr>
+            <tr><td>APP + Reserva Legal</td><td>48,5 ha (23,6%)</td></tr>
+            <tr><td>Datum</td><td>SIRGAS 2000</td></tr>
+            <tr><td>CAR</td><td style="font-family:'Space Mono',monospace;font-size:10px;">MG-3110301-5B0D…</td></tr>
+            <tr><td>CAR atualizado em</td><td>22/04/2025</td></tr>
+          </table>
+        </div>
+        <div class="info-block">
+          <div class="section-label">Comercialização</div>
+          <table class="data-table">
+            <tr><td>Preço Pedido</td><td style="color:var(--green);font-weight:700;">R$ 9.840.000</td></tr>
+            <tr><td>Preço por Hectare</td><td style="color:var(--green);">R$ 48.000 / ha</td></tr>
+            <tr><td>Corretor</td><td>João Luiz — CRECI 35687</td></tr>
+            <tr><td>Contato</td><td>+55 35 9914-9427</td></tr>
+            <tr><td>Situação</td><td><span class="pill pill-yellow" style="font-size:10px;">Apta para Venda</span></td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer"><span class="footer-prop">Fazenda Três Barras — Caldas / MG</span><span class="footer-conf">CONFIDENCIAL · Abril 2026</span></div>
+</section>
+
+
+<!-- ═══ 04 LOCALIZAÇÃO ═══ -->
+<section data-screen-label="04 Localização">
+  <div class="grid-bg"></div>
+  <div class="top-bar"><div class="logo-mark"><div class="logo-icon"><img src="uploads/logo-oficial-branco.png" alt="Talhão"></div><span class="logo-text">Fazenda Três Barras</span></div><span class="slide-tag">04 — Localização e Região</span></div>
+  <div class="slide-content" style="display:flex;gap:36px;">
+    <div style="flex:1;display:flex;flex-direction:column;gap:20px;">
+      <div>
+        <div class="slide-title">Localização</div>
+        <div class="slide-h3" style="margin-bottom:12px;">Caldas · Sul de Minas Gerais</div>
+        <p style="font-size:15px;color:var(--muted);line-height:1.7;">A Fazenda Três Barras está inserida na <strong style="color:var(--text)">Região Vulcânica do Sul de Minas</strong>, entre Poços de Caldas, Caldas e Andradas — território com 12 municípios reconhecido pela produção de culturas de alto valor agregado, como frutas, flores, café especial e viticultura.</p>
+      </div>
+      <div class="info-block">
+        <div class="section-label">Distâncias Estratégicas</div>
+        <table class="data-table">
+          <tr><td>Caldas (centro urbano)</td><td>13,2 km — 25 min</td></tr>
+          <tr><td>Andradas (polo agrícola)</td><td>23,8 km — 35 min</td></tr>
+          <tr><td>Poços de Caldas</td><td>~40 km — 50 min</td></tr>
+          <tr><td>São Paulo (capital)</td><td>235 km — ~3h30</td></tr>
+          <tr><td>Rodovia principal (BR-146)</td><td>13,7 km — 25 min</td></tr>
+        </table>
+      </div>
+      <div class="info-block">
+        <div class="section-label">Vias de Acesso</div>
+        <table class="data-table">
+          <tr><td>Rodovia Federal</td><td>BR-146 — Ótimo estado</td></tr>
+          <tr><td>Tipo de acesso</td><td>100% asfalto — dois caminhos</td></tr>
+          <tr><td>Pedágio</td><td>Sem pedágio na rota</td></tr>
+          <tr><td>Estradas internas</td><td>2,5 km (terra compactada)</td></tr>
+        </table>
+      </div>
+    </div>
+    <div style="flex:1.2;">
+      <div class="map-placeholder" style="height:100%;">
+        <div class="map-inner" style="width:100%;height:100%;position:relative;background:#09110d;">
+          <img src="uploads/foto-pg4.4.png" alt="Mapa de situação da Fazenda Três Barras" style="width:100%;height:100%;display:block;object-fit:cover;object-position:50% 50%;">
+        </div>
+        <div class="map-label">Mapa de Situação — Sul de MG</div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer"><span class="footer-prop">Fazenda Três Barras — Caldas / MG</span><span class="footer-conf">CONFIDENCIAL · Abril 2026</span></div>
+</section>
+
+
+<!-- ═══ 05 PERÍMETRO ═══ -->
+<section data-screen-label="05 Perímetro e Limites">
+  <div class="grid-bg"></div>
+  <div class="top-bar"><div class="logo-mark"><div class="logo-icon"><img src="uploads/logo-oficial-branco.png" alt="Talhão"></div><span class="logo-text">Fazenda Três Barras</span></div><span class="slide-tag">05 — Perímetro e Limites</span></div>
+  <div class="slide-content" style="display:flex;gap:36px;">
+    <div style="flex:1.2;">
+      <div class="map-placeholder" style="height:680px;">
+        <div class="map-inner" style="position:relative;width:100%;height:100%;background:#09110d;">
+          <img src="uploads/foto-pg4.png" alt="Mapa da Fazenda Três Barras" style="width:100%;height:100%;display:block;object-fit:cover;object-position:52% 50%;transform:scale(1.08);transform-origin:center;">
+        </div>
+        <div class="map-label">Mapa de perímetro e Confrontações</div>
+      </div>
+    </div>
+    <div style="flex:1;display:flex;flex-direction:column;gap:18px;">
+      <div><div class="slide-title">Georreferenciamento</div><div class="slide-h3" style="margin-bottom:16px;">Perímetro e Confrontações</div></div>
+      <div class="info-block">
+        <div class="section-label">Dados de Perímetro</div>
+        <table class="data-table">
+          <tr><td>Área SIGEF</td><td>205,0 ha</td></tr>
+          <tr><td>Código SIGEF</td><td style="font-family:'Space Mono',monospace;font-size:12px;">9500849473501</td></tr>
+          <tr><td>Status SIGEF</td><td><span class="pill pill-green" style="font-size:10px;">Certificado</span></td></tr>
+          <tr><td>Datum</td><td>SIRGAS 2000</td></tr>
+          <tr><td>Data atualização</td><td>22/04/2022</td></tr>
+        </table>
+      </div>
+      <div class="info-block">
+        <div class="section-label">Confrontações</div>
+        <table class="data-table">
+          <tr><td>Leste / Oeste</td><td>2 córregos nas divisas</td></tr>
+          <tr><td>Interior</td><td>1 nascente dentro da propriedade</td></tr>
+          <tr><td>Vizinhança</td><td>Propriedades com eucalipto</td></tr>
+        </table>
+      </div>
+      <div class="info-block" style="background:rgba(78,255,140,0.04);">
+        <p style="font-size:13px;color:var(--muted);line-height:1.6;">Fazenda georreferenciada e certificada pelo INCRA. Sem sobreposições detectadas com imóveis vizinhos. Arquivos KML, matrícula, CCIR e ITR disponíveis para download no dossiê técnico.</p>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer"><span class="footer-prop">Fazenda Três Barras — Caldas / MG</span><span class="footer-conf">CONFIDENCIAL · Abril 2026</span></div>
+</section>
+
+
+<!-- ═══ 06 TOPOGRAFIA ═══ -->
+<section data-screen-label="06 Topografia e Relevo">
+  <div class="grid-bg"></div>
+  <div class="top-bar"><div class="logo-mark"><div class="logo-icon"><img src="uploads/logo-oficial-branco.png" alt="Talhão"></div><span class="logo-text">Fazenda Três Barras</span></div><span class="slide-tag">06 — Topografia e Relevo</span></div>
+  <div class="slide-content">
+    <div class="slide-title">Topografia</div>
+    <div class="slide-h2" style="margin-bottom:30px;">Relevo, Altitude e Declividade</div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;">
+      <div class="stat-card">
+        <div class="stat-label">Altitude Mínima</div>
+        <div class="stat-value">1.305<span class="stat-unit">m</span></div>
+        <div class="stat-sub">Fundo de vale / divisas</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Altitude Máxima</div>
+        <div class="stat-value">1.488<span class="stat-unit">m</span></div>
+        <div class="stat-sub">Pontos mais elevados</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Altitude Média</div>
+        <div class="stat-value">1.391<span class="stat-unit">m</span></div>
+        <div class="stat-sub">Excepcional para culturas especiais</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Área Mecanizável</div>
+        <div class="stat-value">~50<span class="stat-unit">%</span></div>
+        <div class="stat-sub">~103 ha aptos à mecanização</div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:24px;">
+      <div>
+        <div class="section-label">Perfil Altimétrico</div>
+        <div style="height:220px;background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden;position:relative;">
+          <svg viewBox="0 0 600 220" style="width:100%;height:100%;position:absolute;">
+            <defs><linearGradient id="tg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#4eff8c" stop-opacity="0.45"/><stop offset="100%" stop-color="#4eff8c" stop-opacity="0.04"/></linearGradient></defs>
+            <path d="M0,200 L0,170 C60,155 100,120 150,95 C200,70 230,55 280,50 C330,45 360,60 400,65 C440,70 480,110 530,130 C560,142 585,158 600,165 L600,200 Z" fill="url(#tg)"/>
+            <path d="M0,170 C60,155 100,120 150,95 C200,70 230,55 280,50 C330,45 360,60 400,65 C440,70 480,110 530,130 C560,142 585,158 600,165" fill="none" stroke="var(--green)" stroke-width="2"/>
+            <text x="8" y="12" font-size="9" fill="var(--muted)" font-family="Space Mono">1.488m</text>
+            <text x="8" y="108" font-size="9" fill="var(--muted)" font-family="Space Mono">1.391m</text>
+            <text x="8" y="195" font-size="9" fill="var(--muted)" font-family="Space Mono">1.305m</text>
+            <line x1="55" y1="12" x2="600" y2="12" stroke="rgba(78,255,140,0.07)" stroke-width="1" stroke-dasharray="4,4"/>
+            <line x1="55" y1="108" x2="600" y2="108" stroke="rgba(78,255,140,0.07)" stroke-width="1" stroke-dasharray="4,4"/>
+            <line x1="280" y1="52" x2="280" y2="80" stroke="rgba(255,255,255,0.3)" stroke-width="1" stroke-dasharray="3,3"/>
+            <text x="280" y="92" text-anchor="middle" font-size="9" fill="rgba(255,255,255,0.4)" font-family="Space Mono">Cume</text>
+          </svg>
+        </div>
+        <div class="section-label" style="margin-top:18px;">Classes de Declividade</div>
+        <div class="topo-bar">
+          <div style="flex:0.10;background:#2ecf68;"></div>
+          <div style="flex:0.40;background:#1a7a3f;"></div>
+          <div style="flex:0.30;background:#0f4a26;"></div>
+          <div style="flex:0.20;background:#060f0a;"></div>
+        </div>
+        <div style="display:flex;gap:16px;flex-wrap:wrap;">
+          <div style="font-size:12px;color:var(--muted);"><span style="color:#2ecf68">■</span> 0-3% (10%)</div>
+          <div style="font-size:12px;color:var(--muted);"><span style="color:#1a7a3f">■</span> 3-8% (40%)</div>
+          <div style="font-size:12px;color:var(--muted);"><span style="color:#0f4a26">■</span> 8-20% Dominant. (30%)</div>
+          <div style="font-size:12px;color:var(--muted);"><span style="color:#4eff8c22">■</span> &gt;20% (20%)</div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px;">
+          <div class="lightbox-thumb" role="button" tabindex="0" aria-label="Ampliar mapa complementar de altitude" data-lightbox-src="uploads/foto-pg6.png" data-lightbox-alt="Mapa complementar de altitude da Fazenda Três Barras" style="height:252px;background:rgba(17,31,22,0.92);border:1px solid rgba(78,255,140,0.14);border-radius:10px;padding:6px;box-shadow:0 10px 24px rgba(0,0,0,0.16);">
+            <img src="uploads/foto-pg6.png" alt="Mapa complementar de altitude da Fazenda Três Barras" style="width:100%;height:100%;display:block;object-fit:contain;background:#09110d;border-radius:7px;opacity:0.96;">
+          </div>
+          <div class="lightbox-thumb" role="button" tabindex="0" aria-label="Ampliar mapa complementar de declividade" data-lightbox-src="uploads/foto-pg6.6.png" data-lightbox-alt="Mapa complementar de declividade da Fazenda Três Barras" style="height:252px;background:rgba(17,31,22,0.92);border:1px solid rgba(78,255,140,0.14);border-radius:10px;padding:6px;box-shadow:0 10px 24px rgba(0,0,0,0.16);">
+            <img src="uploads/foto-pg6.6.png" alt="Mapa complementar de declividade da Fazenda Três Barras" style="width:100%;height:100%;display:block;object-fit:contain;background:#09110d;border-radius:7px;opacity:0.96;">
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:16px;">
+        <div class="info-block">
+          <div class="section-label">Caracterização do Relevo</div>
+          <table class="data-table">
+            <tr><td>Tipo dominante</td><td>Ondulado</td></tr>
+            <tr><td>Declividade faixa</td><td>8–20%</td></tr>
+            <tr><td>Declividade média</td><td>19%</td></tr>
+            <tr><td>Áreas críticas (&gt;20%)</td><td>~30% da área</td></tr>
+          </table>
+        </div>
+        <div class="info-block">
+          <div class="section-label">Aptidão à Mecanização</div>
+          <div class="bar-chart">
+            <div class="bar-row">
+              <div class="bar-meta"><span class="bar-name">Mecanizável (0–12%)</span><span class="bar-pct">~50%</span></div>
+              <div class="bar-track"><div class="bar-fill" style="width:50%"></div></div>
+            </div>
+            <div class="bar-row">
+              <div class="bar-meta"><span class="bar-name">Semi-mecanizável (12–20%)</span><span class="bar-pct">~20%</span></div>
+              <div class="bar-track"><div class="bar-fill" style="width:20%;background:#2ecf68"></div></div>
+            </div>
+            <div class="bar-row">
+              <div class="bar-meta"><span class="bar-name">Manual / Restrito (&gt;20%)</span><span class="bar-pct">~30%</span></div>
+              <div class="bar-track"><div class="bar-fill" style="width:30%;background:var(--muted)"></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="info-block" style="background:rgba(78,255,140,0.04);">
+          <p style="font-size:13px;color:var(--muted);line-height:1.6;">Altitude média superior a <strong style="color:var(--text)">1.400 m</strong> proporciona implantação de culturas tanto temporárias quanto perenes de alto valor, com amplitude térmica que favorece qualidade sensorial dos produtos.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer"><span class="footer-prop">Fazenda Três Barras — Caldas / MG</span><span class="footer-conf">CONFIDENCIAL · Abril 2026</span></div>
+</section>
+
+
+<!-- ═══ 07 HISTÓRICO DE USO ═══ -->
+<section data-screen-label="07 Histórico de Uso">
+  <div class="grid-bg"></div>
+  <div class="top-bar"><div class="logo-mark"><div class="logo-icon"><img src="uploads/logo-oficial-branco.png" alt="Talhão"></div><span class="logo-text">Fazenda Três Barras</span></div><span class="slide-tag">07 — Histórico de Uso do Solo</span></div>
+  <div class="slide-content">
+    <div class="slide-title">Histórico</div>
+    <div class="slide-h2" style="margin-bottom:32px;">Evolução do Uso do Solo (2004–2025)</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:28px;">
+      <div>
+        <div class="section-label">Linha do Tempo de Uso</div>
+        <div class="timeline">
+          <div class="timeline-item">
+            <div class="tl-year">2004</div>
+            <div class="tl-line"><div class="tl-dot"></div><div class="tl-connector"></div></div>
+            <div class="tl-content"><div class="tl-title">Área Consolidada — ~70% limpa</div><div class="tl-desc">Área útil já em excelente condição. Eucalipto presente nas áreas de maior declividade.</div></div>
+          </div>
+          <div class="timeline-item">
+            <div class="tl-year">2008</div>
+            <div class="tl-line"><div class="tl-dot"></div><div class="tl-connector"></div></div>
+            <div class="tl-content"><div class="tl-title">Cultivos Temporários Estabelecidos</div><div class="tl-desc">Face norte da propriedade com cultivos temporários contínuos. Padrão mantido por vizinhos.</div></div>
+          </div>
+          <div class="timeline-item">
+            <div class="tl-year">2013–15</div>
+            <div class="tl-line"><div class="tl-dot"></div><div class="tl-connector"></div></div>
+            <div class="tl-content"><div class="tl-title">Expansão Silvicultura Regional</div><div class="tl-desc">Destoca de eucalipto no entorno. Cultivos temporários ativos na fazenda e vizinhança.</div></div>
+          </div>
+          <div class="timeline-item">
+            <div class="tl-year">2019–21</div>
+            <div class="tl-line"><div class="tl-dot"></div><div class="tl-connector"></div></div>
+            <div class="tl-content"><div class="tl-title">Estabilidade do Aproveitamento</div><div class="tl-desc">Área de aproveitamento idêntica aos níveis atuais. Índice de vegetação indica sazonalidade de chuvas.</div></div>
+          </div>
+          <div class="timeline-item">
+            <div class="tl-year">2025</div>
+            <div class="tl-line"><div class="tl-dot"></div></div>
+            <div class="tl-content"><div class="tl-title">Condição Atual</div><div class="tl-desc">Cultivos temporários em toda área aproveitável. CAR retificado e aprovado. Fazenda disponível para venda.</div></div>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:16px;">
+        <div class="info-block">
+          <div class="section-label">Uso Atual do Solo</div>
+          <div class="bar-chart" style="gap:18px;">
+            <div class="bar-row">
+              <div class="bar-meta"><span class="bar-name">Cultivos Temporários (face norte)</span><span class="bar-pct">~50 ha</span></div>
+              <div class="bar-track"><div class="bar-fill" style="width:50%"></div></div>
+            </div>
+            <div class="bar-row">
+              <div class="bar-meta"><span class="bar-name">Eucalipto / Área com Declividade</span><span class="bar-pct">~50 ha</span></div>
+              <div class="bar-track"><div class="bar-fill" style="width:50%;background:var(--accent2)"></div></div>
+            </div>
+            <div class="bar-row">
+              <div class="bar-meta"><span class="bar-name">APP e Reserva Legal (nativo)</span><span class="bar-pct">48,5 ha</span></div>
+              <div class="bar-track"><div class="bar-fill" style="width:47%;background:#2d6a4f"></div></div>
+            </div>
+            <div class="bar-row">
+              <div class="bar-meta"><span class="bar-name">Outras áreas aproveitáveis</span><span class="bar-pct">~56 ha</span></div>
+              <div class="bar-track"><div class="bar-fill" style="width:54%;background:#6b8a72"></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="info-block" style="background:rgba(78,255,140,0.04);">
+          <div class="section-label">Conclusão do Histórico</div>
+          <p style="font-size:14px;color:var(--muted);line-height:1.7;">Histórico de pelo menos <strong style="color:var(--text)">10 anos de cultivos temporários</strong> consolida o potencial de transformação das áreas em silvicultura, cultivos permanentes ou temporários de maior valor agregado. <strong style="color:var(--text)">Nenhum desmatamento ilegal detectado</strong> em toda série histórica (PRODES/INPE).</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer"><span class="footer-prop">Fazenda Três Barras — Caldas / MG</span><span class="footer-conf">CONFIDENCIAL · Abril 2026</span></div>
+</section>
+
+
+<!-- ═══ 07B EVOLUÇÃO EM FOTOS ═══ -->
+<section data-screen-label="07B Evolução em Fotos">
+  <div class="grid-bg"></div>
+  <div class="top-bar"><div class="logo-mark"><div class="logo-icon"><img src="uploads/logo-oficial-branco.png" alt="Talhão"></div><span class="logo-text">Fazenda Três Barras</span></div><span class="slide-tag">07B — Evolução em Fotos</span></div>
+  <div class="slide-content">
+    <div class="slide-title">Histórico</div>
+    <div class="slide-h2" style="margin-bottom:28px;">Evolução do Uso do Solo (2004–2025)</div>
+    <div class="history-gallery">
+      <div class="history-photo-card lightbox-thumb" role="button" tabindex="0" aria-label="Ampliar imagem histórica de 2004" data-lightbox-src="uploads/2004.png" data-lightbox-alt="Evolução do Uso do Solo — 2004">
+        <img src="uploads/2004.png" alt="Imagem histórica da Fazenda Três Barras em 2004">
+        <div class="history-photo-year">2004</div>
+      </div>
+      <div class="history-photo-card lightbox-thumb" role="button" tabindex="0" aria-label="Ampliar imagem histórica de 2008" data-lightbox-src="uploads/2008.png" data-lightbox-alt="Evolução do Uso do Solo — 2008">
+        <img src="uploads/2008.png" alt="Imagem histórica da Fazenda Três Barras em 2008">
+        <div class="history-photo-year">2008</div>
+      </div>
+      <div class="history-photo-card lightbox-thumb" role="button" tabindex="0" aria-label="Ampliar imagem histórica de 2013" data-lightbox-src="uploads/2013.png" data-lightbox-alt="Evolução do Uso do Solo — 2013">
+        <img src="uploads/2013.png" alt="Imagem histórica da Fazenda Três Barras em 2013">
+        <div class="history-photo-year">2013</div>
+      </div>
+      <div class="history-photo-card lightbox-thumb" role="button" tabindex="0" aria-label="Ampliar imagem histórica de 2014" data-lightbox-src="uploads/2014.png" data-lightbox-alt="Evolução do Uso do Solo — 2014">
+        <img src="uploads/2014.png" alt="Imagem histórica da Fazenda Três Barras em 2014">
+        <div class="history-photo-year">2014</div>
+      </div>
+      <div class="history-photo-card lightbox-thumb" role="button" tabindex="0" aria-label="Ampliar imagem histórica de 2015" data-lightbox-src="uploads/2015.png" data-lightbox-alt="Evolução do Uso do Solo — 2015">
+        <img src="uploads/2015.png" alt="Imagem histórica da Fazenda Três Barras em 2015">
+        <div class="history-photo-year">2015</div>
+      </div>
+      <div class="history-photo-card lightbox-thumb" role="button" tabindex="0" aria-label="Ampliar imagem histórica de 2016" data-lightbox-src="uploads/2016.png" data-lightbox-alt="Evolução do Uso do Solo — 2016">
+        <img src="uploads/2016.png" alt="Imagem histórica da Fazenda Três Barras em 2016">
+        <div class="history-photo-year">2016</div>
+      </div>
+      <div class="history-photo-card lightbox-thumb" role="button" tabindex="0" aria-label="Ampliar imagem histórica de 2017" data-lightbox-src="uploads/2017.png" data-lightbox-alt="Evolução do Uso do Solo — 2017">
+        <img src="uploads/2017.png" alt="Imagem histórica da Fazenda Três Barras em 2017">
+        <div class="history-photo-year">2017</div>
+      </div>
+      <div class="history-photo-card lightbox-thumb" role="button" tabindex="0" aria-label="Ampliar imagem histórica de 2019" data-lightbox-src="uploads/2019.png" data-lightbox-alt="Evolução do Uso do Solo — 2019">
+        <img src="uploads/2019.png" alt="Imagem histórica da Fazenda Três Barras em 2019">
+        <div class="history-photo-year">2019</div>
+      </div>
+      <div class="history-photo-card lightbox-thumb" role="button" tabindex="0" aria-label="Ampliar imagem histórica de 2021" data-lightbox-src="uploads/2021.png" data-lightbox-alt="Evolução do Uso do Solo — 2021">
+        <img src="uploads/2021.png" alt="Imagem histórica da Fazenda Três Barras em 2021">
+        <div class="history-photo-year">2021</div>
+      </div>
+      <div class="history-photo-card lightbox-thumb" role="button" tabindex="0" aria-label="Ampliar imagem histórica de 2025" data-lightbox-src="uploads/2025.png" data-lightbox-alt="Evolução do Uso do Solo — 2025">
+        <img src="uploads/2025.png" alt="Imagem histórica da Fazenda Três Barras em 2025">
+        <div class="history-photo-year">2025</div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer"><span class="footer-prop">Fazenda Três Barras — Caldas / MG</span><span class="footer-conf">CONFIDENCIAL · Abril 2026</span></div>
+</section>
+
+
+<!-- ═══ 08 APTIDÃO AGRÍCOLA ═══ -->
+<section data-screen-label="08 Aptidão Agrícola">
+  <div class="grid-bg"></div>
+  <div class="top-bar"><div class="logo-mark"><div class="logo-icon"><img src="uploads/logo-oficial-branco.png" alt="Talhão"></div><span class="logo-text">Fazenda Três Barras</span></div><span class="slide-tag">08 — Aptidão Agrícola</span></div>
+  <div class="slide-content">
+    <div class="slide-title">Zoneamento</div>
+    <div class="slide-h2" style="margin-bottom:32px;">Aptidão Agrícola — Culturas de Alto Valor</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:28px;">
+      <div style="display:flex;flex-direction:column;gap:18px;">
+        <div class="info-block">
+          <div class="section-label">Aptidão por Cultura</div>
+          <table class="data-table">
+            <tr><td>Avocado (Abacate Hass)</td><td><span class="pill pill-green" style="font-size:10px;">Alta Aptidão</span></td></tr>
+            <tr><td>Café Arábica Especial</td><td><span class="pill pill-green" style="font-size:10px;">Alta Aptidão — ZARC 2021</span></td></tr>
+            <tr><td>Viticultura (Uva fina)</td><td><span class="pill pill-green" style="font-size:10px;">Alta Aptidão</span></td></tr>
+            <tr><td>Fruticultura temperada</td><td><span class="pill pill-green" style="font-size:10px;">Alta Aptidão</span></td></tr>
+            <tr><td>Flores e plantas ornamentais</td><td><span class="pill pill-green" style="font-size:10px;">Alta Aptidão</span></td></tr>
+            <tr><td>Grãos (milho, soja)</td><td><span class="pill pill-yellow" style="font-size:10px;">Aptidão Regular</span></td></tr>
+            <tr><td>Eucalipto / Silvicultura</td><td><span class="pill pill-green" style="font-size:10px;">Alta Aptidão</span></td></tr>
+          </table>
+        </div>
+        <div class="info-block">
+          <div class="section-label">Zoneamento Climático MAPA</div>
+          <table class="data-table">
+            <tr><td>Café Arábica</td><td><strong style="color:var(--green);">Favorável — ZARC reinserido 2021</strong></td></tr>
+            <tr><td>Temperatura média anual</td><td>18–22°C</td></tr>
+            <tr><td>Precipitação anual</td><td>1.000–1.500 mm</td></tr>
+            <tr><td>Altitude média</td><td>1.391 m (favorável especial)</td></tr>
+          </table>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:18px;">
+        <div class="info-block">
+          <div class="section-label">Pontuação de Aptidão</div>
+          <div style="display:flex;flex-direction:column;gap:12px;margin-top:4px;">
+            <div>
+              <div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="font-size:14px;">Avocado / Fruticultura</span><span style="font-family:'Space Mono',monospace;color:var(--green);">95%</span></div>
+              <div class="prog-bar"><div class="prog-fill" style="width:95%"></div></div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="font-size:14px;">Viticultura</span><span style="font-family:'Space Mono',monospace;color:var(--green);">92%</span></div>
+              <div class="prog-bar"><div class="prog-fill" style="width:92%"></div></div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="font-size:14px;">Café Arábica Especial</span><span style="font-family:'Space Mono',monospace;color:var(--green);">88%</span></div>
+              <div class="prog-bar"><div class="prog-fill" style="width:88%"></div></div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="font-size:14px;">Silvicultura</span><span style="font-family:'Space Mono',monospace;color:var(--green);">85%</span></div>
+              <div class="prog-bar"><div class="prog-fill" style="width:85%"></div></div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="font-size:14px;">Grãos (milho/soja)</span><span style="font-family:'Space Mono',monospace;color:var(--accent2);">60%</span></div>
+              <div class="prog-bar"><div class="prog-fill" style="width:60%;background:var(--accent2)"></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="info-block" style="background:rgba(78,255,140,0.04);">
+          <p style="font-size:14px;color:var(--muted);line-height:1.7;">A altitude acima de 1.400 m combinada com o solo de origem vulcânica e a amplitude térmica regional posiciona a fazenda para <strong style="color:var(--text)">culturas premium de alto valor agregado</strong> — avocado e viticultura têm demanda crescente em mercados nacionais e de exportação.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer"><span class="footer-prop">Fazenda Três Barras — Caldas / MG</span><span class="footer-conf">CONFIDENCIAL · Abril 2026</span></div>
+</section>
+
+
+<!-- ═══ 09 SOLO E MANEJO ═══ -->
+<section data-screen-label="09 Solo e Manejo">
+  <div class="grid-bg"></div>
+  <div class="top-bar"><div class="logo-mark"><div class="logo-icon"><img src="uploads/logo-oficial-branco.png" alt="Talhão"></div><span class="logo-text">Fazenda Três Barras</span></div><span class="slide-tag">09 — Solo e Manejo</span></div>
+  <div class="slide-content">
+    <div class="slide-title">Pedologia</div>
+    <div class="slide-h2" style="margin-bottom:32px;">Classificação e Características do Solo</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:22px;">
+      <div style="display:flex;flex-direction:column;gap:16px;">
+        <div class="info-block">
+          <div class="section-label">Classificação Pedológica</div>
+          <table class="data-table">
+            <tr><td>Ordem / Subordem</td><td>Cambissolo Háplico</td></tr>
+            <tr><td>Atividade argila</td><td>Tb — Baixa atividade</td></tr>
+            <tr><td>Saturação de bases</td><td>Distrófico (V &lt; 50%)</td></tr>
+            <tr><td>Textura</td><td>Muito argilosa (&gt;60% argila)</td></tr>
+            <tr><td>Horizonte A</td><td>Moderado e proeminente</td></tr>
+            <tr><td>Saturação Al³⁺</td><td>Álico — atenção</td></tr>
+          </table>
+        </div>
+        <div class="info-block" style="background:rgba(255,224,102,0.05);border-color:rgba(255,224,102,0.2);">
+          <div style="font-size:12px;font-weight:700;color:var(--accent2);margin-bottom:8px;letter-spacing:0.1em;text-transform:uppercase;">Atenção</div>
+          <p style="font-size:13px;color:var(--muted);line-height:1.6;">Solo álico com alta saturação por Al³⁺. Requer <strong style="color:var(--text)">calagem criteriosa</strong> antes da implantação de qualquer lavoura. Análise atualizada não disponível — recomendada antes da aquisição.</p>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:16px;">
+        <div class="info-block">
+          <div class="section-label">O que é Cambissolo Háplico?</div>
+          <div style="display:flex;flex-direction:column;gap:10px;margin-top:4px;">
+            <div style="padding:10px;background:rgba(78,255,140,0.05);border-radius:6px;border-left:3px solid var(--green);">
+              <div style="font-size:12px;font-weight:600;color:var(--green);margin-bottom:3px;">Horizonte B Câmbico</div>
+              <div style="font-size:12px;color:var(--muted);">Solo em desenvolvimento — não tão evoluído quanto Latossolos</div>
+            </div>
+            <div style="padding:10px;background:rgba(78,255,140,0.05);border-radius:6px;border-left:3px solid var(--muted);">
+              <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:3px;">Muito Argiloso</div>
+              <div style="font-size:12px;color:var(--muted);">Acima de 60% de argila — boa retenção de água e nutrientes</div>
+            </div>
+            <div style="padding:10px;background:rgba(255,224,102,0.05);border-radius:6px;border-left:3px solid var(--accent2);">
+              <div style="font-size:12px;font-weight:600;color:var(--accent2);margin-bottom:3px;">Distrófico + Álico</div>
+              <div style="font-size:12px;color:var(--muted);">Requer correção de pH e neutralização do Al³⁺ tóxico antes do plantio</div>
+            </div>
+            <div style="padding:10px;background:rgba(78,255,140,0.05);border-radius:6px;border-left:3px solid var(--green2);">
+              <div style="font-size:12px;font-weight:600;color:var(--green);margin-bottom:3px;">Origem Vulcânica</div>
+              <div style="font-size:12px;color:var(--muted);">Solo formado sobre rochas vulcânicas — riqueza potencial em minerais</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:16px;">
+        <div class="info-block">
+          <div class="section-label">Histórico de Manejo</div>
+          <div class="checklist">
+            <div class="check-item">
+              <div class="check-icon check-ok">✓</div>
+              <div><div class="check-text">Cultivos temporários há +10 anos</div><div class="check-sub">Consolida potencial agrícola da área</div></div>
+            </div>
+            <div class="check-item">
+              <div class="check-icon check-warn">!</div>
+              <div><div class="check-text">Histórico de correções não obtido</div><div class="check-sub">Recomenda-se análise antes da aquisição</div></div>
+            </div>
+            <div class="check-item">
+              <div class="check-icon check-warn">!</div>
+              <div><div class="check-text">Histórico de análise de solo indisponível</div><div class="check-sub">Coletar amostras durante due diligence</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="info-block">
+          <div class="section-label">Recomendação Pré-implantação</div>
+          <table class="data-table">
+            <tr><td>Análise de solo</td><td>Necessária (múltiplos pontos)</td></tr>
+            <tr><td>Calagem</td><td>Provável — solo distrófico</td></tr>
+            <tr><td>Adubação fosfatada</td><td>A confirmar por análise</td></tr>
+            <tr><td>Custo estimado correção</td><td>R$ 1.500–3.000/ha</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer"><span class="footer-prop">Fazenda Três Barras — Caldas / MG</span><span class="footer-conf">CONFIDENCIAL · Abril 2026</span></div>
+</section>
+
+
+<!-- ═══ 10 RECURSOS HÍDRICOS ═══ -->
+<section data-screen-label="10 Recursos Hídricos">
+  <div class="grid-bg"></div>
+  <div class="top-bar"><div class="logo-mark"><div class="logo-icon"><img src="uploads/logo-oficial-branco.png" alt="Talhão"></div><span class="logo-text">Fazenda Três Barras</span></div><span class="slide-tag">10 — Recursos Hídricos</span></div>
+  <div class="slide-content">
+    <div class="slide-title">Hidrologia</div>
+    <div class="slide-h2" style="margin-bottom:32px;">Recursos Hídricos e Potencial de Outorga</div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;">
+      <div class="stat-card">
+        <div class="stat-label">Córregos nas divisas</div>
+        <div class="stat-value">2<span class="stat-unit">un.</span></div>
+        <div class="stat-sub">Cercam a propriedade</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Nascente interna</div>
+        <div class="stat-value">1<span class="stat-unit">un.</span></div>
+        <div class="stat-sub">Dentro da propriedade</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Vazão disponível total</div>
+        <div class="stat-value">10<span class="stat-unit">L/s</span></div>
+        <div class="stat-sub">0,010 m³/s — 2 pontos IGAM</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Outorga atual</div>
+        <div class="stat-value" style="color:var(--accent2);font-size:28px;">Não<span class="stat-unit"> obtida</span></div>
+        <div class="stat-sub">Processo a ser aberto pelo comprador</div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:28px;">
+      <div style="display:flex;flex-direction:column;gap:16px;">
+        <div class="info-block">
+          <div class="section-label">Pontos de Captação — IGAM</div>
+          <table class="data-table">
+            <tr><td colspan="2" style="color:var(--green);font-size:13px;font-weight:600;padding-bottom:6px;">Ponto 1 — Córrego divisa</td></tr>
+            <tr><td>Vazão medida</td><td style="font-family:'Space Mono',monospace;">0,006 m³/s (6 L/s)</td></tr>
+            <tr><td>Disponível p/ outorga</td><td style="color:var(--green);font-family:'Space Mono',monospace;">0,003 m³/s (3 L/s)</td></tr>
+            <tr><td colspan="2" style="color:var(--green);font-size:13px;font-weight:600;padding-top:12px;padding-bottom:6px;">Ponto 2 — Córrego divisa</td></tr>
+            <tr><td>Vazão medida</td><td style="font-family:'Space Mono',monospace;">0,014 m³/s (14 L/s)</td></tr>
+            <tr><td>Disponível p/ outorga</td><td style="color:var(--green);font-family:'Space Mono',monospace;">0,007 m³/s (7 L/s)</td></tr>
+            <tr><td style="padding-top:12px;font-weight:700;color:var(--text);">Total outorgável</td><td style="font-family:'Space Mono',monospace;color:var(--green);font-weight:700;">0,010 m³/s</td></tr>
+          </table>
+        </div>
+        <div class="map-placeholder lightbox-thumb" role="button" tabindex="0" aria-label="Ampliar mapa hídrico" data-lightbox-src="uploads/foto-pg10.png" data-lightbox-alt="Mapa hídrico da Fazenda Três Barras" style="height:230px;">
+          <div class="map-inner" style="width:100%;height:100%;position:relative;background:#09110d;">
+            <img src="uploads/foto-pg10.png" alt="Mapa hídrico da Fazenda Três Barras" style="width:100%;height:100%;display:block;object-fit:cover;object-position:center;">
+          </div>
+          <div class="map-label">Mapa Hídrico — Córregos e Captações</div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:16px;">
+        <div class="info-block">
+          <div class="section-label">Potencial de Irrigação</div>
+          <div class="checklist">
+            <div class="check-item">
+              <div class="check-icon check-ok">✓</div>
+              <div><div class="check-text">Vazão suficiente para 100% da área aproveitável</div><div class="check-sub">Conforme análise IGAM — variável por cultura</div></div>
+            </div>
+            <div class="check-item">
+              <div class="check-icon check-warn">!</div>
+              <div><div class="check-text">Outorga ainda não solicitada</div><div class="check-sub">Processo a ser aberto pelo novo proprietário</div></div>
+            </div>
+            <div class="check-item">
+              <div class="check-icon check-ok">✓</div>
+              <div><div class="check-text">Sem armazenamento de água instalado</div><div class="check-sub">Oportunidade de construção de reservatório</div></div>
+            </div>
+            <div class="check-item">
+              <div class="check-icon check-ok">✓</div>
+              <div><div class="check-text">Dados oficiais do IGAM disponíveis</div><div class="check-sub">Base para processo de outorga expedito</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="info-block" style="background:rgba(78,255,140,0.04);">
+          <p style="font-size:14px;color:var(--muted);line-height:1.7;">A <strong style="color:var(--text)">disponibilidade hídrica confirmada pelo IGAM</strong> é um ponto forte relevante. A fazenda tem potencial para irrigar toda a área aproveitável, o que amplia significativamente as opções de cultivo e reduz o risco climático.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer"><span class="footer-prop">Fazenda Três Barras — Caldas / MG</span><span class="footer-conf">CONFIDENCIAL · Abril 2026</span></div>
+</section>
+
+
+<!-- ═══ 11 CLIMA ═══ -->
+<section data-screen-label="11 Clima e Temperatura">
+  <div class="grid-bg"></div>
+  <div class="top-bar"><div class="logo-mark"><div class="logo-icon"><img src="uploads/logo-oficial-branco.png" alt="Talhão"></div><span class="logo-text">Fazenda Três Barras</span></div><span class="slide-tag">11 — Clima e Temperatura</span></div>
+  <div class="slide-content">
+    <div class="slide-title">Climatologia</div>
+    <div class="slide-h2" style="margin-bottom:28px;">Clima — Temperatura e Precipitação Anual</div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;">
+      <div class="stat-card">
+        <div class="stat-label">Precipitação Anual</div>
+        <div class="stat-value">1.650<span class="stat-unit">mm</span></div>
+        <div class="stat-sub">Média histórica Caldas</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Temp. Média Anual</div>
+        <div class="stat-value">18–22<span class="stat-unit">°C</span></div>
+        <div class="stat-sub">Amplitude térmica elevada</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Temp. Mínima Média</div>
+        <div class="stat-value">13<span class="stat-unit">°C</span></div>
+        <div class="stat-sub">Favorece qualidade de frutas</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Temp. Máxima Média</div>
+        <div class="stat-value">27<span class="stat-unit">°C</span></div>
+        <div class="stat-sub">Confortável para cultivos</div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1.6fr 1fr;gap:28px;">
+      <div>
+        <div class="section-label">Distribuição Mensal — Precipitação e Temperaturas</div>
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:20px;">
+          <svg viewBox="0 0 700 240" style="width:100%;height:auto;">
+            <defs><linearGradient id="rainGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#4eff8c" stop-opacity="0.7"/><stop offset="100%" stop-color="#2ecf68" stop-opacity="0.3"/></linearGradient></defs>
+            <!-- axes -->
+            <line x1="50" y1="20" x2="50" y2="210" stroke="var(--border)" stroke-width="1"/>
+            <line x1="50" y1="210" x2="700" y2="210" stroke="var(--border)" stroke-width="1"/>
+            <!-- month labels -->
+            <text x="78" y="228" text-anchor="middle" font-size="9" fill="var(--muted)" font-family="Space Grotesk">Jan</text>
+            <text x="130" y="228" text-anchor="middle" font-size="9" fill="var(--muted)" font-family="Space Grotesk">Fev</text>
+            <text x="182" y="228" text-anchor="middle" font-size="9" fill="var(--muted)" font-family="Space Grotesk">Mar</text>
+            <text x="234" y="228" text-anchor="middle" font-size="9" fill="var(--muted)" font-family="Space Grotesk">Abr</text>
+            <text x="286" y="228" text-anchor="middle" font-size="9" fill="var(--muted)" font-family="Space Grotesk">Mai</text>
+            <text x="338" y="228" text-anchor="middle" font-size="9" fill="var(--muted)" font-family="Space Grotesk">Jun</text>
+            <text x="390" y="228" text-anchor="middle" font-size="9" fill="var(--muted)" font-family="Space Grotesk">Jul</text>
+            <text x="442" y="228" text-anchor="middle" font-size="9" fill="var(--muted)" font-family="Space Grotesk">Ago</text>
+            <text x="494" y="228" text-anchor="middle" font-size="9" fill="var(--muted)" font-family="Space Grotesk">Set</text>
+            <text x="546" y="228" text-anchor="middle" font-size="9" fill="var(--muted)" font-family="Space Grotesk">Out</text>
+            <text x="598" y="228" text-anchor="middle" font-size="9" fill="var(--muted)" font-family="Space Grotesk">Nov</text>
+            <text x="650" y="228" text-anchor="middle" font-size="9" fill="var(--muted)" font-family="Space Grotesk">Dez</text>
+            <!-- rain bars: 349,276,248,98,65,37,32,33,93,162,239,313 → scale: /350*180 -->
+            <rect x="60" y="30" width="36" height="180" fill="url(#rainGrad)" rx="3"/>
+            <rect x="112" y="62" width="36" height="148" fill="url(#rainGrad)" rx="3"/>
+            <rect x="164" y="82" width="36" height="128" fill="url(#rainGrad)" rx="3"/>
+            <rect x="216" y="160" width="36" height="50" fill="url(#rainGrad)" rx="3" opacity="0.6"/>
+            <rect x="268" y="177" width="36" height="33" fill="url(#rainGrad)" rx="3" opacity="0.5"/>
+            <rect x="320" y="191" width="36" height="19" fill="url(#rainGrad)" rx="3" opacity="0.4"/>
+            <rect x="372" y="193" width="36" height="17" fill="url(#rainGrad)" rx="3" opacity="0.4"/>
+            <rect x="424" y="193" width="36" height="17" fill="url(#rainGrad)" rx="3" opacity="0.4"/>
+            <rect x="476" y="162" width="36" height="48" fill="url(#rainGrad)" rx="3" opacity="0.6"/>
+            <rect x="528" y="127" width="36" height="83" fill="url(#rainGrad)" rx="3" opacity="0.75"/>
+            <rect x="580" y="77" width="36" height="123" fill="url(#rainGrad)" rx="3"/>
+            <rect x="632" y="48" width="36" height="162" fill="url(#rainGrad)" rx="3"/>
+            <!-- temp max line (25,25,25,24,21,21,21,23,25,25,24,25) -->
+            <polyline points="78,38 130,38 182,38 234,42 286,66 338,66 390,66 442,50 494,38 546,38 598,42 650,38" fill="none" stroke="rgba(255,107,107,0.6)" stroke-width="1.5"/>
+            <!-- temp min line (18,18,17,15,12,11,11,12,14,16,16,17) -->
+            <polyline points="78,92 130,92 182,98 234,106 286,120 338,124 390,124 442,120 494,112 546,104 598,104 650,98" fill="none" stroke="rgba(100,180,255,0.5)" stroke-width="1.5"/>
+            <!-- legend -->
+            <line x1="400" y1="20" x2="420" y2="20" stroke="rgba(255,107,107,0.6)" stroke-width="1.5"/><text x="424" y="24" font-size="9" fill="var(--muted)" font-family="Space Grotesk">Temp. Máx.</text>
+            <line x1="510" y1="20" x2="530" y2="20" stroke="rgba(100,180,255,0.5)" stroke-width="1.5"/><text x="534" y="24" font-size="9" fill="var(--muted)" font-family="Space Grotesk">Temp. Mín.</text>
+          </svg>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:16px;">
+        <div class="info-block">
+          <div class="section-label">Estações</div>
+          <table class="data-table">
+            <tr><td>Início da estação chuvosa</td><td>Outubro</td></tr>
+            <tr><td>Meses chuvosos</td><td>Outubro — Março</td></tr>
+            <tr><td>Meses secos</td><td>Abril — Setembro</td></tr>
+            <tr><td>Maior precipitação</td><td>Janeiro (349 mm)</td></tr>
+            <tr><td>Menor precipitação</td><td>Julho (32 mm)</td></tr>
+          </table>
+        </div>
+        <div class="info-block" style="background:rgba(78,255,140,0.04);">
+          <p style="font-size:13px;color:var(--muted);line-height:1.7;">Precipitação média anual superior a <strong style="color:var(--text)">1.650 mm</strong> permite cultivos sem irrigação nas culturas adequadas. A <strong style="color:var(--text)">grande amplitude térmica</strong> (mín. 11°C / máx. 27°C) é diferencial para qualidade de frutas, uvas e café.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer"><span class="footer-prop">Fazenda Três Barras — Caldas / MG</span><span class="footer-conf">CONFIDENCIAL · Abril 2026</span></div>
+</section>
+
+
+<!-- ═══ 12 RISCOS CLIMÁTICOS ═══ -->
+<section data-screen-label="12 Riscos Climáticos">
+  <div class="grid-bg"></div>
+  <div class="top-bar"><div class="logo-mark"><div class="logo-icon"><img src="uploads/logo-oficial-branco.png" alt="Talhão"></div><span class="logo-text">Fazenda Três Barras</span></div><span class="slide-tag">12 — Riscos Climáticos</span></div>
+  <div class="slide-content">
+    <div class="slide-title">Risco Climático</div>
+    <div class="slide-h2" style="margin-bottom:32px;">Geada, Seca e Granizo — Histórico e Mitigação</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:22px;">
+      <div style="display:flex;flex-direction:column;gap:14px;">
+        <div style="background:rgba(100,180,255,0.07);border:1px solid rgba(100,180,255,0.2);border-radius:12px;padding:24px;">
+          <div style="font-size:12px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:rgba(100,180,255,0.8);margin-bottom:14px;">❄ Risco de Geada</div>
+          <table class="data-table">
+            <tr><td>Nível de risco</td><td><span class="pill pill-yellow" style="font-size:10px;">Médio-Alto</span></td></tr>
+            <tr><td>Meses críticos</td><td>Junho, Julho, Agosto</td></tr>
+            <tr><td>Ocorrência</td><td>Anual — inverno</td></tr>
+            <tr><td>Recorde histórico</td><td>-5°C em Jul/1994</td></tr>
+          </table>
+        </div>
+        <div class="info-block">
+          <div class="section-label">Mitigação — Geada</div>
+          <div class="checklist">
+            <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">Monitoramento meteorológico preventivo</div></div></div>
+            <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">Irrigação por aspersão protetora</div><div class="check-sub">Formação de camada de gelo protetora</div></div></div>
+            <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">Variedades tolerantes ao frio</div></div></div>
+            <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">Evitar plantio em baixadas e vales</div></div></div>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:14px;">
+        <div style="background:rgba(255,224,102,0.07);border:1px solid rgba(255,224,102,0.2);border-radius:12px;padding:24px;">
+          <div style="font-size:12px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:rgba(255,224,102,0.8);margin-bottom:14px;">☁ Risco de Seca</div>
+          <table class="data-table">
+            <tr><td>Nível de risco</td><td><span class="pill pill-yellow" style="font-size:10px;">Médio</span></td></tr>
+            <tr><td>Meses secos</td><td>Abril — Setembro</td></tr>
+            <tr><td>Evento histórico</td><td>Estiagem 2014–2015</td></tr>
+            <tr><td>Impacto estimado</td><td>-20 a 30% produtividade</td></tr>
+          </table>
+        </div>
+        <div class="info-block">
+          <div class="section-label">Mitigação — Seca</div>
+          <div class="checklist">
+            <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">Irrigação suplementar (vazão disponível)</div></div></div>
+            <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">Cobertura morta e manejo do solo</div></div></div>
+            <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">Sistemas de captação de água da chuva</div></div></div>
+            <div class="check-item"><div class="check-icon check-warn">!</div><div><div class="check-text">Construção de reservatório recomendada</div></div></div>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:14px;">
+        <div style="background:rgba(255,107,107,0.07);border:1px solid rgba(255,107,107,0.2);border-radius:12px;padding:24px;">
+          <div style="font-size:12px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:rgba(255,107,107,0.8);margin-bottom:14px;">⚡ Risco de Granizo</div>
+          <table class="data-table">
+            <tr><td>Nível de risco</td><td><span class="pill pill-red" style="font-size:10px;">Alto — atenção</span></td></tr>
+            <tr><td>Meses críticos</td><td>Ago–Set e Out–Nov</td></tr>
+            <tr><td>Evento recente</td><td>Agosto/2020 — intenso</td></tr>
+            <tr><td>Culturas mais afetadas</td><td>Frutas, uvas, flores</td></tr>
+          </table>
+        </div>
+        <div class="info-block">
+          <div class="section-label">Mitigação — Granizo</div>
+          <div class="checklist">
+            <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">Seguro agrícola — cobertura de perdas</div></div></div>
+            <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">Telas antigranizo (cultivos sensíveis)</div></div></div>
+            <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">Diversificação de culturas</div></div></div>
+            <div class="check-item"><div class="check-icon check-warn">!</div><div><div class="check-text">Custo de tela: R$ 15–25 mil/ha</div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer"><span class="footer-prop">Fazenda Três Barras — Caldas / MG</span><span class="footer-conf">CONFIDENCIAL · Abril 2026</span></div>
+</section>
+
+
+<!-- ═══ 13 RESERVA LEGAL E APP ═══ -->
+<section data-screen-label="13 Reserva Legal e APP">
+  <div class="grid-bg"></div>
+  <div class="top-bar"><div class="logo-mark"><div class="logo-icon"><img src="uploads/logo-oficial-branco.png" alt="Talhão"></div><span class="logo-text">Fazenda Três Barras</span></div><span class="slide-tag">13 — Reserva Legal e APP</span></div>
+  <div class="slide-content">
+    <div class="slide-title">Meio Ambiente</div>
+    <div class="slide-h2" style="margin-bottom:32px;">Reserva Legal e Áreas de Preservação Permanente</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-bottom:24px;">
+      <div class="stat-card">
+        <div class="stat-label">RL + APP Total</div>
+        <div class="stat-value">48,5<span class="stat-unit">ha</span></div>
+        <div class="stat-sub">23,6% da propriedade</div>
+        <div class="prog-bar" style="margin-top:10px;"><div class="prog-fill" style="width:100%"></div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">APP (rios e nascentes)</div>
+        <div class="stat-value">~40<span class="stat-unit">ha</span></div>
+        <div class="stat-sub">2 córregos + nascente interna</div>
+        <div class="prog-bar" style="margin-top:10px;"><div class="prog-fill" style="width:100%"></div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Conformidade Legal</div>
+        <div class="stat-value" style="color:var(--green);font-size:28px;">Isento</div>
+        <div class="stat-sub">Sem necessidade de compensação</div>
+        <div class="prog-bar" style="margin-top:10px;"><div class="prog-fill" style="width:100%"></div></div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:28px;">
+      <div style="display:flex;flex-direction:column;gap:16px;">
+        <div class="info-block">
+          <div class="section-label">CAR — Detalhamento</div>
+          <table class="data-table">
+            <tr><td>Número CAR</td><td style="font-family:'Space Mono',monospace;font-size:11px;">MG-3110301-5B0D…2347</td></tr>
+            <tr><td>Status</td><td><span class="pill pill-green" style="font-size:10px;">Certificado</span></td></tr>
+            <tr><td>Data inscrição</td><td>24/05/2016</td></tr>
+            <tr><td>Última retificação</td><td>04/08/2022</td></tr>
+            <tr><td>Invasão de APP</td><td><span class="pill pill-green" style="font-size:10px;">Não detectada</span></td></tr>
+            <tr><td>Passivo ambiental</td><td><span class="pill pill-green" style="font-size:10px;">Nenhum</span></td></tr>
+          </table>
+        </div>
+        <div class="info-block">
+          <div class="section-label">APP — Tipos</div>
+          <table class="data-table">
+            <tr><td>Tipo predominante</td><td>Rios e nascentes</td></tr>
+            <tr><td>Área total APP</td><td>~40 ha</td></tr>
+            <tr><td>Situação</td><td>Preservada</td></tr>
+            <tr><td>Desmatamento após 2008</td><td>Não identificado</td></tr>
+          </table>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:16px;">
+        <div class="info-block">
+          <div class="section-label">Situação Geral</div>
+          <div class="checklist">
+            <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">CAR certificado e aprovado</div><div class="check-sub">Disponível para download no dossiê</div></div></div>
+            <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">APPs delimitadas e não invadidas</div></div></div>
+            <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">Sem passivos ambientais</div></div></div>
+            <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">Sem embargos ativos</div></div></div>
+            <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">Sem sobreposição de áreas detectada</div></div></div>
+            <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">Isento de compensação de Reserva Legal</div></div></div>
+          </div>
+        </div>
+        <div class="info-block" style="background:rgba(78,255,140,0.04);">
+          <p style="font-size:14px;color:var(--muted);line-height:1.7;">Toda área desmatada ocorreu <strong style="color:var(--text)">antes de 2008</strong>, conforme histórico de imagens de satélite. A fazenda está em plena conformidade com o Código Florestal Brasileiro, sem qualquer passivo a regularizar.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer"><span class="footer-prop">Fazenda Três Barras — Caldas / MG</span><span class="footer-conf">CONFIDENCIAL · Abril 2026</span></div>
+</section>
+
+
+<!-- ═══ 14 REGULARIDADE AMBIENTAL ═══ -->
+<section data-screen-label="14 Regularidade Ambiental">
+  <div class="grid-bg"></div>
+  <div class="top-bar"><div class="logo-mark"><div class="logo-icon"><img src="uploads/logo-oficial-branco.png" alt="Talhão"></div><span class="logo-text">Fazenda Três Barras</span></div><span class="slide-tag">14 — Regularidade Ambiental</span></div>
+  <div class="slide-content">
+    <div class="slide-title">Conformidade Legal</div>
+    <div class="slide-h2" style="margin-bottom:32px;">Regularidade Ambiental — Checklist Completo</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:32px;">
+      <div style="display:flex;flex-direction:column;gap:18px;">
+        <div class="info-block">
+          <div class="section-label">Cadastro Ambiental Rural</div>
+          <table class="data-table">
+            <tr><td>Número</td><td style="font-family:'Space Mono',monospace;font-size:11px;">MG-3110301-5B0D…2347</td></tr>
+            <tr><td>Status análise</td><td><span class="pill pill-green" style="font-size:10px;">Ativo — Certificado</span></td></tr>
+            <tr><td>Data inscrição</td><td>24/05/2016</td></tr>
+            <tr><td>Última retificação</td><td>04/08/2022</td></tr>
+          </table>
+        </div>
+        <div class="info-block">
+          <div class="section-label">Situação de Passivos</div>
+          <table class="data-table">
+            <tr><td>Passivo de APP</td><td><span class="pill pill-green" style="font-size:10px;">Nenhum</span></td></tr>
+            <tr><td>Passivo de RL</td><td><span class="pill pill-green" style="font-size:10px;">Isento — compensação desnecessária</span></td></tr>
+            <tr><td>Desmatamento ilegal</td><td><span class="pill pill-green" style="font-size:10px;">Não identificado</span></td></tr>
+            <tr><td>Embargo IBAMA/IEF</td><td><span class="pill pill-green" style="font-size:10px;">Sem embargos</span></td></tr>
+            <tr><td>Sobreposição UC/TI</td><td><span class="pill pill-green" style="font-size:10px;">Não detectada</span></td></tr>
+          </table>
+        </div>
+      </div>
+      <div>
+        <div class="section-label">Checklist de Conformidade</div>
+        <div class="checklist" style="gap:16px;">
+          <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">CAR ativo e certificado</div><div class="check-sub">Disponível para download — MG-3110301-5B0D…</div></div></div>
+          <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">APPs preservadas e delimitadas</div><div class="check-sub">Rios, nascentes — sem invasão registrada</div></div></div>
+          <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">Reserva Legal regular — isenta de compensação</div></div></div>
+          <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">Sem embargos ou autos de infração ativos</div><div class="check-sub">Verificado IBAMA / IEF-MG</div></div></div>
+          <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">Sem sobreposição com UC ou Terra Indígena</div></div></div>
+          <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">Desmatamento histórico anterior a 2008</div><div class="check-sub">Confirmado por série histórica de imagens</div></div></div>
+          <div class="check-item"><div class="check-icon check-warn">!</div><div><div class="check-text">Outorga de água a ser solicitada</div><div class="check-sub">Processo a abrir no IGAM pelo comprador</div></div></div>
+        </div>
+        <div style="margin-top:20px;background:rgba(78,255,140,0.05);border:1px solid rgba(78,255,140,0.2);border-radius:10px;padding:20px;">
+          <div style="display:flex;align-items:center;gap:12px;">
+            <div style="font-size:28px;">✓</div>
+            <div>
+              <div style="font-size:15px;font-weight:600;color:var(--green);">Propriedade Ambientalmente Regular</div>
+              <div style="font-size:13px;color:var(--muted);margin-top:3px;">Sem nenhum passivo ou pendência ambiental identificada.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer"><span class="footer-prop">Fazenda Três Barras — Caldas / MG</span><span class="footer-conf">CONFIDENCIAL · Abril 2026</span></div>
+</section>
+
+
+<!-- ═══ 15 REGULARIDADE FUNDIÁRIA ═══ -->
+<section data-screen-label="15 Regularidade Fundiária">
+  <div class="grid-bg"></div>
+  <div class="top-bar"><div class="logo-mark"><div class="logo-icon"><img src="uploads/logo-oficial-branco.png" alt="Talhão"></div><span class="logo-text">Fazenda Três Barras</span></div><span class="slide-tag">15 — Regularidade Fundiária</span></div>
+  <div class="slide-content">
+    <div class="slide-title">Situação Jurídica</div>
+    <div class="slide-h2" style="margin-bottom:32px;">Regularidade Fundiária e Documentação</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:32px;">
+      <div style="display:flex;flex-direction:column;gap:18px;">
+        <div class="info-block">
+          <div class="section-label">Documentação Disponível</div>
+          <div class="checklist">
+            <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">Matrícula nº 8.389 — sem ônus</div><div class="check-sub">Disponível para download</div></div></div>
+            <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">CCIR — exercício atual pago</div></div></div>
+            <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">ITR — sem impostos em aberto</div></div></div>
+            <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">Georreferenciamento INCRA certificado</div><div class="check-sub">SIGEF 9500849473501 — atualizado 22/04/2022</div></div></div>
+            <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">Arquivo KML disponível para download</div></div></div>
+            <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">+15 documentos disponíveis no dossiê</div></div></div>
+          </div>
+        </div>
+        <div class="info-block">
+          <div class="section-label">Situação da Matrícula</div>
+          <table class="data-table">
+            <tr><td>Número</td><td>8.389</td></tr>
+            <tr><td>Ônus / Gravame</td><td><span class="pill pill-green" style="font-size:10px;">Livre e Desembaraçado</span></td></tr>
+            <tr><td>SIGEF Status</td><td><span class="pill pill-green" style="font-size:10px;">Certificado</span></td></tr>
+          </table>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:18px;">
+        <div class="info-block">
+          <div class="section-label">Due Diligence Fundiária</div>
+          <table class="data-table">
+            <tr><td>Fonte principal das áreas</td><td>Arquivo KML oficial</td></tr>
+            <tr><td>Diferença relevante de área</td><td>Não identificada</td></tr>
+            <tr><td>Georreferenciado INCRA</td><td>Sim — agiliza transferência</td></tr>
+            <tr><td>Análise histórica 20 anos</td><td>Não foi possível realizar</td></tr>
+            <tr><td>Levantamento topográfico</td><td>29/04/2026</td></tr>
+          </table>
+        </div>
+        <div class="info-block" style="background:rgba(78,255,140,0.05);border-color:rgba(78,255,140,0.2);">
+          <div style="display:flex;align-items:center;gap:12px;">
+            <div style="width:44px;height:44px;background:rgba(78,255,140,0.15);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:18px;">✓</div>
+            <div>
+              <div style="font-size:15px;font-weight:600;color:var(--green);margin-bottom:3px;">Apta para Transferência</div>
+              <div style="font-size:13px;color:var(--muted);line-height:1.5;">Fazenda georreferenciada e documentada. A certificação SIGEF agiliza o processo de transferência. Recomenda-se certidão negativa atualizada do proprietário antes da assinatura.</div>
+            </div>
+          </div>
+        </div>
+        <div class="info-block" style="background:rgba(255,224,102,0.05);border-color:rgba(255,224,102,0.2);">
+          <div style="font-size:12px;font-weight:600;color:var(--accent2);margin-bottom:6px;">Observação</div>
+          <p style="font-size:13px;color:var(--muted);line-height:1.6;">A análise da cadeia dominial dos últimos 20 anos não foi possível de realizar neste relatório. Recomendamos solicitar certidão vintenária ao cartório antes da aquisição.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer"><span class="footer-prop">Fazenda Três Barras — Caldas / MG</span><span class="footer-conf">CONFIDENCIAL · Abril 2026</span></div>
+</section>
+
+
+<!-- ═══ 16 INFRAESTRUTURA ═══ -->
+<section data-screen-label="16 Infraestrutura">
+  <div class="grid-bg"></div>
+  <div class="top-bar"><div class="logo-mark"><div class="logo-icon"><img src="uploads/logo-oficial-branco.png" alt="Talhão"></div><span class="logo-text">Fazenda Três Barras</span></div><span class="slide-tag">16 — Infraestrutura e Benfeitorias</span></div>
+  <div class="slide-content">
+    <div class="slide-title">Benfeitorias</div>
+    <div class="slide-h2" style="margin-bottom:32px;">Infraestrutura Instalada</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:28px;">
+      <div style="display:flex;flex-direction:column;gap:18px;">
+        <div class="info-block">
+          <div class="section-label">Edificações</div>
+          <table class="data-table">
+            <tr><td>Sede</td><td>1 unidade</td></tr>
+            <tr><td>Galpão para implementos</td><td>1 unidade</td></tr>
+            <tr><td>Curral</td><td>1 unidade</td></tr>
+            <tr><td>Outras benfeitorias relevantes</td><td>Não identificadas</td></tr>
+          </table>
+        </div>
+        <div class="info-block">
+          <div class="section-label">Acesso e Vias Internas</div>
+          <table class="data-table">
+            <tr><td>Estradas internas</td><td>2,5 km — terra compactada</td></tr>
+            <tr><td>Tipo de revestimento</td><td>Terra</td></tr>
+            <tr><td>Condição</td><td>Simples — manutenção básica</td></tr>
+          </table>
+        </div>
+        <div class="info-block" style="background:rgba(255,107,107,0.05);border-color:rgba(255,107,107,0.15);">
+          <div style="font-size:12px;font-weight:600;color:var(--red);margin-bottom:8px;letter-spacing:0.1em;text-transform:uppercase;">Ausências Relevantes</div>
+          <div class="checklist">
+            <div class="check-item"><div class="check-icon check-no">✗</div><div><div class="check-text">Sem energia elétrica trifásica</div><div class="check-sub">Ampliação necessária para operação agrícola</div></div></div>
+            <div class="check-item"><div class="check-icon check-no">✗</div><div><div class="check-text">Sem sistema de irrigação instalado</div><div class="check-sub">A ser implantado pelo comprador</div></div></div>
+            <div class="check-item"><div class="check-icon check-no">✗</div><div><div class="check-text">Sem armazenamento de água</div><div class="check-sub">Reservatório a ser construído</div></div></div>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:18px;">
+        <div class="info-block" style="background:rgba(78,255,140,0.04);">
+          <div class="section-label">Diagnóstico</div>
+          <p style="font-size:15px;color:var(--muted);line-height:1.7;">A fazenda possui <strong style="color:var(--text)">infraestrutura básica</strong> instalada — sede, galpão e curral — adequada para compradores que já possuam operação próxima ou que desejem iniciar projeto do zero com liberdade de planejamento.</p>
+        </div>
+        <div class="info-block">
+          <div class="section-label">Investimento Estimado para Operação</div>
+          <table class="data-table">
+            <tr><td>Energia trifásica (extensão)</td><td>R$ 40–80 mil</td></tr>
+            <tr><td>Sistema de irrigação (básico)</td><td>R$ 200–400 mil</td></tr>
+            <tr><td>Reservatório de água (50 mil m³)</td><td>R$ 150–250 mil</td></tr>
+            <tr><td>Correção de solo (total área)</td><td>R$ 200–400 mil</td></tr>
+            <tr><td>Implantação de lavoura (110 ha)</td><td>R$ 1,5–3,0 M</td></tr>
+            <tr style="border-top:2px solid var(--border);"><td style="font-weight:700;color:var(--text);">Total estimado operação</td><td style="color:var(--accent2);font-weight:700;">R$ 2,1–4,1 M</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer"><span class="footer-prop">Fazenda Três Barras — Caldas / MG</span><span class="footer-conf">CONFIDENCIAL · Abril 2026</span></div>
+</section>
+
+
+<!-- ═══ 17 ACESSO E LOGÍSTICA ═══ -->
+<section data-screen-label="17 Acesso e Logística">
+  <div class="grid-bg"></div>
+  <div class="top-bar"><div class="logo-mark"><div class="logo-icon"><img src="uploads/logo-oficial-branco.png" alt="Talhão"></div><span class="logo-text">Fazenda Três Barras</span></div><span class="slide-tag">17 — Acesso e Logística</span></div>
+  <div class="slide-content">
+    <div class="slide-title">Logística</div>
+    <div class="slide-h2" style="margin-bottom:32px;">Acesso e Conectividade Regional</div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;">
+      <div class="stat-card">
+        <div class="stat-label">Caldas (cidade mais próxima)</div>
+        <div class="stat-value">13,2<span class="stat-unit">km</span></div>
+        <div class="stat-sub">25 minutos — asfalto</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Rodovia principal (BR-146)</div>
+        <div class="stat-value">13,7<span class="stat-unit">km</span></div>
+        <div class="stat-sub">25 min — acesso direto</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">São Paulo</div>
+        <div class="stat-value">235<span class="stat-unit">km</span></div>
+        <div class="stat-sub">~3h30 — sem pedágio na rota</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Andradas (polo agrícola)</div>
+        <div class="stat-value">23,8<span class="stat-unit">km</span></div>
+        <div class="stat-sub">35 min</div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:28px;">
+      <div style="display:flex;flex-direction:column;gap:16px;">
+        <div class="info-block">
+          <div class="section-label">Vias de Acesso</div>
+          <table class="data-table">
+            <tr><td>Rodovia Federal</td><td>BR-146</td></tr>
+            <tr><td>Condição</td><td>Boa — mantida pelo DNIT</td></tr>
+            <tr><td>Pedágio</td><td>Sem pedágio</td></tr>
+            <tr><td>Alternativas de acesso</td><td>2 caminhos diferentes</td></tr>
+            <tr><td>Trecho de terra</td><td>Não há — 100% asfalto</td></tr>
+          </table>
+        </div>
+        <div class="info-block">
+          <div class="section-label">Proximidade de Mercados</div>
+          <table class="data-table">
+            <tr><td>São Paulo (centro consumidor)</td><td>235 km — rodoviário</td></tr>
+            <tr><td>Andradas (atacado/flores)</td><td>23,8 km</td></tr>
+            <tr><td>Poços de Caldas</td><td>~40 km</td></tr>
+            <tr><td>Modal principal</td><td>Rodoviário</td></tr>
+          </table>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:16px;">
+        <div class="info-block" style="background:rgba(78,255,140,0.05);border-color:rgba(78,255,140,0.2);">
+          <div class="section-label">Destaque Logístico</div>
+          <div class="checklist">
+            <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">100% do acesso por asfalto</div><div class="check-sub">Dois caminhos alternativos — sem risco de isolamento</div></div></div>
+            <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">A 3h30 de São Paulo — maior mercado consumidor</div></div></div>
+            <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">Próximo de Andradas — polo de flores e frutas</div></div></div>
+            <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">Região com forte tradição agrícola e serviços</div></div></div>
+          </div>
+        </div>
+        <div class="info-block">
+          <div class="section-label">Serviços na Região</div>
+          <table class="data-table">
+            <tr><td>Assistência técnica (EMATER)</td><td>Caldas — 13 km</td></tr>
+            <tr><td>Cooperativas agrícolas</td><td>Andradas e Caldas</td></tr>
+            <tr><td>Hospital referência</td><td>Caldas e Poços de Caldas</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer"><span class="footer-prop">Fazenda Três Barras — Caldas / MG</span><span class="footer-conf">CONFIDENCIAL · Abril 2026</span></div>
+</section>
+
+
+<!-- ═══ 18 CONTEXTO REGIONAL ═══ -->
+<section data-screen-label="18 Contexto Regional">
+  <div class="grid-bg"></div>
+  <div class="top-bar"><div class="logo-mark"><div class="logo-icon"><img src="uploads/logo-oficial-branco.png" alt="Talhão"></div><span class="logo-text">Fazenda Três Barras</span></div><span class="slide-tag">18 — Contexto Regional</span></div>
+  <div class="slide-content">
+    <div class="slide-title">Região</div>
+    <div class="slide-h2" style="margin-bottom:32px;">Região Vulcânica do Sul de Minas — Caldas</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:22px;">
+      <div style="display:flex;flex-direction:column;gap:14px;">
+        <div style="background:rgba(78,255,140,0.06);border:1px solid rgba(78,255,140,0.2);border-radius:12px;padding:24px;">
+          <div style="font-size:12px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--green);margin-bottom:12px;">Viticultura</div>
+          <p style="font-size:14px;color:var(--muted);line-height:1.6;">Caldas é a <strong style="color:var(--text)">maior produtora de uvas do Sul de Minas</strong> e a <strong style="color:var(--text)">3ª maior do estado</strong>, com produção recorde de 1.625 toneladas (2015). Conta com o Núcleo Tecnológico EPAMIG Uva e Vinho, que desenvolve pesquisas e produz mudas.</p>
+        </div>
+        <div class="info-block">
+          <div class="section-label">Potencial Vínico</div>
+          <table class="data-table">
+            <tr><td>Posição estadual</td><td>3ª maior produtora de uvas</td></tr>
+            <tr><td>Centro de pesquisa</td><td>EPAMIG Uva e Vinho</td></tr>
+            <tr><td>Altitude favorável</td><td>&gt; 1.400 m</td></tr>
+          </table>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:14px;">
+        <div style="background:rgba(78,255,140,0.06);border:1px solid rgba(78,255,140,0.2);border-radius:12px;padding:24px;">
+          <div style="font-size:12px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--green);margin-bottom:12px;">Café e Fruticultura</div>
+          <p style="font-size:14px;color:var(--muted);line-height:1.6;">Caldas integra a <strong style="color:var(--text)">Região Vulcânica do Café</strong> — território com 12 municípios que produz cafés de qualidade superior pelo solo rico em minerais. O município foi <strong style="color:var(--text)">reinserido no ZARC para café arábica em 2021</strong>, garantindo acesso a crédito rural e seguro agrícola.</p>
+        </div>
+        <div class="info-block">
+          <div class="section-label">Indicadores Agropecuários</div>
+          <table class="data-table">
+            <tr><td>Leite (produção diária)</td><td>~24.000 litros</td></tr>
+            <tr><td>Pequenos produtores</td><td>300 produtores de leite</td></tr>
+            <tr><td>Mel</td><td>1.000 t produzidas (2010)</td></tr>
+          </table>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:14px;">
+        <div style="background:rgba(255,224,102,0.06);border:1px solid rgba(255,224,102,0.2);border-radius:12px;padding:24px;">
+          <div style="font-size:12px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--accent2);margin-bottom:12px;">Terras Raras — Diferencial</div>
+          <p style="font-size:14px;color:var(--muted);line-height:1.6;">A região é reconhecida pela ocorrência de <strong style="color:var(--text)">terras raras</strong>, com empresas como a <strong style="color:var(--text)">Meteoric Resources</strong> operando próximo à fazenda. Solo de <strong style="color:var(--text)">origem vulcânica</strong> com riqueza mineral diferenciada.</p>
+        </div>
+        <div class="info-block">
+          <div class="section-label">Região Vulcânica</div>
+          <table class="data-table">
+            <tr><td>Municípios no polo</td><td>12 municípios</td></tr>
+            <tr><td>Mineração próxima</td><td>Meteoric Resources</td></tr>
+            <tr><td>Solo</td><td>Origem vulcânica — minerais</td></tr>
+            <tr><td>Expansão agrícola</td><td>Forte crescimento regional</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer"><span class="footer-prop">Fazenda Três Barras — Caldas / MG</span><span class="footer-conf">CONFIDENCIAL · Abril 2026</span></div>
+</section>
+
+
+<!-- ═══ 19 POTENCIAL DE EXPANSÃO ═══ -->
+<section data-screen-label="19 Potencial de Expansão">
+  <div class="grid-bg"></div>
+  <div class="top-bar"><div class="logo-mark"><div class="logo-icon"><img src="uploads/logo-oficial-branco.png" alt="Talhão"></div><span class="logo-text">Fazenda Três Barras</span></div><span class="slide-tag">19 — Potencial de Expansão</span></div>
+  <div class="slide-content">
+    <div class="slide-title">Crescimento</div>
+    <div class="slide-h2" style="margin-bottom:30px;">Potencial de Implantação e Cenários de Uso</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-bottom:24px;">
+      <div class="stat-card">
+        <div class="stat-label">Área aproveitável total</div>
+        <div class="stat-value">157<span class="stat-unit">ha</span></div>
+        <div class="stat-sub">76,4% da propriedade</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Área agrícola imediata</div>
+        <div class="stat-value">110<span class="stat-unit">ha</span></div>
+        <div class="stat-sub">53% — sem eucalipto/declive</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Área com eucalipto/declive</div>
+        <div class="stat-value">~47<span class="stat-unit">ha</span></div>
+        <div class="stat-sub">Potencial de reconversão</div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:28px;">
+      <div style="display:flex;flex-direction:column;gap:16px;">
+        <div class="info-block">
+          <div class="section-label">Cenários de Implantação</div>
+          <table class="data-table">
+            <tr><td>Avocado Hass (110 ha)</td><td style="color:var(--green);">Viável imediato</td></tr>
+            <tr><td>Viticultura (30–50 ha)</td><td style="color:var(--green);">Alta aptidão — apoio EPAMIG</td></tr>
+            <tr><td>Café arábica especial (50 ha)</td><td style="color:var(--green);">ZARC aprovado desde 2021</td></tr>
+            <tr><td>Grãos temporários (110 ha)</td><td style="color:var(--accent2);">Viável com correção de solo</td></tr>
+            <tr><td>Eucalipto manutenção (47 ha)</td><td style="color:var(--accent2);">Já presente — manter/reconverter</td></tr>
+            <tr><td>Turismo rural / enoturismo</td><td style="color:var(--accent2);">Região favorável</td></tr>
+          </table>
+        </div>
+        <div class="info-block">
+          <div class="section-label">Investimento por Cenário (estimado)</div>
+          <table class="data-table">
+            <tr><td>Avocado (110 ha, mudas + infra)</td><td>R$ 2,2–3,3 M</td></tr>
+            <tr><td>Viticultura (40 ha, completo)</td><td>R$ 1,2–2,0 M</td></tr>
+            <tr><td>Café arábica (50 ha)</td><td>R$ 700k–1,0 M</td></tr>
+            <tr><td>Irrigação completa</td><td>R$ 300–500k</td></tr>
+          </table>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:16px;">
+        <div class="info-block">
+          <div class="section-label">Projeção de Receita — Avocado (110 ha)</div>
+          <div style="background:var(--bg);border-radius:8px;padding:16px;margin-top:4px;">
+            <svg viewBox="0 0 400 160" style="width:100%;height:auto;">
+              <line x1="40" y1="150" x2="400" y2="150" stroke="var(--border)" stroke-width="1"/>
+              <rect x="50" y="130" width="50" height="20" fill="rgba(78,255,140,0.2)" rx="2"/>
+              <text x="75" y="126" text-anchor="middle" font-size="9" fill="var(--muted)" font-family="Space Mono">Ano 1-2</text>
+              <text x="75" y="165" text-anchor="middle" font-size="9" fill="var(--muted)" font-family="Space Grotesk">Implant.</text>
+              <rect x="140" y="100" width="50" height="50" fill="rgba(78,255,140,0.4)" rx="2"/>
+              <text x="165" y="96" text-anchor="middle" font-size="9" fill="var(--text)" font-family="Space Mono">R$500k</text>
+              <text x="165" y="165" text-anchor="middle" font-size="9" fill="var(--muted)" font-family="Space Grotesk">Ano 3</text>
+              <rect x="230" y="60" width="50" height="90" fill="rgba(78,255,140,0.6)" rx="2"/>
+              <text x="255" y="56" text-anchor="middle" font-size="9" fill="var(--text)" font-family="Space Mono">R$2,0M</text>
+              <text x="255" y="165" text-anchor="middle" font-size="9" fill="var(--muted)" font-family="Space Grotesk">Ano 5</text>
+              <rect x="320" y="20" width="60" height="130" fill="rgba(78,255,140,0.85)" rx="2"/>
+              <text x="350" y="16" text-anchor="middle" font-size="9" fill="var(--green)" font-family="Space Mono" font-weight="700">R$3,5M+</text>
+              <text x="350" y="165" text-anchor="middle" font-size="9" fill="var(--muted)" font-family="Space Grotesk">Plena prod.</text>
+            </svg>
+          </div>
+          <p style="font-size:12px;color:var(--muted);margin-top:8px;line-height:1.5;">Estimativa para avocado Hass em 110 ha. Produção plena a partir do ano 7. Preço médio R$ 3,50/kg, produtividade 10 t/ha.</p>
+        </div>
+        <div class="info-block" style="background:rgba(78,255,140,0.04);">
+          <p style="font-size:14px;color:var(--muted);line-height:1.7;">A <strong style="color:var(--text)">flexibilidade de uso</strong> é o grande diferencial da Fazenda Três Barras — o comprador tem liberdade total para escolher a cultura mais aderente à sua tese de investimento, sem restrições fundiárias ou ambientais.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer"><span class="footer-prop">Fazenda Três Barras — Caldas / MG</span><span class="footer-conf">CONFIDENCIAL · Abril 2026</span></div>
+</section>
+
+
+<!-- ═══ 20 ANÁLISE DE RISCO ═══ -->
+<section data-screen-label="20 Análise de Risco">
+  <div class="grid-bg"></div>
+  <div class="top-bar"><div class="logo-mark"><div class="logo-icon"><img src="uploads/logo-oficial-branco.png" alt="Talhão"></div><span class="logo-text">Fazenda Três Barras</span></div><span class="slide-tag">20 — Análise de Risco</span></div>
+  <div class="slide-content">
+    <div class="slide-title">Risco</div>
+    <div class="slide-h2" style="margin-bottom:28px;">Matriz de Risco da Propriedade</div>
+    <div class="risk-grid">
+      <div class="risk-item">
+        <div class="risk-level" style="color:var(--red);">■ Alto</div>
+        <div class="risk-title">Risco de Geada</div>
+        <div class="risk-desc">Geadas anuais no inverno com histórico de -5°C (jul/1994). Mitiga com irrigação por aspersão protetora e escolha de variedades resistentes.</div>
+      </div>
+      <div class="risk-item">
+        <div class="risk-level" style="color:var(--red);">■ Alto</div>
+        <div class="risk-title">Risco de Granizo</div>
+        <div class="risk-desc">Evento intenso em agosto/2020. Culturas como uva, avocado e flores são vulneráveis. Mitigação: telas antigranizo e seguro agrícola.</div>
+      </div>
+      <div class="risk-item">
+        <div class="risk-level" style="color:var(--accent2);">■ Médio</div>
+        <div class="risk-title">Risco de Seca</div>
+        <div class="risk-desc">Estiagem 2014-2015 reduziu 20-30% a produtividade. Vazão disponível para outorga mitiga parcialmente. Sem reservatório instalado.</div>
+      </div>
+      <div class="risk-item">
+        <div class="risk-level" style="color:var(--green);">■ Baixo</div>
+        <div class="risk-title">Risco Ambiental</div>
+        <div class="risk-desc">CAR certificado, sem embargos ou passivos. APPs preservadas e nenhum desmatamento ilegal identificado. Situação irrepreensível.</div>
+      </div>
+      <div class="risk-item">
+        <div class="risk-level" style="color:var(--green);">■ Baixo</div>
+        <div class="risk-title">Risco Fundiário</div>
+        <div class="risk-desc">Matrícula limpa, SIGEF certificado, sem ônus. Documentação completa disponível. Cadeia dominial dos últimos 20 anos a verificar.</div>
+      </div>
+      <div class="risk-item">
+        <div class="risk-level" style="color:var(--accent2);">■ Médio</div>
+        <div class="risk-title">Risco de Solo</div>
+        <div class="risk-desc">Cambissolo Háplico álico requer calagem e correção. Sem histórico de análise disponível. Custo estimado R$ 1.500–3.000/ha para correção.</div>
+      </div>
+      <div class="risk-item">
+        <div class="risk-level" style="color:var(--accent2);">■ Médio</div>
+        <div class="risk-title">Risco de Infraestrutura</div>
+        <div class="risk-desc">Infraestrutura básica — sem trifásico, irrigação ou reservatório. Investimento adicional de R$ 2–4 M necessário antes de entrar em produção.</div>
+      </div>
+      <div class="risk-item">
+        <div class="risk-level" style="color:var(--green);">■ Baixo</div>
+        <div class="risk-title">Risco de Mercado</div>
+        <div class="risk-desc">Região com forte expansão de culturas premium. Proximidade de São Paulo garante acesso ao maior mercado consumidor. Diversificação possível.</div>
+      </div>
+      <div class="risk-item">
+        <div class="risk-level" style="color:var(--green);">■ Baixo</div>
+        <div class="risk-title">Risco de Logística</div>
+        <div class="risk-desc">Acesso 100% asfalto pela BR-146, dois caminhos alternativos. A 235 km de São Paulo. Sem gargalos logísticos identificados.</div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer"><span class="footer-prop">Fazenda Três Barras — Caldas / MG</span><span class="footer-conf">CONFIDENCIAL · Abril 2026</span></div>
+</section>
+
+
+<!-- ═══ 21 SWOT ═══ -->
+<section data-screen-label="21 Análise SWOT">
+  <div class="grid-bg"></div>
+  <div class="top-bar"><div class="logo-mark"><div class="logo-icon"><img src="uploads/logo-oficial-branco.png" alt="Talhão"></div><span class="logo-text">Fazenda Três Barras</span></div><span class="slide-tag">21 — Análise SWOT</span></div>
+  <div class="slide-content">
+    <div class="slide-title">Diagnóstico Estratégico</div>
+    <div class="slide-h2" style="margin-bottom:28px;">Análise SWOT da Propriedade</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;height:700px;">
+      <div style="background:rgba(78,255,140,0.05);border:1px solid rgba(78,255,140,0.2);border-radius:12px;padding:26px;">
+        <div style="font-size:12px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--green);margin-bottom:14px;">▲ Forças</div>
+        <div class="checklist" style="gap:13px;">
+          <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">Altitude excepcional &gt; 1.400 m — culturas premium</div></div></div>
+          <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">Documentação 100% regular — SIGEF, CAR, ITR, CCIR</div></div></div>
+          <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">Solo de origem vulcânica — riqueza mineral diferenciada</div></div></div>
+          <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">Vazão hídrica disponível para 100% da área</div></div></div>
+          <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">Acesso 100% asfalto, dois caminhos — sem isolamento</div></div></div>
+          <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">157 ha aproveitáveis — sem passivos ambientais</div></div></div>
+          <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">Reinserção no ZARC café arábica (2021)</div></div></div>
+        </div>
+      </div>
+      <div style="background:rgba(255,107,107,0.05);border:1px solid rgba(255,107,107,0.15);border-radius:12px;padding:26px;">
+        <div style="font-size:12px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--red);margin-bottom:14px;">▼ Fraquezas</div>
+        <div class="checklist" style="gap:13px;">
+          <div class="check-item"><div class="check-icon check-no">✗</div><div><div class="check-text">Sem energia elétrica trifásica instalada</div></div></div>
+          <div class="check-item"><div class="check-icon check-no">✗</div><div><div class="check-text">Sem irrigação — sem reservatório de água</div></div></div>
+          <div class="check-item"><div class="check-icon check-no">✗</div><div><div class="check-text">Solo distrófico e álico — requer calagem</div></div></div>
+          <div class="check-item"><div class="check-icon check-warn">!</div><div><div class="check-text">Infraestrutura básica — investimento adicional necessário</div></div></div>
+          <div class="check-item"><div class="check-icon check-warn">!</div><div><div class="check-text">~50 ha com eucalipto / declividade &gt; 20%</div></div></div>
+          <div class="check-item"><div class="check-icon check-warn">!</div><div><div class="check-text">Sem histórico de análise de solo disponível</div></div></div>
+        </div>
+      </div>
+      <div style="background:rgba(78,255,140,0.03);border:1px solid rgba(78,255,140,0.12);border-radius:12px;padding:26px;">
+        <div style="font-size:12px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:rgba(78,200,140,0.7);margin-bottom:14px;">◆ Oportunidades</div>
+        <div class="checklist" style="gap:13px;">
+          <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">Mercado crescente de avocado no Brasil e exportação</div></div></div>
+          <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">Viticultura premium — região já consolidada (EPAMIG)</div></div></div>
+          <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">Expansão agrícola de alto valor em Caldas e Andradas</div></div></div>
+          <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">Outorga hídrica disponível — base técnica sólida (IGAM)</div></div></div>
+          <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">Enoturismo / agroturismo regional em crescimento</div></div></div>
+        </div>
+      </div>
+      <div style="background:rgba(255,224,102,0.04);border:1px solid rgba(255,224,102,0.15);border-radius:12px;padding:26px;">
+        <div style="font-size:12px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--accent2);margin-bottom:14px;">● Ameaças</div>
+        <div class="checklist" style="gap:13px;">
+          <div class="check-item"><div class="check-icon check-warn">!</div><div><div class="check-text">Geadas anuais — risco real para culturas sensíveis</div></div></div>
+          <div class="check-item"><div class="check-icon check-warn">!</div><div><div class="check-text">Granizo recorrente — custo de proteção elevado</div></div></div>
+          <div class="check-item"><div class="check-icon check-warn">!</div><div><div class="check-text">Oscilação de preços de commodities agrícolas</div></div></div>
+          <div class="check-item"><div class="check-icon check-warn">!</div><div><div class="check-text">Concorrência de outras propriedades na região</div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer"><span class="footer-prop">Fazenda Três Barras — Caldas / MG</span><span class="footer-conf">CONFIDENCIAL · Abril 2026</span></div>
+</section>
+
+
+<!-- ═══ 22 VALUATION ═══ -->
+<section data-screen-label="22 Valuation">
+  <div class="grid-bg"></div>
+  <div class="top-bar"><div class="logo-mark"><div class="logo-icon"><img src="uploads/logo-oficial-branco.png" alt="Talhão"></div><span class="logo-text">Fazenda Três Barras</span></div><span class="slide-tag">22 — Valuation</span></div>
+  <div class="slide-content">
+    <div class="slide-title">Precificação</div>
+    <div class="slide-h2" style="margin-bottom:28px;">Análise de Preço — Referências de Mercado</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:28px;">
+      <div style="display:flex;flex-direction:column;gap:18px;">
+        <div class="info-block">
+          <div class="section-label">Preço Pedido</div>
+          <table class="data-table">
+            <tr><td>Valor total</td><td style="color:var(--green);font-weight:700;font-size:18px;">R$ 9.840.000</td></tr>
+            <tr><td>Por hectare total</td><td style="color:var(--green);">R$ 48.000 / ha</td></tr>
+            <tr><td>Por hectare aproveitável</td><td>R$ 62.700 / ha</td></tr>
+            <tr><td>Por hectare agrícola</td><td>R$ 89.500 / ha</td></tr>
+          </table>
+        </div>
+        <div class="info-block">
+          <div class="section-label">Composição de Valor Estimada</div>
+          <table class="data-table">
+            <tr><td>Terra nua (205 ha × R$40k)</td><td>R$ 8.200.000</td></tr>
+            <tr><td>Benfeitorias (sede, galpão, curral)</td><td>R$ 500.000</td></tr>
+            <tr><td>Estradas internas e acessos</td><td>R$ 80.000</td></tr>
+            <tr><td>Eucalipto existente (~47 ha)</td><td>R$ 470.000</td></tr>
+            <tr><td>Prêmio localização / altitude</td><td>R$ 590.000</td></tr>
+            <tr style="border-top:2px solid var(--border);"><td style="font-weight:700;color:var(--text);">Total estimado</td><td style="color:var(--green);font-weight:700;">R$ 9.840.000</td></tr>
+          </table>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:18px;">
+        <div class="price-card">
+          <div style="font-size:12px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:rgba(78,255,140,0.7);margin-bottom:10px;">Preço Pedido</div>
+          <div style="font-size:68px;font-weight:700;line-height:1;color:var(--green);font-family:'Space Mono',monospace;margin-bottom:6px;">R$9,84M</div>
+          <div style="font-size:18px;color:var(--muted);margin-bottom:20px;">R$ 48.000 / hectare total</div>
+          <div style="width:100%;height:1px;background:rgba(78,255,140,0.2);margin-bottom:16px;"></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+            <div><div style="font-size:11px;color:rgba(78,255,140,0.5);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:3px;">Por ha aproveitável</div><div style="font-family:'Space Mono',monospace;font-size:16px;color:var(--text);">R$ 62.700</div></div>
+            <div><div style="font-size:11px;color:rgba(78,255,140,0.5);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:3px;">Por ha agrícola</div><div style="font-family:'Space Mono',monospace;font-size:16px;color:var(--text);">R$ 89.500</div></div>
+          </div>
+        </div>
+        <div class="info-block">
+          <div class="section-label">Contexto Regional de Preços</div>
+          <p style="font-size:14px;color:var(--muted);line-height:1.7;">O preço pedido de <strong style="color:var(--text)">R$ 48.000/ha</strong> está compatível com o mercado para propriedades de altitude na Região Vulcânica de Caldas-Andradas. A altitude acima de 1.400 m, documentação regular e localização próxima a São Paulo justificam o patamar de precificação.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer"><span class="footer-prop">Fazenda Três Barras — Caldas / MG</span><span class="footer-conf">CONFIDENCIAL · Abril 2026</span></div>
+</section>
+
+
+<!-- ═══ 23 RESUMO EXECUTIVO ═══ -->
+<section data-screen-label="23 Resumo Executivo">
+  <div class="grid-bg"></div>
+  <div class="top-bar"><div class="logo-mark"><div class="logo-icon"><img src="uploads/logo-oficial-branco.png" alt="Talhão"></div><span class="logo-text">Fazenda Três Barras</span></div><span class="slide-tag">23 — Resumo Executivo</span></div>
+  <div class="slide-content">
+    <div class="slide-title">Resumo</div>
+    <div class="slide-h2" style="margin-bottom:28px;">Resumo Executivo da Propriedade</div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;">
+      <div class="stat-card"><div class="stat-label">Área Total</div><div class="stat-value">205<span class="stat-unit">ha</span></div></div>
+      <div class="stat-card"><div class="stat-label">Área Aproveitável</div><div class="stat-value">157<span class="stat-unit">ha</span></div></div>
+      <div class="stat-card"><div class="stat-label">Altitude Média</div><div class="stat-value">1.391<span class="stat-unit">m</span></div></div>
+      <div class="stat-card"><div class="stat-label">Preço Pedido</div><div class="stat-value" style="color:var(--green);font-size:28px;">R$9,84<span class="stat-unit">M</span></div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:28px;">
+      <div style="display:flex;flex-direction:column;gap:16px;">
+        <div class="info-block">
+          <div class="section-label">Destaques da Propriedade</div>
+          <div class="checklist">
+            <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">Altitude &gt; 1.400 m — aptidão premium confirmada</div></div></div>
+            <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">Documentação 100% regular — +15 documentos</div></div></div>
+            <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">Sem passivos ambientais ou fundiários</div></div></div>
+            <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">Vazão hídrica para irrigar 100% da área</div></div></div>
+            <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">Acesso 100% asfalto — 235 km de SP</div></div></div>
+            <div class="check-item"><div class="check-icon check-warn">!</div><div><div class="check-text">Infraestrutura básica — investimento adicional necessário</div></div></div>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:16px;">
+        <div class="price-card" style="padding:32px;">
+          <div style="font-size:11px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:rgba(78,255,140,0.6);margin-bottom:8px;">Preço de Referência</div>
+          <div style="font-size:52px;font-weight:700;line-height:1;color:var(--green);font-family:'Space Mono',monospace;margin-bottom:4px;">R$ 9,84M</div>
+          <div style="font-size:16px;color:var(--muted);">R$ 48.000 / hectare total</div>
+        </div>
+        <div class="info-block">
+          <div class="section-label">Perfil do Comprador Ideal</div>
+          <table class="data-table">
+            <tr><td>Operador com experiência</td><td>Máxima eficiência</td></tr>
+            <tr><td>Investidor de capital</td><td>Projeto do zero — mais flex.</td></tr>
+            <tr><td>Operação próxima</td><td>Complemento de área</td></tr>
+            <tr><td>Score de risco geral</td><td><span class="pill pill-yellow" style="font-size:10px;">Médio — infraestrutura a implantar</span></td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer"><span class="footer-prop">Fazenda Três Barras — Caldas / MG</span><span class="footer-conf">CONFIDENCIAL · Abril 2026</span></div>
+</section>
+
+
+<!-- ═══ 24 RECOMENDAÇÕES ═══ -->
+<section data-screen-label="24 Recomendações">
+  <div class="grid-bg"></div>
+  <div class="top-bar"><div class="logo-mark"><div class="logo-icon"><img src="uploads/logo-oficial-branco.png" alt="Talhão"></div><span class="logo-text">Fazenda Três Barras</span></div><span class="slide-tag">24 — Recomendações Técnicas</span></div>
+  <div class="slide-content">
+    <div class="slide-title">Para o Comprador</div>
+    <div class="slide-h2" style="margin-bottom:28px;">Recomendações Técnicas Pré-Aquisição e Pós-Compra</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;">
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div style="font-size:12px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--green);margin-bottom:4px;">Diligências Imediatas</div>
+        <div class="info-block" style="flex:1;">
+          <div class="checklist">
+            <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">Certidão vintenária da matrícula</div><div class="check-sub">Cadeia dominial dos últimos 20 anos</div></div></div>
+            <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">Certidões negativas do proprietário</div><div class="check-sub">Trabalhistas, fiscais, cível</div></div></div>
+            <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">Vistoria de campo independente</div><div class="check-sub">Eng. agrônomo credenciado</div></div></div>
+            <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">Análise de solo — múltiplos pontos</div><div class="check-sub">Essencial antes de implantar qualquer cultura</div></div></div>
+            <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">Verificar disponibilidade de energia trifásica</div><div class="check-sub">Consulta CEMIG — extensão de rede</div></div></div>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div style="font-size:12px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--accent2);margin-bottom:4px;">Primeiros 12 meses</div>
+        <div class="info-block" style="flex:1;">
+          <div class="checklist">
+            <div class="check-item"><div class="check-icon check-warn">!</div><div><div class="check-text">Instalar energia trifásica</div><div class="check-sub">R$ 40–80 mil — base para tudo</div></div></div>
+            <div class="check-item"><div class="check-icon check-warn">!</div><div><div class="check-text">Solicitar outorga de água ao IGAM</div><div class="check-sub">Usar dados levantados — processo expedito</div></div></div>
+            <div class="check-item"><div class="check-icon check-warn">!</div><div><div class="check-text">Construir reservatório de água</div><div class="check-sub">Mitiga risco hídrico no seco</div></div></div>
+            <div class="check-item"><div class="check-icon check-warn">!</div><div><div class="check-text">Corrigir solo — calagem e adubação</div><div class="check-sub">Essencial para solo álico</div></div></div>
+            <div class="check-item"><div class="check-icon check-warn">!</div><div><div class="check-text">Implantar irrigação básica</div><div class="check-sub">R$ 200–400 mil — gotejamento</div></div></div>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div style="font-size:12px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);margin-bottom:4px;">Médio Prazo (2–5 anos)</div>
+        <div class="info-block" style="flex:1;">
+          <div class="checklist">
+            <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">Implantar cultura principal (avocado / vinho / café)</div></div></div>
+            <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">Investir em proteção antigranizo</div><div class="check-sub">Telas em áreas de culturas sensíveis</div></div></div>
+            <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">Buscar certificação orgânica / sustentável</div><div class="check-sub">Prêmio de 20–40% sobre commodities</div></div></div>
+            <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">Explorar potencial de agroturismo</div><div class="check-sub">Região com forte apelo turístico</div></div></div>
+            <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">Reconverter eucalipto degradado</div><div class="check-sub">+47 ha para cultivos de maior valor</div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer"><span class="footer-prop">Fazenda Três Barras — Caldas / MG</span><span class="footer-conf">CONFIDENCIAL · Abril 2026</span></div>
+</section>
+
+
+<!-- ═══ 25 CONCLUSÃO ═══ -->
+<section data-screen-label="25 Conclusão">
+  <div class="grid-bg"></div>
+  <div style="position:absolute;inset:0;background:radial-gradient(ellipse 70% 70% at 30% 50%, #0d3020 0%, var(--bg) 70%);"></div>
+  <div class="top-bar">
+    <div class="logo-mark"><div class="logo-icon"><img src="uploads/logo-oficial-branco.png" alt="Talhão"></div><span class="logo-text">Fazenda Três Barras</span></div>
+    <span class="slide-tag">25 — Conclusão e Parecer</span>
+  </div>
+  <div class="slide-content" style="display:flex;flex-direction:column;justify-content:center;align-items:flex-start;max-width:1200px;">
+    <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px;">
+      <div style="width:56px;height:56px;background:rgba(78,255,140,0.15);border:1px solid rgba(78,255,140,0.3);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;">✓</div>
+      <div class="slide-title" style="margin:0;">Parecer Técnico Final</div>
+    </div>
+    <h1 style="font-size:60px;font-weight:700;line-height:1.0;margin-bottom:24px;color:var(--text);">Ativo de Alto Potencial com<br><span style="color:var(--green);">Excelente Localização</span></h1>
+    <p style="font-size:20px;color:var(--muted);max-width:920px;line-height:1.65;margin-bottom:44px;font-weight:300;">A Fazenda Três Barras reúne os atributos essenciais para um projeto agrícola de alto valor: <strong style="color:var(--text)">altitude acima de 1.400 m, documentação irrepreensível, aptidão para culturas premium e logística favorável</strong>. A ausência de infraestrutura avançada representa oportunidade de personalização para o perfil do comprador.</p>
+    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:12px;overflow:hidden;width:100%;max-width:920px;">
+      <div style="background:var(--card);padding:18px 22px;text-align:center;"><div style="font-family:'Space Mono',monospace;font-size:20px;font-weight:700;color:var(--green);">205</div><div style="font-size:10px;color:var(--muted);margin-top:4px;text-transform:uppercase;letter-spacing:0.08em;">ha totais</div></div>
+      <div style="background:var(--card);padding:18px 22px;text-align:center;"><div style="font-family:'Space Mono',monospace;font-size:20px;font-weight:700;color:var(--green);">157</div><div style="font-size:10px;color:var(--muted);margin-top:4px;text-transform:uppercase;letter-spacing:0.08em;">ha aproveit.</div></div>
+      <div style="background:var(--card);padding:18px 22px;text-align:center;"><div style="font-family:'Space Mono',monospace;font-size:20px;font-weight:700;color:var(--green);">1.391m</div><div style="font-size:10px;color:var(--muted);margin-top:4px;text-transform:uppercase;letter-spacing:0.08em;">alt. média</div></div>
+      <div style="background:var(--card);padding:18px 22px;text-align:center;"><div style="font-family:'Space Mono',monospace;font-size:20px;font-weight:700;color:var(--green);">10 L/s</div><div style="font-size:10px;color:var(--muted);margin-top:4px;text-transform:uppercase;letter-spacing:0.08em;">vazão outorg.</div></div>
+      <div style="background:var(--card);padding:18px 22px;text-align:center;"><div style="font-family:'Space Mono',monospace;font-size:20px;font-weight:700;color:var(--green);">R$9,84M</div><div style="font-size:10px;color:var(--muted);margin-top:4px;text-transform:uppercase;letter-spacing:0.08em;">preço pedido</div></div>
+    </div>
+  </div>
+  <div class="slide-footer"><span class="footer-prop">Fazenda Três Barras — Caldas / MG — Relatório Técnico Abril 2026</span><span class="footer-conf">CONFIDENCIAL · Uso restrito ao adquirente</span></div>
+</section>
+
+
+<!-- ═══ 26 CHECKLIST FINAL ═══ -->
+<section data-screen-label="26 Checklist Final">
+  <div class="grid-bg"></div>
+  <div class="top-bar"><div class="logo-mark"><div class="logo-icon"><img src="uploads/logo-oficial-branco.png" alt="Talhão"></div><span class="logo-text">Fazenda Três Barras</span></div><span class="slide-tag">26 — Checklist Final</span></div>
+  <div class="slide-content">
+    <div class="slide-title">Visão Geral</div>
+    <div class="slide-h2" style="margin-bottom:32px;">Score Final por Categoria</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:28px;">
+      <div style="display:flex;flex-direction:column;gap:14px;">
+        <div class="info-block">
+          <div class="section-label">Pontuação por Categoria</div>
+          <div style="display:flex;flex-direction:column;gap:14px;margin-top:4px;">
+            <div><div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="font-size:14px;">Localização e Acesso</span><span style="font-family:'Space Mono',monospace;color:var(--green);font-weight:700;">9/10</span></div><div class="prog-bar"><div class="prog-fill" style="width:90%"></div></div></div>
+            <div><div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="font-size:14px;">Regularidade Fundiária</span><span style="font-family:'Space Mono',monospace;color:var(--green);font-weight:700;">9/10</span></div><div class="prog-bar"><div class="prog-fill" style="width:90%"></div></div></div>
+            <div><div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="font-size:14px;">Situação Ambiental</span><span style="font-family:'Space Mono',monospace;color:var(--green);font-weight:700;">10/10</span></div><div class="prog-bar"><div class="prog-fill" style="width:100%"></div></div></div>
+            <div><div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="font-size:14px;">Aptidão e Altitude</span><span style="font-family:'Space Mono',monospace;color:var(--green);font-weight:700;">9/10</span></div><div class="prog-bar"><div class="prog-fill" style="width:90%"></div></div></div>
+            <div><div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="font-size:14px;">Recursos Hídricos</span><span style="font-family:'Space Mono',monospace;color:var(--green);font-weight:700;">8/10</span></div><div class="prog-bar"><div class="prog-fill" style="width:80%"></div></div></div>
+            <div><div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="font-size:14px;">Infraestrutura</span><span style="font-family:'Space Mono',monospace;color:var(--accent2);font-weight:700;">4/10</span></div><div class="prog-bar"><div class="prog-fill" style="width:40%;background:var(--accent2)"></div></div></div>
+            <div><div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="font-size:14px;">Risco Climático (geada/granizo)</span><span style="font-family:'Space Mono',monospace;color:var(--accent2);font-weight:700;">5/10</span></div><div class="prog-bar"><div class="prog-fill" style="width:50%;background:var(--accent2)"></div></div></div>
+            <div><div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="font-size:14px;font-weight:700;">Score Geral</span><span style="font-family:'Space Mono',monospace;color:var(--green);font-weight:700;">7,7/10</span></div><div class="prog-bar"><div class="prog-fill" style="width:77%"></div></div></div>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:14px;">
+        <div class="info-block" style="background:rgba(78,255,140,0.05);border-color:rgba(78,255,140,0.2);">
+          <div class="section-label">Pontos Fortes Principais</div>
+          <div class="checklist">
+            <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">Situação ambiental irrepreensível</div><div class="check-sub">CAR ativo, sem passivos, sem embargos</div></div></div>
+            <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">Altitude &gt; 1.400 m — diferencial competitivo real</div></div></div>
+            <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">Acesso asfalto 100% — dois caminhos</div></div></div>
+            <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">Vazão hídrica confirmada pelo IGAM</div></div></div>
+          </div>
+        </div>
+        <div class="info-block" style="background:rgba(255,224,102,0.05);border-color:rgba(255,224,102,0.2);">
+          <div class="section-label">Pontos de Atenção</div>
+          <div class="checklist">
+            <div class="check-item"><div class="check-icon check-warn">!</div><div><div class="check-text">Infraestrutura básica — investimento necessário</div></div></div>
+            <div class="check-item"><div class="check-icon check-warn">!</div><div><div class="check-text">Geada e granizo — risco real e recorrente</div></div></div>
+            <div class="check-item"><div class="check-icon check-warn">!</div><div><div class="check-text">Solo álico requer correção antes do plantio</div></div></div>
+          </div>
+        </div>
+        <div class="info-block">
+          <div class="section-label">Documentos Disponíveis no Dossiê</div>
+          <p style="font-size:14px;color:var(--muted);line-height:1.7;">Matrícula, CCIR, ITR, CAR (download), arquivo KML, demarcação SIGEF e mais de <strong style="color:var(--text)">15 documentos</strong> disponíveis para due diligence completa.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer"><span class="footer-prop">Fazenda Três Barras — Caldas / MG — Relatório Técnico Abril 2026</span><span class="footer-conf">CONFIDENCIAL · Abril 2026</span></div>
+</section>
+
+
+<!-- ═══ 27 CONTATO ═══ -->
+<section data-screen-label="27 Contato">
+  <div class="grid-bg"></div>
+  <div style="position:absolute;inset:0;background:radial-gradient(ellipse 60% 60% at 50% 50%, #0d2a18 0%, var(--bg) 70%);"></div>
+  <div class="top-bar">
+    <div class="logo-mark"><div class="logo-icon"><img src="uploads/logo-oficial-branco.png" alt="Talhão"></div><span class="logo-text">Fazenda Três Barras</span></div>
+    <span class="slide-tag">27 — Contato e Responsabilidade</span>
+  </div>
+  <div class="slide-content" style="display:flex;flex-direction:column;justify-content:center;gap:40px;">
+    <div>
+      <div class="slide-title">Responsabilidade Técnica</div>
+      <div class="slide-h3">Corretor e Equipe de Elaboração</div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:24px;">
+      <div class="info-block">
+        <div style="width:48px;height:48px;background:rgba(78,255,140,0.1);border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:16px;">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="7" r="4" stroke="var(--green)" stroke-width="1.5"/><path d="M3 18c0-4 3.134-7 7-7s7 3 7 7" stroke="var(--green)" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </div>
+        <div style="font-size:17px;font-weight:600;color:var(--text);margin-bottom:4px;">João Luiz</div>
+        <div style="font-size:13px;color:var(--green);margin-bottom:12px;">Corretor de Imóveis Rurais · CRECI 35687</div>
+        <table class="data-table">
+          <tr><td>Telefone / WhatsApp</td><td>+55 35 9914-9427</td></tr>
+          <tr><td>Especialidade</td><td>Imóveis rurais Sul de Minas</td></tr>
+        </table>
+      </div>
+      <div class="info-block">
+        <div style="display:flex;align-items:center;margin-bottom:16px;">
+          <img src="uploads/logo-oficial-branco.png" alt="Talhão" style="width:168px;height:auto;display:block;">
+        </div>
+        <div style="font-size:17px;font-weight:600;color:var(--text);margin-bottom:4px;">Talhão Tecnologia Ltda.</div>
+        <div style="font-size:13px;color:var(--muted);margin-bottom:12px;">Dados técnicos e geoespaciais</div>
+        <p style="font-size:13px;color:var(--muted);line-height:1.6;">Empresa especializada em coleta, organização e disponibilização de dados técnicos sobre imóveis rurais. Relatório gerado em 29/04/2026.</p>
+      </div>
+      <div class="info-block">
+        <div style="width:48px;height:48px;background:rgba(78,255,140,0.1);border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:16px;">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 2L12.5 7.5H18L13.5 11L15.5 17L10 13.5L4.5 17L6.5 11L2 7.5H7.5Z" stroke="var(--green)" stroke-width="1.5"/></svg>
+        </div>
+        <div style="font-size:17px;font-weight:600;color:var(--text);margin-bottom:4px;">Disclaimer</div>
+        <div style="font-size:13px;color:var(--muted);margin-bottom:8px;"></div>
+        <p style="font-size:12px;color:var(--muted);line-height:1.6;">Este relatório tem caráter exclusivamente informativo. Os dados não substituem due diligence legal, ambiental, agronômica ou financeira conduzida por profissionais habilitados. Valores são estimativos. Base: Abril/2026.</p>
+      </div>
+    </div>
+    <div style="background:rgba(78,255,140,0.05);border:1px solid rgba(78,255,140,0.15);border-radius:10px;padding:20px 28px;display:flex;align-items:center;justify-content:space-between;">
+      <div>
+        <div style="font-size:13px;font-weight:600;color:var(--green);margin-bottom:4px;">Para visita ou mais informações:</div>
+        <div style="font-size:16px;color:var(--text);">João Luiz — CRECI 35687 · <strong style="color:var(--green);">+55 35 9914-9427</strong></div>
+      </div>
+      <div style="font-family:'Space Mono',monospace;font-size:11px;color:var(--muted);text-align:right;">TALHAO-2026.04.29<br>Fazenda Três Barras — Caldas/MG<br>205 ha · R$ 9.840.000</div>
+    </div>
+  </div>
+  <div class="slide-footer"><span class="footer-prop">Fazenda Três Barras — Caldas / MG — Relatório Técnico Abril 2026</span><span class="footer-conf">CONFIDENCIAL · Uso restrito ao adquirente</span></div>
+</section>
+
+</deck-stage>
+
+<div class="lightbox-overlay" id="imageLightbox" aria-hidden="true">
+  <div class="lightbox-dialog">
+    <button class="lightbox-close" id="imageLightboxClose" type="button" aria-label="Fechar imagem ampliada">×</button>
+    <img class="lightbox-image" id="imageLightboxImg" alt="">
+  </div>
+</div>
+
+<script type="application/json" id="speaker-notes">
+[
+  "Capa — Fazenda Três Barras, 205 hectares em Caldas, MG. Altitude acima de 1.400 metros, região vulcânica do Sul de Minas. Preço pedido: R$ 9,84 milhões.",
+  "Índice do relatório dividido em três grandes seções: Identificação, Técnico e Ambiental, e Jurídico e Conclusão.",
+  "Dados cadastrais completos. Matrícula 8.389, SIGEF certificado 9500849473501, CAR ativo. Preço: R$ 48.000 por hectare. Corretor João Luiz, CRECI 35687.",
+  "Caldas está na Região Vulcânica do Sul de Minas, entre Poços de Caldas e Andradas. A 235 km de São Paulo, 3h30 por rodovia. Acesso 100% asfalto.",
+  "Fazenda georreferenciada e certificada pelo INCRA. Dois córregos nas divisas e uma nascente interna. Arquivo KML disponível para download.",
+  "Altitude mínima 1.305 metros, máxima 1.488 metros, média 1.391 metros. Aproximadamente 50% mecanizável. Relevo ondulado com declividade média de 19%.",
+  "Histórico de uso estável desde 2004. Cultivos temporários consolidados na face norte por mais de 10 anos. Nenhum desmatamento ilegal detectado em toda a série histórica.",
+  "Cronologia visual da fazenda com imagens históricas disponíveis entre 2004 e 2025, evidenciando a estabilidade do uso do solo e a consolidação progressiva das áreas aproveitáveis.",
+  "Aptidão destacada para avocado, viticultura, café arábica especial e fruticultura temperada. Município reinserido no ZARC para café arábica em 2021.",
+  "Solo Cambissolo Háplico, muito argiloso, distrófico e álico. Requer calagem e correção antes da implantação de qualquer cultura. Análise de solo não disponível — recomendada.",
+  "Dois córregos nas divisas e uma nascente interna. Vazão disponível para outorga: 10 litros por segundo em dois pontos. Suficiente para irrigar 100% da área. Outorga ainda não solicitada.",
+  "Precipitação anual de 1.650 mm. Temperatura média de 18 a 22°C. Grande amplitude térmica — diferencial para qualidade de frutas, uvas e café.",
+  "Geadas anuais no inverno com mínima histórica de -5°C. Granizo recorrente em agosto e outubro. Ambos os riscos são mitigáveis com manejo adequado.",
+  "APP e Reserva Legal somam 48,5 hectares, 23,6% da propriedade. CAR certificado, sem passivos, sem embargos. Isenta de compensação.",
+  "Regularidade ambiental irrepreensível. Checklist verde em todos os pontos: CAR, APPs, RL, embargos, sobreposições, desmatamento.",
+  "Matrícula 8.389 sem ônus. SIGEF certificado. CCIR e ITR em dia. Mais de 15 documentos disponíveis. Recomendamos apenas certidão vintenária complementar.",
+  "Infraestrutura básica: uma sede, um galpão e um curral. Sem energia trifásica, sem irrigação e sem reservatório. Investimento adicional de R$ 2 a 4 milhões estimado.",
+  "Acesso 100% asfalto pela BR-146. Dois caminhos alternativos. Caldas a 13 km, São Paulo a 235 km sem pedágio.",
+  "Caldas é a terceira maior produtora de uvas de Minas Gerais. Região vulcânica com potencial para avocado, café especial, viticultura e flores. Meteoric Resources opera próximo.",
+  "Área aproveitável de 157 hectares com potencial imediato para avocado, vinho ou café. Projeção de receita bruta acima de R$ 3,5 milhões por ano em plena produção.",
+  "Riscos de geada e granizo são altos e requerem atenção. Demais riscos são baixos a médios. Infraestrutura ausente é o principal ponto de atenção.",
+  "SWOT: pontos fortes superam as fraquezas. Oportunidades de avocado, viticultura e enoturismo são relevantes. Geada e granizo são as principais ameaças.",
+  "Preço pedido de R$ 9,84 milhões equivale a R$ 48 mil por hectare total ou R$ 62.700 por hectare aproveitável. Compatível com o mercado regional.",
+  "Resumo executivo: 205 hectares, altitude 1.391 metros, 157 hectares aproveitáveis e vazão hídrica para 100% da área. Infraestrutura básica é o ponto de atenção.",
+  "Recomendações prioritárias: certidão vintenária, análise de solo, energia trifásica, outorga de água e construção de reservatório.",
+  "Conclusão: ativo de alto potencial com excelente localização. Score geral 7,7 de 10. Liberdade total de personalização para o comprador.",
+  "Score final 7,7 de 10. Situação ambiental nota 10. Infraestrutura nota 4. Mais de 15 documentos disponíveis no dossiê.",
+  "Contato: João Luiz, CRECI 35687, telefone 35 9914-9427. Relatório gerado pela Talhão Tecnologia em 29 de abril de 2026."
+]
+</script>
+
+<script>
+  (function () {
+    var overlay = document.getElementById('imageLightbox');
+    var overlayImage = document.getElementById('imageLightboxImg');
+    var closeButton = document.getElementById('imageLightboxClose');
+    var triggers = document.querySelectorAll('.lightbox-thumb');
+
+    if (!overlay || !overlayImage || !closeButton || !triggers.length) return;
+
+    function sizeLightboxImage() {
+      if (!overlayImage.naturalWidth) return;
+      overlayImage.style.width = Math.min(window.innerWidth * 0.9, overlayImage.naturalWidth * 2) + 'px';
+    }
+
+    function openLightbox(src, alt) {
+      overlayImage.onload = sizeLightboxImage;
+      overlayImage.src = src;
+      overlayImage.alt = alt || '';
+      overlay.classList.add('is-open');
+      overlay.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+      if (overlayImage.complete) sizeLightboxImage();
+      closeButton.focus();
+    }
+
+    function closeLightbox() {
+      overlay.classList.remove('is-open');
+      overlay.setAttribute('aria-hidden', 'true');
+      overlayImage.removeAttribute('src');
+      overlayImage.alt = '';
+      overlayImage.style.width = '';
+      document.body.style.overflow = '';
+    }
+
+    triggers.forEach(function (trigger) {
+      trigger.addEventListener('click', function () {
+        openLightbox(trigger.getAttribute('data-lightbox-src'), trigger.getAttribute('data-lightbox-alt'));
+      });
+
+      trigger.addEventListener('keydown', function (event) {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          openLightbox(trigger.getAttribute('data-lightbox-src'), trigger.getAttribute('data-lightbox-alt'));
+        }
+      });
+    });
+
+    closeButton.addEventListener('click', closeLightbox);
+
+    overlay.addEventListener('click', function (event) {
+      if (event.target === overlay) {
+        closeLightbox();
+      }
+    });
+
+    document.addEventListener('keydown', function (event) {
+      if (event.key === 'Escape' && overlay.classList.contains('is-open')) {
+        closeLightbox();
+      }
+    });
+
+    window.addEventListener('resize', function () {
+      if (overlay.classList.contains('is-open')) {
+        sizeLightboxImage();
+      }
+    });
+  })();
+</script>
+
+</body>
+</html>
+

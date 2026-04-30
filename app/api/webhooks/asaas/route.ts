@@ -1,8 +1,6 @@
 import { createClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
 
-// Supabase inicializado dentro do handler para evitar erros no build
-
 interface AsaasWebhook {
   event: string
   payment: {
@@ -14,7 +12,40 @@ interface AsaasWebhook {
   }
 }
 
+async function addCreditsToWallet(supabase: any, userId: string, quantidadeCreditos: number) {
+  const { data: carteira, error: carteiraError } = await supabase
+    .from('carteira')
+    .select('creditos')
+    .eq('user_id', userId)
+    .single()
+
+  if (carteiraError || !carteira) {
+    throw carteiraError ?? new Error('Carteira não encontrada')
+  }
+
+  const { error: updateCarteiraError } = await supabase
+    .from('carteira')
+    .update({
+      creditos: Number(carteira.creditos ?? 0) + Number(quantidadeCreditos ?? 0),
+      atualizado_em: new Date().toISOString(),
+    })
+    .eq('user_id', userId)
+
+  if (updateCarteiraError) {
+    throw updateCarteiraError
+  }
+}
+
 export async function POST(request: NextRequest) {
+  // Valida o token do webhook configurado no painel Asaas
+  const webhookToken = process.env.ASAAS_WEBHOOK_TOKEN
+  if (webhookToken) {
+    const incomingToken = request.headers.get('asaas-access-token')
+    if (incomingToken !== webhookToken) {
+      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
+    }
+  }
+
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!
@@ -58,53 +89,61 @@ export async function POST(request: NextRequest) {
         novoStatus = 'pending'
     }
 
-    // 3. Atualizar status do pagamento no banco
-    const { data: payment, error: updateError } = await supabase
-      .from('payments')
-      .update({
-        status: novoStatus,
-        updated_at: new Date().toISOString(),
-      })
-      .eq('id', paymentId)
-      .select()
-      .single()
+    let payment: any = null
 
-    if (updateError) {
-      console.error('Erro ao atualizar pagamento:', updateError)
-      return NextResponse.json(
-        { error: 'Erro ao processar pagamento' },
-        { status: 500 }
-      )
-    }
+    if (creditosAdicionados) {
+      const { data: approvedPayment, error: approveError } = await supabase
+        .from('payments')
+        .update({
+          status: novoStatus,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', paymentId)
+        .eq('status', 'pending')
+        .select()
+        .maybeSingle()
 
-    // 4. Se pagamento foi aprovado, adicionar créditos
-    console.log(`💰 Status: ${novoStatus}, Créditos a adicionar: ${creditosAdicionados}`)
-    if (creditosAdicionados && payment) {
-      const { data: carteira, error: carteiraError } = await supabase
-        .from('carteira')
-        .select('creditos')
-        .eq('user_id', payment.user_id)
-        .single()
+      if (approveError) {
+        console.error('Erro ao atualizar pagamento:', approveError)
+        return NextResponse.json(
+          { error: 'Erro ao processar pagamento' },
+          { status: 500 }
+        )
+      }
 
-      if (!carteiraError && carteira) {
-        const novosCreditosTotais = carteira.creditos + (payment.quantidade_creditos || 0)
+      payment = approvedPayment
 
-        const { error: updateCarteiraError } = await supabase
-          .from('carteira')
-          .update({
-            creditos: novosCreditosTotais,
-            atualizado_em: new Date().toISOString(),
-          })
-          .eq('user_id', payment.user_id)
-
-        if (updateCarteiraError) {
-          console.error('Erro ao atualizar carteira:', updateCarteiraError)
-        } else {
+      console.log(`💰 Status: ${novoStatus}, Créditos a adicionar: ${creditosAdicionados}`)
+      if (payment) {
+        try {
+          await addCreditsToWallet(supabase, payment.user_id, payment.quantidade_creditos || 0)
           console.log(
             `✅ Créditos adicionados: ${payment.quantidade_creditos} para usuário ${payment.user_id}`
           )
+        } catch (walletError) {
+          console.error('Erro ao atualizar carteira:', walletError)
         }
       }
+    } else {
+      const { data: updatedPayment, error: updateError } = await supabase
+        .from('payments')
+        .update({
+          status: novoStatus,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', paymentId)
+        .select()
+        .single()
+
+      if (updateError) {
+        console.error('Erro ao atualizar pagamento:', updateError)
+        return NextResponse.json(
+          { error: 'Erro ao processar pagamento' },
+          { status: 500 }
+        )
+      }
+
+      payment = updatedPayment
     }
 
     // 5. Retornar sucesso (importante para Asaas saber que processamos)

@@ -9,6 +9,13 @@ type CreatePaymentBody = {
   cpf?: string
   phone?: string
   payment_method?: string
+  card_holder?: string
+  card_number?: string
+  card_expiry_month?: string
+  card_expiry_year?: string
+  card_cvv?: string
+  card_cep?: string
+  card_address_number?: string
 }
 
 type AsaasListResponse<T> = {
@@ -21,8 +28,10 @@ type AsaasCustomer = {
 
 type AsaasPayment = {
   id: string
+  status?: string
   invoiceUrl?: string
   bankSlipUrl?: string
+  identificationField?: string
 }
 
 type AsaasPixQrCode = {
@@ -186,12 +195,12 @@ async function updatePaymentRecord(supabase: AdminClient, paymentId: string, pay
     payload,
     Object.fromEntries(
       Object.entries(payload).filter(
-        ([key]) => !['asaas_payment_id', 'boleto_url', 'invoice_url'].includes(key)
+        ([key]) => !['asaas_payment_id', 'boleto_url', 'invoice_url', 'boleto_line'].includes(key)
       )
     ),
     Object.fromEntries(
       Object.entries(payload).filter(
-        ([key]) => !['asaas_payment_id', 'boleto_url', 'invoice_url', 'updated_at'].includes(key)
+        ([key]) => !['asaas_payment_id', 'boleto_url', 'invoice_url', 'boleto_line', 'updated_at'].includes(key)
       )
     ),
   ]
@@ -213,6 +222,61 @@ async function updatePaymentRecord(supabase: AdminClient, paymentId: string, pay
   }
 
   throw lastError ?? new Error('Não foi possível atualizar o pagamento.')
+}
+
+async function addCreditsToWallet(supabase: AdminClient, userId: string, quantidadeCreditos: number) {
+  const { data: carteira, error: carteiraError } = await supabase
+    .from('carteira')
+    .select('creditos')
+    .eq('user_id', userId)
+    .single()
+
+  if (carteiraError || !carteira) {
+    throw new Error('Não foi possível localizar a carteira do usuário.')
+  }
+
+  const novosCreditosTotais = Number(carteira.creditos ?? 0) + quantidadeCreditos
+
+  const { error: updateCarteiraError } = await supabase
+    .from('carteira')
+    .update({
+      creditos: novosCreditosTotais,
+      atualizado_em: new Date().toISOString(),
+    })
+    .eq('user_id', userId)
+
+  if (updateCarteiraError) {
+    throw new Error(updateCarteiraError.message)
+  }
+}
+
+async function approvePaymentAndCredit(
+  supabase: AdminClient,
+  paymentId: string,
+  userId: string,
+  quantidadeCreditos: number
+) {
+  const { data: approvedPayment, error: approveError } = await supabase
+    .from('payments')
+    .update({
+      status: 'approved',
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', paymentId)
+    .eq('status', 'pending')
+    .select('id')
+    .maybeSingle()
+
+  if (approveError) {
+    throw new Error(approveError.message)
+  }
+
+  if (!approvedPayment) {
+    return false
+  }
+
+  await addCreditsToWallet(supabase, userId, quantidadeCreditos)
+  return true
 }
 
 export async function POST(request: NextRequest) {
@@ -240,6 +304,13 @@ export async function POST(request: NextRequest) {
   const quantidadeCreditos = Number(body.quantidade_creditos)
   const cpf = sanitizeCpf(body.cpf || '')
   const phone = (body.phone || '').replace(/\D/g, '').slice(0, 15)
+  const cardHolder = body.card_holder?.trim() ?? ''
+  const cardNumber = (body.card_number ?? '').replace(/\s/g, '')
+  const cardExpiryMonth = body.card_expiry_month ?? ''
+  const cardExpiryYear = body.card_expiry_year ?? ''
+  const cardCvv = body.card_cvv ?? ''
+  const cardCep = (body.card_cep ?? '').replace(/\D/g, '')
+  const cardAddressNumber = body.card_address_number?.trim() ?? ''
 
   if (body.user_id && body.user_id !== user.id) {
     return NextResponse.json(
@@ -267,6 +338,15 @@ export async function POST(request: NextRequest) {
       { success: false, error: 'CPF inválido.' },
       { status: 400 }
     )
+  }
+
+  if (paymentMethod === 'cartao') {
+    if (!cardHolder || cardNumber.length < 15 || !cardExpiryMonth || !cardExpiryYear || cardCvv.length < 3 || cardCep.length !== 8 || !cardAddressNumber) {
+      return NextResponse.json(
+        { success: false, error: 'Dados do cartão inválidos.' },
+        { status: 400 }
+      )
+    }
   }
 
   const valor = Number((quantidadeCreditos * CREDIT_PRICE).toFixed(2))
@@ -318,6 +398,23 @@ export async function POST(request: NextRequest) {
         dueDate: buildDueDate(paymentMethod),
         description: `${quantidadeCreditos} crédito${quantidadeCreditos === 1 ? '' : 's'} Talhão`,
         externalReference: paymentId,
+        ...(paymentMethod === 'cartao' ? {
+          creditCard: {
+            holderName: cardHolder,
+            number: cardNumber,
+            expiryMonth: cardExpiryMonth,
+            expiryYear: cardExpiryYear,
+            ccv: cardCvv,
+          },
+          creditCardHolderInfo: {
+            name: user.user_metadata?.full_name || user.user_metadata?.name || cardHolder,
+            email: user.email,
+            cpfCnpj: cpf,
+            postalCode: cardCep,
+            addressNumber: cardAddressNumber,
+            phone: phone || '',
+          },
+        } : {}),
       }),
     })
 
@@ -330,11 +427,24 @@ export async function POST(request: NextRequest) {
       pixCopyPaste = pixData.payload ?? null
     }
 
+    let boletoLine: string | null = null
+    if (paymentMethod === 'boleto') {
+      try {
+        const boletoData = await asaasRequest<{ identificationField?: string }>(
+          `/payments/${payment.id}/identificationField`
+        )
+        boletoLine = boletoData.identificationField ?? null
+      } catch {
+        // não crítico — boleto_url ainda está disponível como fallback
+      }
+    }
+
     try {
       await updatePaymentRecord(supabase, paymentId, {
         asaas_payment_id: payment.id,
         pix_qr_code: pixQrCode,
         pix_copy_paste: pixCopyPaste,
+        boleto_line: boletoLine,
         boleto_url: payment.bankSlipUrl ?? null,
         invoice_url: payment.invoiceUrl ?? null,
         updated_at: new Date().toISOString(),
@@ -343,14 +453,25 @@ export async function POST(request: NextRequest) {
       // Não interrompe a jornada do usuário se apenas o enriquecimento do histórico falhar.
     }
 
+    const approved = payment.status === 'CONFIRMED' || payment.status === 'RECEIVED'
+
+    if (paymentMethod === 'cartao' && approved) {
+      try {
+        await approvePaymentAndCredit(supabase, paymentId, user.id, quantidadeCreditos)
+      } catch {
+        // O webhook do Asaas ainda pode concluir a sincronização se esse passo falhar.
+      }
+    }
+
     return NextResponse.json({
       success: true,
       payment_id: paymentId,
       pix_qr_code: pixQrCode,
       pix_copy_paste: pixCopyPaste,
+      boleto_line: boletoLine,
       boleto_url: payment.bankSlipUrl ?? null,
-      invoice_url: payment.invoiceUrl ?? null,
       valor,
+      approved: payment.status === 'CONFIRMED' || payment.status === 'RECEIVED',
     })
   } catch (error) {
     try {

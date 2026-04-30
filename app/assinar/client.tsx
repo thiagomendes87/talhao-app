@@ -12,9 +12,11 @@ type PaymentResult = {
   payment_id: string
   pix_qr_code?: string
   pix_copy_paste?: string
+  boleto_line?: string
   boleto_url?: string
   invoice_url?: string
   valor?: number
+  approved?: boolean
 }
 
 const pacotes = [4, 6, 8, 10, 14, 20, 30]
@@ -40,6 +42,14 @@ export default function AssinarClient() {
   const [erro, setErro] = useState('')
   const [resultado, setResultado] = useState<PaymentResult | null>(null)
   const [pixCopiado, setPixCopiado] = useState(false)
+  // Dados do cartão
+  const [cardHolder, setCardHolder] = useState('')
+  const [cardNumber, setCardNumber] = useState('')
+  const [cardExpiry, setCardExpiry] = useState('')
+  const [cardCvv, setCardCvv] = useState('')
+  const [cardCep, setCardCep] = useState('')
+  const [cardAddressNum, setCardAddressNum] = useState('')
+  const [boletoCopiado, setBoletoCopiado] = useState(false)
 
   useEffect(() => {
     const verificarAuth = async () => {
@@ -81,6 +91,23 @@ export default function AssinarClient() {
     return nums
   }
 
+  const formatCardNumber = (v: string) => {
+    const nums = v.replace(/\D/g, '').slice(0, 16)
+    return nums.replace(/(\d{4})(?=\d)/g, '$1 ').trim()
+  }
+
+  const formatExpiry = (v: string) => {
+    const nums = v.replace(/\D/g, '').slice(0, 4)
+    if (nums.length >= 3) return `${nums.slice(0, 2)}/${nums.slice(2)}`
+    return nums
+  }
+
+  const formatCep = (v: string) => {
+    const nums = v.replace(/\D/g, '').slice(0, 8)
+    if (nums.length > 5) return `${nums.slice(0, 5)}-${nums.slice(5)}`
+    return nums
+  }
+
   const getPhoneForApi = () => {
     const nums = phone.replace(/\D/g, '')
     // Remove DDI prefix for Asaas (which handles BR numbers without +55)
@@ -97,6 +124,14 @@ export default function AssinarClient() {
     if (!phoneNums || (ddi === '+55' && phoneNums.length < 10) || phoneNums.length < 7) {
       setErro('Telefone inválido')
       return
+    }
+    if (paymentMethod === 'cartao') {
+      if (!cardHolder.trim()) { setErro('Informe o nome como está no cartão'); return }
+      if (cardNumber.replace(/\s/g, '').length < 15) { setErro('Número do cartão inválido'); return }
+      if (cardExpiry.length < 5) { setErro('Validade inválida (MM/AA)'); return }
+      if (cardCvv.length < 3) { setErro('CVV inválido'); return }
+      if (cardCep.replace(/\D/g, '').length < 8) { setErro('CEP inválido'); return }
+      if (!cardAddressNum.trim()) { setErro('Informe o número do endereço'); return }
     }
     setProcessando(true)
     setErro('')
@@ -115,6 +150,15 @@ export default function AssinarClient() {
           payment_method: paymentMethod,
           cpf,
           phone: getPhoneForApi(),
+          ...(paymentMethod === 'cartao' ? {
+            card_holder: cardHolder,
+            card_number: cardNumber.replace(/\s/g, ''),
+            card_expiry_month: cardExpiry.split('/')[0],
+            card_expiry_year: `20${cardExpiry.split('/')[1] ?? ''}`,
+            card_cvv: cardCvv,
+            card_cep: cardCep.replace(/\D/g, ''),
+            card_address_number: cardAddressNum,
+          } : {}),
         }),
       })
 
@@ -125,12 +169,14 @@ export default function AssinarClient() {
         return
       }
 
-      if (paymentMethod === 'boleto' && data.boleto_url) {
-        window.open(data.boleto_url, '_blank', 'noopener,noreferrer')
-      }
+      if (paymentMethod === 'cartao') {
+        if (!data.approved) {
+          setErro(data.error || 'Pagamento com cartão não foi aprovado')
+          return
+        }
 
-      if (paymentMethod === 'cartao' && data.invoice_url) {
-        window.open(data.invoice_url, '_blank', 'noopener,noreferrer')
+        setResultado(data)
+        return
       }
 
       router.push(`/pagamento/${data.payment_id}`)
@@ -147,6 +193,14 @@ export default function AssinarClient() {
       navigator.clipboard.writeText(resultado.pix_copy_paste)
       setPixCopiado(true)
       setTimeout(() => setPixCopiado(false), 3000)
+    }
+  }
+
+  const copiarBoleto = () => {
+    if (resultado?.boleto_line) {
+      navigator.clipboard.writeText(resultado.boleto_line)
+      setBoletoCopiado(true)
+      setTimeout(() => setBoletoCopiado(false), 3000)
     }
   }
 
@@ -368,10 +422,10 @@ export default function AssinarClient() {
                 {/* Método */}
                 <div className="mb-5">
                   <label className="form-label">Forma de pagamento</label>
-                  <div className="grid grid-cols-3 gap-2">
-                    {[
-                      { id: 'pix', label: 'PIX', icon: '⚡', desc: 'Instantâneo' },
-                      { id: 'boleto', label: 'Boleto', icon: '📄', desc: 'Até 3 dias' },
+                <div className="grid grid-cols-3 gap-2">
+                  {[
+                    { id: 'pix', label: 'PIX', icon: '⚡', desc: 'Instantâneo' },
+                    { id: 'boleto', label: 'Boleto', icon: '📄', desc: 'Até 3 dias' },
                       { id: 'cartao', label: 'Cartão', icon: '💳', desc: 'Crédito' },
                     ].map(m => (
                       <button key={m.id} onClick={() => setPaymentMethod(m.id as PaymentMethod)}
@@ -385,6 +439,62 @@ export default function AssinarClient() {
                     ))}
                   </div>
                 </div>
+
+                {paymentMethod === 'cartao' && (
+                  <div className="mt-4 space-y-3">
+                    <p className="text-xs font-bold text-gray-500 uppercase">Dados do cartão</p>
+
+                    <div>
+                      <label className="form-label">Nome no cartão</label>
+                      <input type="text" placeholder="Como está impresso no cartão"
+                        value={cardHolder}
+                        onChange={e => setCardHolder(e.target.value.toUpperCase())}
+                        className="form-input rounded-xl" />
+                    </div>
+
+                    <div>
+                      <label className="form-label">Número do cartão</label>
+                      <input type="text" placeholder="0000 0000 0000 0000"
+                        value={cardNumber}
+                        onChange={e => setCardNumber(formatCardNumber(e.target.value))}
+                        className="form-input rounded-xl font-mono tracking-widest" />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="form-label">Validade</label>
+                        <input type="text" placeholder="MM/AA"
+                          value={cardExpiry}
+                          onChange={e => setCardExpiry(formatExpiry(e.target.value))}
+                          className="form-input rounded-xl" />
+                      </div>
+                      <div>
+                        <label className="form-label">CVV</label>
+                        <input type="text" placeholder="000"
+                          value={cardCvv}
+                          onChange={e => setCardCvv(e.target.value.replace(/\D/g, '').slice(0, 4))}
+                          className="form-input rounded-xl" />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="form-label">CEP do titular</label>
+                        <input type="text" placeholder="00000-000"
+                          value={cardCep}
+                          onChange={e => setCardCep(formatCep(e.target.value))}
+                          className="form-input rounded-xl" />
+                      </div>
+                      <div>
+                        <label className="form-label">Número</label>
+                        <input type="text" placeholder="Ex: 123"
+                          value={cardAddressNum}
+                          onChange={e => setCardAddressNum(e.target.value)}
+                          className="form-input rounded-xl" />
+                      </div>
+                    </div>
+                  </div>
+                )}
 
                 {erro && (
                   <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm mb-4">
@@ -425,15 +535,40 @@ export default function AssinarClient() {
                 )}
 
                 {/* ── RESULTADO BOLETO ── */}
-                {paymentMethod === 'boleto' && resultado.boleto_url && (
+                {paymentMethod === 'boleto' && (
                   <div className="text-center">
                     <div className="text-3xl mb-2">📄</div>
                     <h2 className="text-lg font-extrabold text-[#162113] mb-1">Boleto gerado!</h2>
                     <p className="text-sm text-gray-500 mb-4">Vencimento em 3 dias úteis</p>
-                    <a href={resultado.boleto_url} target="_blank" rel="noopener noreferrer"
-                      className="block w-full bg-[#162113] text-white font-bold py-3 rounded-xl text-sm hover:bg-[#2d2d50] transition-colors mb-3">
-                      Abrir boleto →
-                    </a>
+
+                    {resultado?.boleto_line ? (
+                      <>
+                        <p className="text-xs text-gray-500 mb-2">Copie a linha digitável e pague no seu banco:</p>
+                        <div className="bg-gray-50 border border-gray-200 rounded-xl p-3 mb-3 text-xs text-gray-700 break-all font-mono text-left">
+                          {resultado.boleto_line}
+                        </div>
+                        <button onClick={copiarBoleto}
+                          className={`w-full py-3 rounded-xl font-bold text-sm transition-colors mb-3 ${
+                            boletoCopiado
+                              ? 'bg-green-100 text-green-700 border border-green-300'
+                              : 'bg-[#162113] text-white hover:bg-[#1f5230]'
+                          }`}>
+                          {boletoCopiado ? '✅ Linha copiada!' : '📋 Copiar linha digitável'}
+                        </button>
+                      </>
+                    ) : resultado?.boleto_url ? (
+                      <a href={resultado.boleto_url} target="_blank" rel="noopener noreferrer"
+                        className="block w-full bg-[#162113] text-white font-bold py-3 rounded-xl text-sm hover:bg-[#1f5230] transition-colors mb-3">
+                        Abrir boleto PDF →
+                      </a>
+                    ) : null}
+
+                    {resultado?.boleto_url && resultado?.boleto_line && (
+                      <a href={resultado.boleto_url} target="_blank" rel="noopener noreferrer"
+                        className="text-xs text-[#2D6A4F] underline">
+                        Ver boleto em PDF
+                      </a>
+                    )}
                     <p className="text-xs text-gray-400">Os créditos serão adicionados após a compensação.</p>
                   </div>
                 )}
@@ -441,18 +576,12 @@ export default function AssinarClient() {
                 {/* ── RESULTADO CARTÃO ── */}
                 {paymentMethod === 'cartao' && (
                   <div className="text-center">
-                    <div className="text-3xl mb-2">💳</div>
-                    <h2 className="text-lg font-extrabold text-[#162113] mb-1">Página de pagamento aberta</h2>
+                    <div className="text-3xl mb-2">✅</div>
+                    <h2 className="text-lg font-extrabold text-[#162113] mb-1">Pagamento realizado!</h2>
                     <p className="text-sm text-gray-500 mb-4">
-                      Uma nova aba foi aberta com a página segura do Asaas para inserir os dados do cartão.
+                      Seu cartão foi cobrado com sucesso. Os créditos já estão na sua carteira.
                     </p>
-                    {resultado.invoice_url && (
-                      <a href={resultado.invoice_url} target="_blank" rel="noopener noreferrer"
-                        className="block w-full bg-[#162113] text-white font-bold py-3 rounded-xl text-sm hover:bg-[#2d2d50] transition-colors mb-3">
-                        Abrir novamente →
-                      </a>
-                    )}
-                    <p className="text-xs text-gray-400">Os créditos serão adicionados automaticamente após a confirmação.</p>
+                    <p className="text-xs text-gray-400">Você receberá a confirmação por e-mail.</p>
                   </div>
                 )}
 

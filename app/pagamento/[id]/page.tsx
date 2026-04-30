@@ -15,6 +15,7 @@ type Payment = {
   payment_method: 'pix' | 'boleto' | 'cartao'
   pix_qr_code?: string
   pix_copy_paste?: string
+  boleto_line?: string
   boleto_url?: string
   invoice_url?: string
   created_at: string
@@ -60,6 +61,7 @@ export default function PagamentoPage() {
   const [carregando, setCarregando] = useState(true)
   const [erro, setErro] = useState('')
   const [pixCopiado, setPixCopiado] = useState(false)
+  const [boletoCopiado, setBoletoCopiado] = useState(false)
   const [autoRefresh, setAutoRefresh] = useState(true)
 
   useEffect(() => {
@@ -130,6 +132,14 @@ export default function PagamentoPage() {
       navigator.clipboard.writeText(payment.pix_copy_paste)
       setPixCopiado(true)
       setTimeout(() => setPixCopiado(false), 3000)
+    }
+  }
+
+  const copiarBoleto = () => {
+    if (payment.boleto_line) {
+      navigator.clipboard.writeText(payment.boleto_line)
+      setBoletoCopiado(true)
+      setTimeout(() => setBoletoCopiado(false), 3000)
     }
   }
 
@@ -269,21 +279,36 @@ export default function PagamentoPage() {
             </div>
           )}
 
-          {payment.status === 'pending' && payment.payment_method === 'boleto' && payment.boleto_url && (
+          {payment.status === 'pending' && payment.payment_method === 'boleto' && (
             <div className="bg-white rounded-xl border border-gray-200 p-6 mb-6 text-center">
               <div className="text-3xl mb-2">📄</div>
               <h3 className="font-bold text-[#162113] mb-3">Seu boleto está pronto</h3>
-              <p className="text-sm text-gray-500 mb-5">
-                Abra o boleto em uma nova aba para concluir o pagamento.
-              </p>
-              <a
-                href={payment.boleto_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-block rounded-xl bg-[#162113] px-5 py-3 text-sm font-bold text-white transition-colors hover:bg-[#1f5230]"
-              >
-                Abrir boleto
-              </a>
+
+              {payment.boleto_line ? (
+                <>
+                  <p className="text-sm text-gray-500 mb-3">Copie a linha digitável e pague no seu banco:</p>
+                  <div className="bg-gray-50 border border-gray-200 rounded-xl p-3 mb-4 text-xs text-gray-700 break-all font-mono text-left">
+                    {payment.boleto_line}
+                  </div>
+                  <button onClick={copiarBoleto}
+                    className={`w-full py-3 rounded-xl font-bold text-sm transition-colors mb-3 ${
+                      boletoCopiado
+                        ? 'bg-green-100 text-green-700 border border-green-300'
+                        : 'bg-[#162113] text-white hover:bg-[#1f5230]'
+                    }`}>
+                    {boletoCopiado ? '✅ Linha copiada!' : '📋 Copiar linha digitável'}
+                  </button>
+                </>
+              ) : null}
+
+              {payment.boleto_url && (
+                <a href={payment.boleto_url} target="_blank" rel="noopener noreferrer"
+                  className={`text-xs text-[#2D6A4F] underline ${!payment.boleto_line ? 'block' : ''}`}>
+                  {payment.boleto_line ? 'Ver boleto em PDF' : 'Abrir boleto PDF →'}
+                </a>
+              )}
+
+              <p className="text-xs text-gray-500 mt-4">A página atualiza automaticamente após a compensação.</p>
             </div>
           )}
 

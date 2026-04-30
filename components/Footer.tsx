@@ -40,10 +40,13 @@ const LEGAL_CONTENT: Record<LegalModalKey, { title: string; body: string }> = {
   },
 }
 
+const FOOTER_WHATSAPP_URL =
+  'https://wa.me/551153043330?text=Olá%2C%20gostaria%20de%20saber%20mais%20sobre%20o%20Talhão'
+
 const socialLinks = [
   {
     label: 'WhatsApp',
-    href: 'https://wa.me/5511530433330?text=Olá%2C%20gostaria%20de%20saber%20mais%20sobre%20o%20Talhão',
+    href: FOOTER_WHATSAPP_URL,
     icon: (
       <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
         <path d="M20 11.5A8.5 8.5 0 0 1 7.6 19l-3.6 1 1.1-3.5A8.5 8.5 0 1 1 20 11.5Z" />
@@ -236,7 +239,7 @@ export default function Footer() {
             </div>
 
             <a
-              href="https://wa.me/5511530433330?text=Olá%2C%20gostaria%20de%20saber%20mais%20sobre%20o%20Talhão"
+              href={FOOTER_WHATSAPP_URL}
               target="_blank"
               rel="noopener noreferrer"
               className="relative inline-flex items-center justify-center gap-2 self-start rounded-xl bg-[#25D366] px-6 py-3 text-[14px] font-semibold text-white shadow-[0_8px_24px_rgba(37,211,102,0.35)] transition-all duration-200 hover:bg-[#1ebe5b] hover:shadow-[0_12px_32px_rgba(37,211,102,0.5)] sm:self-auto"

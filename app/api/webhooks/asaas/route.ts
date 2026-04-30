@@ -36,6 +36,48 @@ async function addCreditsToWallet(supabase: any, userId: string, quantidadeCredi
   }
 }
 
+async function activateSubscription(
+  supabase: any,
+  userId: string,
+  paymentId: string,
+  planType: string
+) {
+  const { data: existingSubscription } = await supabase
+    .from('subscriptions')
+    .select('id')
+    .eq('payment_id', paymentId)
+    .eq('status', 'active')
+    .maybeSingle()
+
+  if (existingSubscription) {
+    return
+  }
+
+  const now = new Date()
+  const expiresAt = new Date(now)
+
+  if (planType === 'pro_anual') {
+    expiresAt.setFullYear(expiresAt.getFullYear() + 1)
+  } else {
+    expiresAt.setDate(expiresAt.getDate() + 30)
+  }
+
+  await supabase
+    .from('subscriptions')
+    .update({ status: 'cancelled' })
+    .eq('user_id', userId)
+    .eq('status', 'active')
+
+  await supabase.from('subscriptions').insert({
+    user_id: userId,
+    plan_type: planType,
+    status: 'active',
+    payment_id: paymentId,
+    started_at: now.toISOString(),
+    expires_at: expiresAt.toISOString(),
+  })
+}
+
 export async function POST(request: NextRequest) {
   // Valida o token do webhook configurado no painel Asaas
   const webhookToken = process.env.ASAAS_WEBHOOK_TOKEN
@@ -91,6 +133,8 @@ export async function POST(request: NextRequest) {
 
     let payment: any = null
 
+    let approvedPaymentChangedState = false
+
     if (creditosAdicionados) {
       const { data: approvedPayment, error: approveError } = await supabase
         .from('payments')
@@ -112,6 +156,7 @@ export async function POST(request: NextRequest) {
       }
 
       payment = approvedPayment
+      approvedPaymentChangedState = Boolean(approvedPayment)
 
       console.log(`💰 Status: ${novoStatus}, Créditos a adicionar: ${creditosAdicionados}`)
       if (payment) {
@@ -122,6 +167,35 @@ export async function POST(request: NextRequest) {
           )
         } catch (walletError) {
           console.error('Erro ao atualizar carteira:', walletError)
+        }
+      }
+
+      if (!payment) {
+        const { data: currentPayment, error: currentPaymentError } = await supabase
+          .from('payments')
+          .select()
+          .eq('id', paymentId)
+          .single()
+
+        if (currentPaymentError) {
+          console.error('Erro ao carregar pagamento aprovado:', currentPaymentError)
+          return NextResponse.json(
+            { error: 'Erro ao processar pagamento' },
+            { status: 500 }
+          )
+        }
+
+        payment = currentPayment
+      }
+
+      if (payment && (payment.plan_type === 'pro_mensal' || payment.plan_type === 'pro_anual')) {
+        try {
+          await activateSubscription(supabase, payment.user_id, payment.id, payment.plan_type)
+          if (approvedPaymentChangedState) {
+            console.log(`✅ Assinatura ${payment.plan_type} ativada para ${payment.user_id}`)
+          }
+        } catch (subError) {
+          console.error('Erro ao ativar assinatura:', subError)
         }
       }
     } else {

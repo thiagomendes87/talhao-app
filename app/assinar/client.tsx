@@ -15,6 +15,7 @@ type PaymentResult = {
   invoice_url?: string
   valor?: number
   approved?: boolean
+  plan_type?: 'pro_mensal' | 'pro_anual' | 'creditos'
 }
 
 const pacotes = [4, 6, 8, 10, 14, 20, 30]
@@ -24,8 +25,13 @@ export default function AssinarClient() {
   const searchParams = useSearchParams()
   const tabParam = searchParams.get('tab')
 
-  const [tipoCompra, setTipoCompra] = useState<'pro' | 'downloads'>(tabParam === 'downloads' ? 'downloads' : 'pro')
+  const [tipoCompra, setTipoCompra] = useState<'pro_mensal' | 'pro_anual' | 'downloads'>(
+    tabParam === 'downloads' ? 'downloads' :
+    tabParam === 'pro_anual' ? 'pro_anual' :
+    'pro_mensal'
+  )
   const [quantidade, setQuantidade] = useState(8)
+  const [planType, setPlanType] = useState<'pro_mensal' | 'pro_anual' | 'creditos'>('creditos')
   const [creditos, setCreditos] = useState(0)
   const [carregando, setCarregando] = useState(true)
   const [session, setSession] = useState<any>(null)
@@ -145,6 +151,7 @@ export default function AssinarClient() {
           user_id: currentSession?.user.id,
           quantidade_creditos: quantidade,
           payment_method: paymentMethod,
+          plan_type: planType,
           cpf,
           phone: getPhoneForApi(),
           ...(paymentMethod === 'cartao' ? {
@@ -193,8 +200,9 @@ export default function AssinarClient() {
     }
   }
 
-  const abrirModal = (qty: number) => {
+  const abrirModal = (qty: number, plan: 'pro_mensal' | 'pro_anual' | 'creditos' = 'creditos') => {
     setQuantidade(qty)
+    setPlanType(plan)
     setResultado(null)
     setErro('')
     setModalAberto(true)
@@ -259,7 +267,11 @@ export default function AssinarClient() {
         <div className="mx-auto max-w-6xl px-6 py-8">
           {/* Abas */}
           <div className="flex gap-2 sm:gap-4 mb-6 sm:mb-8 border-b-2 border-gray-200">
-            {[['pro', 'Plano Pro'], ['downloads', 'Comprar Créditos']].map(([tab, label]) => (
+            {[
+              ['pro_mensal', '⭐ Pro Mensal'],
+              ['pro_anual', '🏆 Pro Anual'],
+              ['downloads', 'Créditos Avulsos'],
+            ].map(([tab, label]) => (
               <button key={tab} onClick={() => setTipoCompra(tab as any)}
                 className={`pb-3 px-3 sm:px-6 font-bold text-sm sm:text-lg transition-all border-b-2 whitespace-nowrap ${
                   tipoCompra === tab ? 'text-[#162113] border-[#162113]' : 'text-gray-400 border-transparent'
@@ -269,18 +281,17 @@ export default function AssinarClient() {
             ))}
           </div>
 
-          {tipoCompra === 'pro' ? (
-            /* ── PLANO PRO ── */
+          {tipoCompra === 'pro_mensal' && (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
               <div className="space-y-6">
-              <div>
-                <p className="text-xs font-bold text-gray-500 uppercase mb-2">Plano Pro</p>
-                <h1 className="text-3xl sm:text-4xl font-extrabold text-[#162113] mb-3">R$ 49,00/mês</h1>
-                <p className="text-gray-600">Downloads ilimitados · Cancele quando quiser</p>
-              </div>
+                <div>
+                  <p className="text-xs font-bold text-gray-500 uppercase mb-2">Plano Pro Mensal</p>
+                  <h1 className="text-3xl sm:text-4xl font-extrabold text-[#162113] mb-3">R$ 49,00<span className="text-lg font-normal text-gray-500">/mês</span></h1>
+                  <p className="text-gray-600">14 créditos por mês · Cancele quando quiser</p>
+                </div>
                 <div className="bg-[#F0FDF4] border border-[#2D6A4F] rounded-xl p-5 space-y-3">
                   <h3 className="font-bold text-[#2D6A4F] mb-3">Incluso:</h3>
-                  {['KML (CAR/SICAR)', 'SIGEF e Topografia', 'Todas as análises da Talhão', 'Downloads ilimitados', 'Suporte por email e WhatsApp', 'Sem compromisso anual'].map(f => (
+                  {['KML (CAR/SICAR)', 'SIGEF e Topografia', 'Todas as análises da Talhão', '14 créditos mensais', 'Suporte por email e WhatsApp', 'Sem compromisso anual'].map(f => (
                     <div key={f} className="flex gap-3 text-sm text-gray-700">
                       <span className="text-[#2D6A4F] font-bold">✓</span> {f}
                     </div>
@@ -291,20 +302,65 @@ export default function AssinarClient() {
                 <div className="flex justify-between items-end">
                   <div>
                     <p className="text-sm text-gray-600">Plano Pro (1 mês)</p>
-                    <p className="text-xs text-gray-500">Renova automaticamente</p>
+                    <p className="text-xs text-gray-500">Renova manualmente</p>
                   </div>
                   <p className="text-2xl font-extrabold text-[#162113]">R$ 49,00</p>
                 </div>
-                <button
-                  onClick={() => abrirModal(14)}
-                  className="w-full rounded-xl bg-[#1f5230] px-5 py-3 text-base font-semibold text-white shadow-[0_12px_32px_rgba(31,82,48,0.22)] transition hover:-translate-y-[1px] hover:bg-[#2a6b3f] hover:shadow-[0_18px_42px_rgba(31,82,48,0.28)]">
-                  Assinar Pro →
+                <button onClick={() => abrirModal(14, 'pro_mensal')}
+                  className="w-full rounded-xl bg-[#1f5230] px-5 py-3 text-base font-semibold text-white shadow-[0_12px_32px_rgba(31,82,48,0.22)] transition hover:-translate-y-[1px] hover:bg-[#2a6b3f]">
+                  Assinar Pro Mensal →
                 </button>
                 <p className="text-xs text-gray-500 text-center">PIX · Cartão de Crédito</p>
               </div>
             </div>
-          ) : (
-            /* ── CRÉDITOS AVULSOS ── */
+          )}
+
+          {tipoCompra === 'pro_anual' && (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
+              <div className="space-y-6">
+                <div>
+                  <p className="text-xs font-bold text-gray-500 uppercase mb-2">Plano Pro Anual</p>
+                  <div className="flex items-end gap-3 mb-1">
+                    <h1 className="text-3xl sm:text-4xl font-extrabold text-[#162113]">R$ 468,00<span className="text-lg font-normal text-gray-500">/ano</span></h1>
+                  </div>
+                  <p className="text-gray-600">R$ 39,00/mês · <span className="text-[#2D6A4F] font-bold">Economize R$ 120 vs mensal</span></p>
+                </div>
+                <div className="inline-flex items-center gap-2 bg-amber-50 border border-amber-300 rounded-full px-4 py-1.5 text-sm text-amber-800 font-semibold">
+                  🏆 Melhor custo-benefício
+                </div>
+                <div className="bg-[#F0FDF4] border border-[#2D6A4F] rounded-xl p-5 space-y-3">
+                  <h3 className="font-bold text-[#2D6A4F] mb-3">Incluso:</h3>
+                  {['KML (CAR/SICAR)', 'SIGEF e Topografia', 'Todas as análises da Talhão', '168 créditos (14/mês por 12 meses)', 'Suporte por email e WhatsApp', 'Acesso garantido por 12 meses'].map(f => (
+                    <div key={f} className="flex gap-3 text-sm text-gray-700">
+                      <span className="text-[#2D6A4F] font-bold">✓</span> {f}
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div className="bg-white rounded-xl border-2 border-[#2D6A4F] p-5 lg:h-fit lg:sticky lg:top-8 space-y-5 relative overflow-hidden">
+                <div className="absolute top-0 right-0 bg-[#2D6A4F] text-white text-xs font-bold px-3 py-1 rounded-bl-xl">
+                  Recomendado
+                </div>
+                <div className="flex justify-between items-end">
+                  <div>
+                    <p className="text-sm text-gray-600">Plano Pro (12 meses)</p>
+                    <p className="text-xs text-[#2D6A4F] font-semibold">Equivale a R$ 39/mês</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-2xl font-extrabold text-[#162113]">R$ 468,00</p>
+                    <p className="text-xs text-gray-400 line-through">R$ 588,00</p>
+                  </div>
+                </div>
+                <button onClick={() => abrirModal(168, 'pro_anual')}
+                  className="w-full rounded-xl bg-[#1f5230] px-5 py-3 text-base font-semibold text-white shadow-[0_12px_32px_rgba(31,82,48,0.22)] transition hover:-translate-y-[1px] hover:bg-[#2a6b3f]">
+                  Assinar Pro Anual →
+                </button>
+                <p className="text-xs text-gray-500 text-center">PIX · Cartão de Crédito</p>
+              </div>
+            </div>
+          )}
+
+          {tipoCompra === 'downloads' && (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
               <div className="space-y-6">
               <div>
@@ -341,7 +397,7 @@ export default function AssinarClient() {
                   <p className="text-2xl font-extrabold text-[#162113]">R$ {totalDownloads.toFixed(2)}</p>
                 </div>
                 <button
-                  onClick={() => abrirModal(quantidade)}
+                  onClick={() => abrirModal(quantidade, 'creditos')}
                   className="w-full rounded-xl bg-[#1f5230] px-5 py-3 text-base font-semibold text-white shadow-[0_12px_32px_rgba(31,82,48,0.22)] transition hover:-translate-y-[1px] hover:bg-[#2a6b3f] hover:shadow-[0_18px_42px_rgba(31,82,48,0.28)]">
                   Comprar {quantidade} créditos →
                 </button>
@@ -364,7 +420,12 @@ export default function AssinarClient() {
               <>
             <h2 className="text-xl font-extrabold text-[#162113] mb-1">Finalizar pagamento</h2>
                 <p className="text-sm text-gray-500 mb-5">
-                  {quantidade} créditos · <strong>R$ {(quantidade * 3.5).toFixed(2)}</strong>
+                  {planType === 'pro_anual'
+                    ? <>Plano Pro Anual · <strong>R$ 468,00</strong></>
+                    : planType === 'pro_mensal'
+                    ? <>Plano Pro Mensal · <strong>R$ 49,00</strong></>
+                    : <>{quantidade} créditos · <strong>R$ {(quantidade * 3.5).toFixed(2)}</strong></>
+                  }
                 </p>
 
                 {/* CPF */}
@@ -492,7 +553,11 @@ export default function AssinarClient() {
 
                 <button onClick={handlePagar} disabled={processando}
                   className="w-full rounded-xl bg-[#1f5230] px-5 py-3 text-base font-semibold text-white shadow-[0_12px_32px_rgba(31,82,48,0.22)] transition hover:-translate-y-[1px] hover:bg-[#2a6b3f] hover:shadow-[0_18px_42px_rgba(31,82,48,0.28)] disabled:opacity-50">
-                  {processando ? 'Processando...' : `Pagar R$ ${(quantidade * 3.5).toFixed(2)}`}
+                  {processando ? 'Processando...' :
+                    planType === 'pro_anual' ? 'Pagar R$ 468,00' :
+                    planType === 'pro_mensal' ? 'Pagar R$ 49,00' :
+                    `Pagar R$ ${(quantidade * 3.5).toFixed(2)}`
+                  }
                 </button>
 
                 <p className="text-xs text-gray-400 text-center mt-3">Pagamento seguro via Asaas</p>

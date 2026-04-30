@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getAuthenticatedUserFromRequest, getSupabaseAdminClient } from '@/lib/server-auth'
 
-type PaymentMethod = 'pix' | 'cartao'
+type BillingMethod = 'pix' | 'cartao'
+type PlanType = 'pro_mensal' | 'pro_anual' | 'creditos'
 
 type CreatePaymentBody = {
   user_id?: string
@@ -9,6 +10,7 @@ type CreatePaymentBody = {
   cpf?: string
   phone?: string
   payment_method?: string
+  plan_type?: string
   card_holder?: string
   card_number?: string
   card_expiry_month?: string
@@ -40,6 +42,10 @@ type AsaasPixQrCode = {
 type AdminClient = any
 
 const CREDIT_PRICE = 3.5
+const PLANOS = {
+  pro_mensal: { valor: 49.00, creditos: 14 },
+  pro_anual: { valor: 468.00, creditos: 168 },
+} satisfies Record<Exclude<PlanType, 'creditos'>, { valor: number; creditos: number }>
 
 function getRequiredEnv(name: string) {
   const value = process.env[name]
@@ -59,12 +65,12 @@ function sanitizeCpf(value: string) {
   return value.replace(/\D/g, '')
 }
 
-function normalizePaymentMethod(value?: string): PaymentMethod | null {
+function normalizePaymentMethod(value?: string): BillingMethod | null {
   if (value === 'pix' || value === 'cartao') return value
   return null
 }
 
-function toAsaasBillingType(paymentMethod: PaymentMethod) {
+function toAsaasBillingType(paymentMethod: BillingMethod) {
   if (paymentMethod === 'pix') return 'PIX'
   return 'CREDIT_CARD'
 }
@@ -244,11 +250,54 @@ async function addCreditsToWallet(supabase: AdminClient, userId: string, quantid
   }
 }
 
+async function activateSubscription(
+  supabase: AdminClient,
+  userId: string,
+  paymentId: string,
+  planType: Exclude<PlanType, 'creditos'>
+) {
+  const { data: existingSubscription } = await supabase
+    .from('subscriptions')
+    .select('id')
+    .eq('payment_id', paymentId)
+    .eq('status', 'active')
+    .maybeSingle()
+
+  if (existingSubscription) {
+    return
+  }
+
+  const now = new Date()
+  const expiresAt = new Date(now)
+
+  if (planType === 'pro_anual') {
+    expiresAt.setFullYear(expiresAt.getFullYear() + 1)
+  } else {
+    expiresAt.setDate(expiresAt.getDate() + 30)
+  }
+
+  await supabase
+    .from('subscriptions')
+    .update({ status: 'cancelled' })
+    .eq('user_id', userId)
+    .eq('status', 'active')
+
+  await supabase.from('subscriptions').insert({
+    user_id: userId,
+    plan_type: planType,
+    status: 'active',
+    payment_id: paymentId,
+    started_at: now.toISOString(),
+    expires_at: expiresAt.toISOString(),
+  })
+}
+
 async function approvePaymentAndCredit(
   supabase: AdminClient,
   paymentId: string,
   userId: string,
-  quantidadeCreditos: number
+  quantidadeCreditos: number,
+  planType: PlanType
 ) {
   const { data: approvedPayment, error: approveError } = await supabase
     .from('payments')
@@ -270,6 +319,11 @@ async function approvePaymentAndCredit(
   }
 
   await addCreditsToWallet(supabase, userId, quantidadeCreditos)
+
+  if (planType === 'pro_mensal' || planType === 'pro_anual') {
+    await activateSubscription(supabase, userId, paymentId, planType)
+  }
+
   return true
 }
 
@@ -295,7 +349,13 @@ export async function POST(request: NextRequest) {
   }
 
   const paymentMethod = normalizePaymentMethod(body.payment_method)
-  const quantidadeCreditos = Number(body.quantidade_creditos)
+  const planType: PlanType =
+    body.plan_type === 'pro_mensal' ? 'pro_mensal' :
+    body.plan_type === 'pro_anual' ? 'pro_anual' :
+    'creditos'
+  const quantidadeCreditos = planType === 'creditos'
+    ? Number(body.quantidade_creditos)
+    : PLANOS[planType].creditos
   const cpf = sanitizeCpf(body.cpf || '')
   const phone = (body.phone || '').replace(/\D/g, '').slice(0, 15)
   const cardHolder = body.card_holder?.trim() ?? ''
@@ -320,9 +380,9 @@ export async function POST(request: NextRequest) {
     )
   }
 
-  if (!Number.isInteger(quantidadeCreditos) || quantidadeCreditos <= 0) {
+  if (planType === 'creditos' && (!Number.isInteger(quantidadeCreditos) || quantidadeCreditos <= 0)) {
     return NextResponse.json(
-      { success: false, error: 'A quantidade de créditos deve ser um número inteiro positivo.' },
+      { success: false, error: 'Quantidade de créditos inválida.' },
       { status: 400 }
     )
   }
@@ -343,7 +403,9 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  const valor = Number((quantidadeCreditos * CREDIT_PRICE).toFixed(2))
+  const valor = planType === 'creditos'
+    ? Number((quantidadeCreditos * CREDIT_PRICE).toFixed(2))
+    : PLANOS[planType].valor
   const paymentId = crypto.randomUUID()
   const now = new Date().toISOString()
   const supabase = getSupabaseAdminClient() as any
@@ -367,6 +429,7 @@ export async function POST(request: NextRequest) {
       amount: valor,
       quantidade_creditos: quantidadeCreditos,
       payment_method: paymentMethod,
+      plan_type: planType,
       status: 'pending',
       updated_at: now,
     })
@@ -390,7 +453,10 @@ export async function POST(request: NextRequest) {
         billingType: toAsaasBillingType(paymentMethod),
         value: valor,
         dueDate: buildDueDate(),
-        description: `${quantidadeCreditos} crédito${quantidadeCreditos === 1 ? '' : 's'} Talhão`,
+        description:
+          planType === 'pro_anual' ? 'Plano Pro Anual — Talhão (12 meses)' :
+          planType === 'pro_mensal' ? 'Plano Pro Mensal — Talhão' :
+          `${quantidadeCreditos} crédito${quantidadeCreditos === 1 ? '' : 's'} Talhão`,
         externalReference: paymentId,
         ...(paymentMethod === 'cartao' ? {
           creditCard: {
@@ -435,13 +501,13 @@ export async function POST(request: NextRequest) {
 
     const approved = payment.status === 'CONFIRMED' || payment.status === 'RECEIVED'
 
-    if (paymentMethod === 'cartao' && approved) {
-      try {
-        await approvePaymentAndCredit(supabase, paymentId, user.id, quantidadeCreditos)
-      } catch {
-        // O webhook do Asaas ainda pode concluir a sincronização se esse passo falhar.
-      }
+  if (paymentMethod === 'cartao' && approved) {
+    try {
+      await approvePaymentAndCredit(supabase, paymentId, user.id, quantidadeCreditos, planType)
+    } catch {
+      // O webhook do Asaas ainda pode concluir a sincronização se esse passo falhar.
     }
+  }
 
     return NextResponse.json({
       success: true,
@@ -449,6 +515,7 @@ export async function POST(request: NextRequest) {
       pix_qr_code: pixQrCode,
       pix_copy_paste: pixCopyPaste,
       valor,
+      plan_type: planType,
       approved: payment.status === 'CONFIRMED' || payment.status === 'RECEIVED',
     })
   } catch (error) {

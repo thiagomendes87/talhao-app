@@ -102,9 +102,9 @@ export default function LeadCaptureSheet({
 
             <div className="grid grid-cols-3 gap-3">
               {[
-                { label: 'Área total', value: '1.842 ha' },
-                { label: 'Uso agrícola', value: '74%' },
-                { label: 'Risco ambiental', value: 'Baixo' },
+                { label: 'Área total', value: '205 ha' },
+                { label: 'Uso agrícola', value: '54%' },
+                { label: 'Documentação', value: '100% regular' },
               ].map((s) => (
                 <div
                   key={s.label}

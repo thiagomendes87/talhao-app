@@ -3,6 +3,7 @@
 import { useRef } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { useAuthSession } from '@/lib/use-auth-session'
+import LeadCaptureSheet from '@/components/LeadCaptureSheet'
 import dynamic from 'next/dynamic'
 
 const MapEmbedded = dynamic(() => import('./MapEmbedded'), {
@@ -45,10 +46,13 @@ export default function MapaClient() {
   }
 
   return (
-    <MapEmbedded
-      authToken={frozenToken.current}
-      geoApiUrl={geoApiUrl}
-      searchQuery={searchQuery}
-    />
+    <>
+      <MapEmbedded
+        authToken={frozenToken.current}
+        geoApiUrl={geoApiUrl}
+        searchQuery={searchQuery}
+      />
+      <LeadCaptureSheet trigger="timer" timerMs={20000} />
+    </>
   )
 }

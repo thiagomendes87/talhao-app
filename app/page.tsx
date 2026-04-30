@@ -3,6 +3,7 @@ import MapHero from '@/components/MapHero'
 import TrustStrip from '@/components/TrustStrip'
 import StatsBar from '@/components/StatsBar'
 import HowItWorks from '@/components/HowItWorks'
+import LeadCaptureSheet from '@/components/LeadCaptureSheet'
 import OutputFormats from '@/components/OutputFormats'
 import ForWho from '@/components/ForWho'
 import Pricing from '@/components/Pricing'
@@ -24,6 +25,7 @@ export default function Home() {
       <FAQ />
       <CTASection />
       <Footer />
+      <LeadCaptureSheet trigger="scroll" scrollPct={40} />
     </main>
   )
 }

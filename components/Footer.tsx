@@ -41,7 +41,7 @@ const LEGAL_CONTENT: Record<LegalModalKey, { title: string; body: string }> = {
 }
 
 const FOOTER_WHATSAPP_URL =
-  'https://wa.me/551153043330?text=Olá%2C%20gostaria%20de%20saber%20mais%20sobre%20o%20Talhão'
+  'https://wa.me/551153043330?text=Olá%2C%20gostaria%20de%20saber%20mais%20sobre%20a%20Talhão'
 
 const socialLinks = [
   {

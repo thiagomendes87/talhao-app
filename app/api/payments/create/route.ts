@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getAuthenticatedUserFromRequest, getSupabaseAdminClient } from '@/lib/server-auth'
 
-type PaymentMethod = 'pix' | 'boleto' | 'cartao'
+type PaymentMethod = 'pix' | 'cartao'
 
 type CreatePaymentBody = {
   user_id?: string
@@ -30,8 +30,6 @@ type AsaasPayment = {
   id: string
   status?: string
   invoiceUrl?: string
-  bankSlipUrl?: string
-  identificationField?: string
 }
 
 type AsaasPixQrCode = {
@@ -62,23 +60,19 @@ function sanitizeCpf(value: string) {
 }
 
 function normalizePaymentMethod(value?: string): PaymentMethod | null {
-  if (value === 'pix' || value === 'boleto' || value === 'cartao') {
-    return value
-  }
-
+  if (value === 'pix' || value === 'cartao') return value
   return null
 }
 
 function toAsaasBillingType(paymentMethod: PaymentMethod) {
   if (paymentMethod === 'pix') return 'PIX'
-  if (paymentMethod === 'boleto') return 'BOLETO'
   return 'CREDIT_CARD'
 }
 
-function buildDueDate(paymentMethod: PaymentMethod) {
+function buildDueDate() {
   const date = new Date()
   date.setHours(0, 0, 0, 0)
-  date.setDate(date.getDate() + (paymentMethod === 'boleto' ? 3 : 1))
+  date.setDate(date.getDate() + 1)
   return date.toISOString().slice(0, 10)
 }
 
@@ -195,12 +189,12 @@ async function updatePaymentRecord(supabase: AdminClient, paymentId: string, pay
     payload,
     Object.fromEntries(
       Object.entries(payload).filter(
-        ([key]) => !['asaas_payment_id', 'boleto_url', 'invoice_url', 'boleto_line'].includes(key)
+        ([key]) => !['asaas_payment_id', 'invoice_url'].includes(key)
       )
     ),
     Object.fromEntries(
       Object.entries(payload).filter(
-        ([key]) => !['asaas_payment_id', 'boleto_url', 'invoice_url', 'boleto_line', 'updated_at'].includes(key)
+        ([key]) => !['asaas_payment_id', 'invoice_url', 'updated_at'].includes(key)
       )
     ),
   ]
@@ -395,7 +389,7 @@ export async function POST(request: NextRequest) {
         customer: customerId,
         billingType: toAsaasBillingType(paymentMethod),
         value: valor,
-        dueDate: buildDueDate(paymentMethod),
+        dueDate: buildDueDate(),
         description: `${quantidadeCreditos} crédito${quantidadeCreditos === 1 ? '' : 's'} Talhão`,
         externalReference: paymentId,
         ...(paymentMethod === 'cartao' ? {
@@ -427,25 +421,11 @@ export async function POST(request: NextRequest) {
       pixCopyPaste = pixData.payload ?? null
     }
 
-    let boletoLine: string | null = null
-    if (paymentMethod === 'boleto') {
-      try {
-        const boletoData = await asaasRequest<{ identificationField?: string }>(
-          `/payments/${payment.id}/identificationField`
-        )
-        boletoLine = boletoData.identificationField ?? null
-      } catch {
-        // não crítico — boleto_url ainda está disponível como fallback
-      }
-    }
-
     try {
       await updatePaymentRecord(supabase, paymentId, {
         asaas_payment_id: payment.id,
         pix_qr_code: pixQrCode,
         pix_copy_paste: pixCopyPaste,
-        boleto_line: boletoLine,
-        boleto_url: payment.bankSlipUrl ?? null,
         invoice_url: payment.invoiceUrl ?? null,
         updated_at: new Date().toISOString(),
       })
@@ -468,8 +448,6 @@ export async function POST(request: NextRequest) {
       payment_id: paymentId,
       pix_qr_code: pixQrCode,
       pix_copy_paste: pixCopyPaste,
-      boleto_line: boletoLine,
-      boleto_url: payment.bankSlipUrl ?? null,
       valor,
       approved: payment.status === 'CONFIRMED' || payment.status === 'RECEIVED',
     })

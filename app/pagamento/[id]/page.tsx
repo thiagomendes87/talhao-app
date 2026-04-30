@@ -12,11 +12,9 @@ type Payment = {
   status: 'pending' | 'approved' | 'failed' | 'refunded'
   amount: number
   quantidade_creditos: number
-  payment_method: 'pix' | 'boleto' | 'cartao'
+  payment_method: 'pix' | 'cartao'
   pix_qr_code?: string
   pix_copy_paste?: string
-  boleto_line?: string
-  boleto_url?: string
   invoice_url?: string
   created_at: string
 }
@@ -25,7 +23,7 @@ const statusConfig = {
   pending: {
     icon: '⏳',
     titulo: 'Aguardando pagamento',
-    descricao: 'Escaneie o QR code PIX ou use o código para pagar',
+    descricao: 'Escaneie o QR code PIX ou informe os dados do cartão',
     cor: 'bg-amber-50 border-amber-200 text-amber-800',
     progresso: 33,
   },
@@ -61,7 +59,6 @@ export default function PagamentoPage() {
   const [carregando, setCarregando] = useState(true)
   const [erro, setErro] = useState('')
   const [pixCopiado, setPixCopiado] = useState(false)
-  const [boletoCopiado, setBoletoCopiado] = useState(false)
   const [autoRefresh, setAutoRefresh] = useState(true)
 
   useEffect(() => {
@@ -135,21 +132,12 @@ export default function PagamentoPage() {
     }
   }
 
-  const copiarBoleto = () => {
-    if (payment.boleto_line) {
-      navigator.clipboard.writeText(payment.boleto_line)
-      setBoletoCopiado(true)
-      setTimeout(() => setBoletoCopiado(false), 3000)
-    }
-  }
-
   const formatData = (dateString: string) => {
     return new Date(dateString).toLocaleString('pt-BR')
   }
 
   const metodoPagamentoIcon = {
     pix: '⚡',
-    boleto: '📄',
     cartao: '💳',
   }
 
@@ -276,39 +264,6 @@ export default function PagamentoPage() {
                 </button>
               )}
               <p className="text-xs text-gray-500">A página será atualizada automaticamente assim que o pagamento for confirmado</p>
-            </div>
-          )}
-
-          {payment.status === 'pending' && payment.payment_method === 'boleto' && (
-            <div className="bg-white rounded-xl border border-gray-200 p-6 mb-6 text-center">
-              <div className="text-3xl mb-2">📄</div>
-              <h3 className="font-bold text-[#162113] mb-3">Seu boleto está pronto</h3>
-
-              {payment.boleto_line ? (
-                <>
-                  <p className="text-sm text-gray-500 mb-3">Copie a linha digitável e pague no seu banco:</p>
-                  <div className="bg-gray-50 border border-gray-200 rounded-xl p-3 mb-4 text-xs text-gray-700 break-all font-mono text-left">
-                    {payment.boleto_line}
-                  </div>
-                  <button onClick={copiarBoleto}
-                    className={`w-full py-3 rounded-xl font-bold text-sm transition-colors mb-3 ${
-                      boletoCopiado
-                        ? 'bg-green-100 text-green-700 border border-green-300'
-                        : 'bg-[#162113] text-white hover:bg-[#1f5230]'
-                    }`}>
-                    {boletoCopiado ? '✅ Linha copiada!' : '📋 Copiar linha digitável'}
-                  </button>
-                </>
-              ) : null}
-
-              {payment.boleto_url && (
-                <a href={payment.boleto_url} target="_blank" rel="noopener noreferrer"
-                  className={`text-xs text-[#2D6A4F] underline ${!payment.boleto_line ? 'block' : ''}`}>
-                  {payment.boleto_line ? 'Ver boleto em PDF' : 'Abrir boleto PDF →'}
-                </a>
-              )}
-
-              <p className="text-xs text-gray-500 mt-4">A página atualiza automaticamente após a compensação.</p>
             </div>
           )}
 

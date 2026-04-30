@@ -7,13 +7,11 @@ import Link from 'next/link'
 import AppTopbar from '@/components/AppTopbar'
 import { buildLoginPath, supabase } from '@/lib/supabase'
 
-type PaymentMethod = 'pix' | 'boleto' | 'cartao'
+type PaymentMethod = 'pix' | 'cartao'
 type PaymentResult = {
   payment_id: string
   pix_qr_code?: string
   pix_copy_paste?: string
-  boleto_line?: string
-  boleto_url?: string
   invoice_url?: string
   valor?: number
   approved?: boolean
@@ -49,7 +47,6 @@ export default function AssinarClient() {
   const [cardCvv, setCardCvv] = useState('')
   const [cardCep, setCardCep] = useState('')
   const [cardAddressNum, setCardAddressNum] = useState('')
-  const [boletoCopiado, setBoletoCopiado] = useState(false)
 
   useEffect(() => {
     const verificarAuth = async () => {
@@ -196,14 +193,6 @@ export default function AssinarClient() {
     }
   }
 
-  const copiarBoleto = () => {
-    if (resultado?.boleto_line) {
-      navigator.clipboard.writeText(resultado.boleto_line)
-      setBoletoCopiado(true)
-      setTimeout(() => setBoletoCopiado(false), 3000)
-    }
-  }
-
   const abrirModal = (qty: number) => {
     setQuantidade(qty)
     setResultado(null)
@@ -311,7 +300,7 @@ export default function AssinarClient() {
                   className="w-full rounded-xl bg-[#1f5230] px-5 py-3 text-base font-semibold text-white shadow-[0_12px_32px_rgba(31,82,48,0.22)] transition hover:-translate-y-[1px] hover:bg-[#2a6b3f] hover:shadow-[0_18px_42px_rgba(31,82,48,0.28)]">
                   Assinar Pro →
                 </button>
-                <p className="text-xs text-gray-500 text-center">PIX · Boleto · Cartão</p>
+                <p className="text-xs text-gray-500 text-center">PIX · Cartão de Crédito</p>
               </div>
             </div>
           ) : (
@@ -356,7 +345,7 @@ export default function AssinarClient() {
                   className="w-full rounded-xl bg-[#1f5230] px-5 py-3 text-base font-semibold text-white shadow-[0_12px_32px_rgba(31,82,48,0.22)] transition hover:-translate-y-[1px] hover:bg-[#2a6b3f] hover:shadow-[0_18px_42px_rgba(31,82,48,0.28)]">
                   Comprar {quantidade} créditos →
                 </button>
-                <p className="text-xs text-gray-500 text-center">PIX · Boleto · Cartão</p>
+                <p className="text-xs text-gray-500 text-center">PIX · Cartão de Crédito</p>
               </div>
             </div>
           )}
@@ -422,11 +411,10 @@ export default function AssinarClient() {
                 {/* Método */}
                 <div className="mb-5">
                   <label className="form-label">Forma de pagamento</label>
-                <div className="grid grid-cols-3 gap-2">
+                <div className="grid grid-cols-2 gap-2">
                   {[
                     { id: 'pix', label: 'PIX', icon: '⚡', desc: 'Instantâneo' },
-                    { id: 'boleto', label: 'Boleto', icon: '📄', desc: 'Até 3 dias' },
-                      { id: 'cartao', label: 'Cartão', icon: '💳', desc: 'Crédito' },
+                    { id: 'cartao', label: 'Cartão', icon: '💳', desc: 'Crédito' },
                     ].map(m => (
                       <button key={m.id} onClick={() => setPaymentMethod(m.id as PaymentMethod)}
                         className={`p-3 rounded-xl border-2 transition-all text-center ${
@@ -531,45 +519,6 @@ export default function AssinarClient() {
                       {pixCopiado ? '✅ Código copiado!' : '📋 Copiar código PIX'}
                     </button>
                     <p className="text-xs text-gray-400">Os créditos serão adicionados automaticamente após a confirmação.</p>
-                  </div>
-                )}
-
-                {/* ── RESULTADO BOLETO ── */}
-                {paymentMethod === 'boleto' && (
-                  <div className="text-center">
-                    <div className="text-3xl mb-2">📄</div>
-                    <h2 className="text-lg font-extrabold text-[#162113] mb-1">Boleto gerado!</h2>
-                    <p className="text-sm text-gray-500 mb-4">Vencimento em 3 dias úteis</p>
-
-                    {resultado?.boleto_line ? (
-                      <>
-                        <p className="text-xs text-gray-500 mb-2">Copie a linha digitável e pague no seu banco:</p>
-                        <div className="bg-gray-50 border border-gray-200 rounded-xl p-3 mb-3 text-xs text-gray-700 break-all font-mono text-left">
-                          {resultado.boleto_line}
-                        </div>
-                        <button onClick={copiarBoleto}
-                          className={`w-full py-3 rounded-xl font-bold text-sm transition-colors mb-3 ${
-                            boletoCopiado
-                              ? 'bg-green-100 text-green-700 border border-green-300'
-                              : 'bg-[#162113] text-white hover:bg-[#1f5230]'
-                          }`}>
-                          {boletoCopiado ? '✅ Linha copiada!' : '📋 Copiar linha digitável'}
-                        </button>
-                      </>
-                    ) : resultado?.boleto_url ? (
-                      <a href={resultado.boleto_url} target="_blank" rel="noopener noreferrer"
-                        className="block w-full bg-[#162113] text-white font-bold py-3 rounded-xl text-sm hover:bg-[#1f5230] transition-colors mb-3">
-                        Abrir boleto PDF →
-                      </a>
-                    ) : null}
-
-                    {resultado?.boleto_url && resultado?.boleto_line && (
-                      <a href={resultado.boleto_url} target="_blank" rel="noopener noreferrer"
-                        className="text-xs text-[#2D6A4F] underline">
-                        Ver boleto em PDF
-                      </a>
-                    )}
-                    <p className="text-xs text-gray-400">Os créditos serão adicionados após a compensação.</p>
                   </div>
                 )}
 

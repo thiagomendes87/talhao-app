@@ -71,7 +71,7 @@ const planByMode = {
   annual: {
     price: 'R$39',
     period: '/mês',
-    note: 'cobrado em R$468/ano · 20% off ilustrativo',
+    note: 'cobrado em R$468/ano · 20% off no plano anual',
     kicker: 'anual',
     strike: 'R$49',
   },

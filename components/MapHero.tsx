@@ -54,7 +54,7 @@ export default function MapHero() {
       onClick={() => router.push('/mapa')}
     >
       <iframe
-        src={`${GEO_API_URL}/?cleanmode=1`}
+        src={`${GEO_API_URL}/?cleanmode=1&lat=-12.1693&lng=-45.8310&zoom=12&sources=sicar,sigef,snci`}
         title="Mapa Talhão"
         className="absolute inset-0 z-0 h-full w-full border-none pointer-events-none"
         loading="lazy"

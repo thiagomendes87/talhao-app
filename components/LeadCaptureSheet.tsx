@@ -24,14 +24,6 @@ export default function LeadCaptureSheet({
   useEffect(() => {
     if (dismissed) return
 
-    try {
-      const persistedDismissed = localStorage.getItem('lead_sheet_dismissed')
-      if (persistedDismissed) {
-        const ts = Number(persistedDismissed)
-        if (Date.now() - ts < 7 * 24 * 60 * 60 * 1000) return
-      }
-    } catch {}
-
     if (trigger === 'timer') {
       const t = setTimeout(() => setVisible(true), timerMs)
       return () => clearTimeout(t)
@@ -55,9 +47,6 @@ export default function LeadCaptureSheet({
   const dismiss = () => {
     setVisible(false)
     setDismissed(true)
-    try {
-      localStorage.setItem('lead_sheet_dismissed', String(Date.now()))
-    } catch {}
   }
 
   const handleSubmit = () => {

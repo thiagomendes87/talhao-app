@@ -1,0 +1,1899 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Relatório Técnico — Fazenda Amizade</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<script src="/deck-stage.js"></script>
+<style>
+  :root {
+    --bg: #0b1510;
+    --bg2: #0f1e14;
+    --bg3: #152318;
+    --green: #4eff8c;
+    --green2: #2ecf68;
+    --green3: #1a7a3f;
+    --text: #e8f0eb;
+    --muted: #6b8a72;
+    --border: #1e3324;
+    --card: #111f16;
+    --accent2: #ffe066;
+    --red: #ff6b6b;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #000; font-family: 'Space Grotesk', sans-serif; color: var(--text); }
+  section { width: 1920px; height: 1080px; background: var(--bg); position: relative; overflow: hidden; display: flex; flex-direction: column; }
+  .grid-bg { position: absolute; inset: 0; background-image: linear-gradient(rgba(78,255,140,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(78,255,140,0.03) 1px, transparent 1px); background-size: 60px 60px; pointer-events: none; }
+  .top-bar { display: flex; align-items: center; justify-content: space-between; padding: 28px 60px; border-bottom: 1px solid var(--border); flex-shrink: 0; position: relative; z-index: 10; }
+  .logo-mark { display: flex; align-items: center; gap: 16px; }
+  .talhao-logo { height: 40px; width: auto; display: block; }
+  .logo-icon { width: 32px; height: 32px; background: var(--green); border-radius: 6px; display: flex; align-items: center; justify-content: center; }
+  .logo-icon svg { width: 18px; height: 18px; }
+  .logo-text { font-size: 13px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+  .slide-tag { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; }
+  .slide-content { flex: 1; padding: 50px 60px; position: relative; z-index: 5; }
+  .slide-title { font-size: 14px; font-weight: 500; letter-spacing: 0.15em; text-transform: uppercase; color: var(--green); margin-bottom: 16px; }
+  .slide-h1 { font-size: 72px; font-weight: 700; line-height: 1.0; color: var(--text); }
+  .slide-h2 { font-size: 44px; font-weight: 700; line-height: 1.1; }
+  .slide-h3 { font-size: 30px; font-weight: 600; }
+  .stat-grid { display: grid; gap: 16px; }
+  .stat-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 24px 28px; position: relative; overflow: hidden; }
+  .stat-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--green), transparent); }
+  .stat-label { font-size: 11px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+  .stat-value { font-size: 38px; font-weight: 700; color: var(--text); line-height: 1; font-family: 'Space Mono', monospace; }
+  .stat-unit { font-size: 14px; color: var(--muted); font-family: 'Space Grotesk', sans-serif; font-weight: 400; margin-left: 4px; }
+  .stat-sub { font-size: 13px; color: var(--muted); margin-top: 6px; }
+  .pill { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 100px; font-size: 11px; font-weight: 600; letter-spacing: 0.10em; text-transform: uppercase; }
+  .pill-green { background: rgba(78,255,140,0.12); color: var(--green); border: 1px solid rgba(78,255,140,0.25); }
+  .pill-yellow { background: rgba(255,224,102,0.12); color: var(--accent2); border: 1px solid rgba(255,224,102,0.25); }
+  .pill-red { background: rgba(255,107,107,0.12); color: var(--red); border: 1px solid rgba(255,107,107,0.25); }
+  .pill-muted { background: rgba(107,138,114,0.15); color: var(--muted); border: 1px solid var(--border); }
+  .dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+  .map-placeholder { border-radius: 12px; overflow: hidden; border: 1px solid var(--border); position: relative; background: #0a1a0e; }
+  .map-inner { width: 100%; height: 100%; position: relative; background: repeating-linear-gradient(45deg, rgba(78,255,140,0.03) 0px, rgba(78,255,140,0.03) 1px, transparent 1px, transparent 12px), linear-gradient(#0a1a0e, #0d2415); }
+  .map-label { position: absolute; bottom: 16px; left: 16px; font-family: 'Space Mono', monospace; font-size: 11px; color: var(--muted); background: rgba(0,0,0,0.6); padding: 4px 10px; border-radius: 4px; }
+  .data-table { width: 100%; border-collapse: collapse; }
+  .data-table tr { border-bottom: 1px solid var(--border); }
+  .data-table tr:last-child { border-bottom: none; }
+  .data-table td { padding: 14px 0; font-size: 15px; }
+  .data-table td:first-child { color: var(--muted); font-size: 12px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; width: 45%; }
+  .data-table td:last-child { font-weight: 500; color: var(--text); text-align: right; }
+  .bar-chart { display: flex; flex-direction: column; gap: 16px; }
+  .bar-row { display: flex; flex-direction: column; gap: 5px; }
+  .bar-meta { display: flex; justify-content: space-between; align-items: center; }
+  .bar-name { font-size: 13px; color: var(--text); font-weight: 500; }
+  .bar-pct { font-family: 'Space Mono', monospace; font-size: 13px; color: var(--muted); }
+  .bar-track { height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 4px; background: var(--green); }
+  .vdivider { width: 1px; background: var(--border); align-self: stretch; margin: 0 32px; flex-shrink: 0; }
+  .info-block { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 28px 32px; }
+  .checklist { display: flex; flex-direction: column; gap: 12px; }
+  .check-item { display: flex; align-items: flex-start; gap: 12px; }
+  .check-icon { width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 11px; margin-top: 1px; }
+  .check-ok { background: rgba(78,255,140,0.15); color: var(--green); }
+  .check-warn { background: rgba(255,224,102,0.15); color: var(--accent2); }
+  .check-no { background: rgba(255,107,107,0.15); color: var(--red); }
+  .check-text { font-size: 14px; color: var(--text); line-height: 1.4; }
+  .check-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .legend { display: flex; flex-direction: column; gap: 10px; }
+  .legend-item { display: flex; align-items: center; gap: 12px; }
+  .legend-dot { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; }
+  .legend-label { font-size: 14px; color: var(--text); }
+  .legend-val { font-family: 'Space Mono', monospace; font-size: 13px; color: var(--muted); margin-left: auto; }
+  .price-card { background: linear-gradient(135deg, rgba(78,255,140,0.1), rgba(46,207,104,0.05)); border: 1px solid rgba(78,255,140,0.3); border-radius: 16px; padding: 40px; }
+  .section-label { font-size: 11px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--green); margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+  .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+  .prog-bar { height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; margin-top: 10px; }
+  .prog-fill { height: 100%; background: linear-gradient(90deg, var(--green2), var(--green)); border-radius: 2px; }
+  .topo-bar { display: flex; height: 36px; border-radius: 6px; overflow: hidden; margin-bottom: 8px; }
+  .slide-footer { padding: 18px 60px; border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; position: relative; z-index: 10; }
+  .footer-prop { font-size: 12px; color: var(--muted); letter-spacing: 0.06em; }
+  .footer-conf { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--border); letter-spacing: 0.08em; text-transform: uppercase; }
+  .risk-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; }
+  .risk-item { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 18px; }
+  .risk-level { font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 6px; }
+  .risk-title { font-size: 14px; font-weight: 600; margin-bottom: 5px; }
+  .risk-desc { font-size: 12px; color: var(--muted); line-height: 1.5; }
+  .timeline { display: flex; flex-direction: column; }
+  .timeline-item { display: grid; grid-template-columns: 100px 36px 1fr; gap: 0 16px; align-items: start; min-height: 64px; }
+  .tl-year { font-family: 'Space Mono', monospace; font-size: 13px; color: var(--green); font-weight: 700; padding-top: 3px; text-align: right; }
+  .tl-line { display: flex; flex-direction: column; align-items: center; }
+  .tl-dot { width: 10px; height: 10px; background: var(--green); border-radius: 50%; flex-shrink: 0; margin-top: 4px; }
+  .tl-connector { width: 2px; flex: 1; background: var(--border); margin-top: 4px; }
+  .tl-content { padding-top: 1px; padding-bottom: 16px; }
+  .tl-title { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 3px; }
+  .tl-desc { font-size: 12px; color: var(--muted); line-height: 1.5; }
+  .watermark { position: absolute; bottom: 70px; right: 60px; font-family: 'Space Mono', monospace; font-size: 11px; color: rgba(107,138,114,0.3); text-align: right; letter-spacing: 0.06em; z-index: 3; }
+</style>
+</head>
+<body>
+<deck-stage>
+
+<!-- ═══ 01 CAPA ═══ -->
+<section data-screen-label="01 Capa">
+  <div class="grid-bg"></div>
+  <div style="position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 75% 50%, #0d3020 0%, var(--bg) 70%);"></div>
+
+  <div style="position:absolute;left:0;top:0;bottom:0;width:1100px;display:flex;flex-direction:column;padding:64px 80px;z-index:10;">
+    <div class="logo-mark" style="margin-bottom:auto;">
+      <img src="/logo-oficial.png" alt="talhão" class="talhao-logo">
+      <span class="logo-text">Fazenda Amizade</span>
+    </div>
+
+    <div style="margin-bottom:44px;">
+      <div style="display:flex;gap:10px;margin-bottom:28px;flex-wrap:wrap;">
+        <span class="pill pill-green"><span class="dot" style="background:var(--green)"></span>SIGEF Certificado</span>
+        <span class="pill pill-muted">Campos Altos · Alto Paranaíba MG</span>
+        <span class="pill pill-yellow">À Venda</span>
+        <span class="pill pill-muted">Polo Cafeeiro</span>
+      </div>
+
+      <div style="font-size:13px;color:var(--muted);letter-spacing:0.18em;text-transform:uppercase;margin-bottom:14px;font-weight:600;">Fazenda</div>
+      <h1 style="font-size:90px;font-weight:700;line-height:0.92;color:var(--text);margin-bottom:22px;letter-spacing:-0.02em;">Amizade</h1>
+      <div style="width:80px;height:3px;background:var(--green);margin-bottom:28px;"></div>
+      <p style="font-size:19px;color:var(--muted);max-width:520px;line-height:1.6;font-weight:400;">Propriedade rural de <strong style="color:var(--text)">962,2 hectares</strong> localizada em Campos Altos, Alto Paranaíba — MG. Altitude acima de 1.000 m, café consolidado há mais de 20 anos e 6 outorgas de irrigação vigentes.</p>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:12px;overflow:hidden;">
+      <div style="background:var(--card);padding:18px 22px;">
+        <div class="stat-label">Área Total</div>
+        <div style="font-family:'Space Mono',monospace;font-size:26px;font-weight:700;color:var(--text);">962,2<span style="font-size:13px;color:var(--muted);font-family:'Space Grotesk',sans-serif;"> ha</span></div>
+      </div>
+      <div style="background:var(--card);padding:18px 22px;">
+        <div class="stat-label">Município</div>
+        <div style="font-size:17px;font-weight:600;color:var(--text);margin-top:3px;">Campos Altos</div>
+      </div>
+      <div style="background:var(--card);padding:18px 22px;">
+        <div class="stat-label">Preço Pedido</div>
+        <div style="font-size:17px;font-weight:600;color:var(--green);margin-top:3px;">R$ 100,0M</div>
+      </div>
+      <div style="background:var(--card);padding:18px 22px;">
+        <div class="stat-label">Elaborado em</div>
+        <div style="font-size:17px;font-weight:600;color:var(--text);margin-top:3px;">Maio / 2026</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- right map -->
+  <div style="position:absolute;right:0;top:0;bottom:0;width:860px;overflow:hidden;">
+    <div class="map-inner" style="width:100%;height:100%;">
+      <img src="/fazenda-amizade-assets/talhao-ai-mg-mapa.png" alt="Mapa da Fazenda Amizade" style="width:100%;height:100%;position:absolute;inset:0;object-fit:contain;object-position:center center;filter:saturate(1.08) brightness(1.02) contrast(1.04);">
+    </div>
+    <div style="position:absolute;inset:0;background:linear-gradient(90deg, var(--bg) 0%, rgba(11,21,16,0.65) 10%, transparent 26%);pointer-events:none;"></div>
+  </div>
+
+  <div class="watermark">CONFIDENCIAL<br>Uso restrito ao adquirente</div>
+</section>
+
+
+<!-- ═══ 02 SUMÁRIO ═══ -->
+<section data-screen-label="02 Sumário">
+  <div class="grid-bg"></div>
+  <div class="top-bar">
+    <div class="logo-mark"><img src="/logo-oficial.png" alt="talhão" class="talhao-logo"><span class="logo-text">Fazenda Amizade</span></div>
+    <span class="slide-tag">02 — Índice</span>
+  </div>
+  <div class="slide-content">
+    <div class="slide-title">Sumário</div>
+    <div class="slide-h2" style="margin-bottom:44px;">Conteúdo do Relatório</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;">
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div style="font-size:11px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);padding-bottom:8px;border-bottom:1px solid var(--border);">I — Identificação</div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div style="display:flex;align-items:center;gap:12px;"><span style="font-family:'Space Mono',monospace;font-size:12px;color:var(--green);min-width:28px;">03</span><span style="font-size:15px;">Dados Cadastrais</span></div>
+          <div style="display:flex;align-items:center;gap:12px;"><span style="font-family:'Space Mono',monospace;font-size:12px;color:var(--green);min-width:28px;">04</span><span style="font-size:15px;">Localização e Região</span></div>
+          <div style="display:flex;align-items:center;gap:12px;"><span style="font-family:'Space Mono',monospace;font-size:12px;color:var(--green);min-width:28px;">05</span><span style="font-size:15px;">Perímetro e Limites</span></div>
+          <div style="display:flex;align-items:center;gap:12px;"><span style="font-family:'Space Mono',monospace;font-size:12px;color:var(--green);min-width:28px;">06</span><span style="font-size:15px;">Topografia e Relevo</span></div>
+          <div style="display:flex;align-items:center;gap:12px;"><span style="font-family:'Space Mono',monospace;font-size:12px;color:var(--green);min-width:28px;">07</span><span style="font-size:15px;">Histórico de Uso do Solo</span></div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div style="font-size:11px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);padding-bottom:8px;border-bottom:1px solid var(--border);">II — Técnico e Ambiental</div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div style="display:flex;align-items:center;gap:12px;"><span style="font-family:'Space Mono',monospace;font-size:12px;color:var(--green);min-width:28px;">08</span><span style="font-size:15px;">Aptidão Agrícola</span></div>
+          <div style="display:flex;align-items:center;gap:12px;"><span style="font-family:'Space Mono',monospace;font-size:12px;color:var(--green);min-width:28px;">09</span><span style="font-size:15px;">Solo e Manejo</span></div>
+          <div style="display:flex;align-items:center;gap:12px;"><span style="font-family:'Space Mono',monospace;font-size:12px;color:var(--green);min-width:28px;">10</span><span style="font-size:15px;">Água e Irrigação</span></div>
+          <div style="display:flex;align-items:center;gap:12px;"><span style="font-family:'Space Mono',monospace;font-size:12px;color:var(--green);min-width:28px;">11</span><span style="font-size:15px;">Clima e Temperatura</span></div>
+          <div style="display:flex;align-items:center;gap:12px;"><span style="font-family:'Space Mono',monospace;font-size:12px;color:var(--green);min-width:28px;">12</span><span style="font-size:15px;">Riscos Climáticos</span></div>
+          <div style="display:flex;align-items:center;gap:12px;"><span style="font-family:'Space Mono',monospace;font-size:12px;color:var(--green);min-width:28px;">13</span><span style="font-size:15px;">Reserva Legal e APP</span></div>
+          <div style="display:flex;align-items:center;gap:12px;"><span style="font-family:'Space Mono',monospace;font-size:12px;color:var(--green);min-width:28px;">14</span><span style="font-size:15px;">Regularidade Ambiental</span></div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div style="font-size:11px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);padding-bottom:8px;border-bottom:1px solid var(--border);">III — Jurídico e Conclusão</div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div style="display:flex;align-items:center;gap:12px;"><span style="font-family:'Space Mono',monospace;font-size:12px;color:var(--green);min-width:28px;">15</span><span style="font-size:15px;">Regularidade Fundiária</span></div>
+          <div style="display:flex;align-items:center;gap:12px;"><span style="font-family:'Space Mono',monospace;font-size:12px;color:var(--green);min-width:28px;">16</span><span style="font-size:15px;">Infraestrutura</span></div>
+          <div style="display:flex;align-items:center;gap:12px;"><span style="font-family:'Space Mono',monospace;font-size:12px;color:var(--green);min-width:28px;">17</span><span style="font-size:15px;">Acesso e Logística</span></div>
+          <div style="display:flex;align-items:center;gap:12px;"><span style="font-family:'Space Mono',monospace;font-size:12px;color:var(--green);min-width:28px;">18</span><span style="font-size:15px;">Contexto Regional</span></div>
+          <div style="display:flex;align-items:center;gap:12px;"><span style="font-family:'Space Mono',monospace;font-size:12px;color:var(--green);min-width:28px;">19</span><span style="font-size:15px;">Potencial de Expansão</span></div>
+          <div style="display:flex;align-items:center;gap:12px;"><span style="font-family:'Space Mono',monospace;font-size:12px;color:var(--green);min-width:28px;">20</span><span style="font-size:15px;">Análise de Risco</span></div>
+          <div style="display:flex;align-items:center;gap:12px;"><span style="font-family:'Space Mono',monospace;font-size:12px;color:var(--green);min-width:28px;">21</span><span style="font-size:15px;">Análise SWOT</span></div>
+          <div style="display:flex;align-items:center;gap:12px;"><span style="font-family:'Space Mono',monospace;font-size:12px;color:var(--green);min-width:28px;">22–27</span><span style="font-size:15px;">Valuation e Conclusão</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer"><span class="footer-prop">Fazenda Amizade — Campos Altos / MG</span><span class="footer-conf">CONFIDENCIAL · Maio 2026</span></div>
+</section>
+
+
+<!-- ═══ 03 DADOS CADASTRAIS ═══ -->
+<section data-screen-label="03 Dados Cadastrais">
+  <div class="grid-bg"></div>
+  <div class="top-bar"><div class="logo-mark"><img src="/logo-oficial.png" alt="talhão" class="talhao-logo"><span class="logo-text">Fazenda Amizade</span></div><span class="slide-tag">03 — Dados Cadastrais</span></div>
+  <div class="slide-content">
+    <div class="slide-title">Ficha Técnica</div>
+    <div class="slide-h2" style="margin-bottom:36px;">Dados Cadastrais e Documentação</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:28px;">
+      <div style="display:flex;flex-direction:column;gap:18px;">
+        <div class="info-block">
+          <div class="section-label">Identificação da Propriedade</div>
+          <table class="data-table">
+            <tr><td>Nome do Imóvel</td><td>Fazenda Amizade</td></tr>
+            <tr><td>Código SIGEF</td><td style="font-family:'Space Mono',monospace;font-size:13px;">4230250026234</td></tr>
+            <tr><td>Matrícula</td><td>2.979</td></tr>
+            <tr><td>Município</td><td>Campos Altos</td></tr>
+            <tr><td>UF</td><td>Minas Gerais</td></tr>
+            <tr><td>Coordenadas (centroide)</td><td style="font-family:'Space Mono',monospace;font-size:13px;">19°41'29"S / 46°10'21"W</td></tr>
+          </table>
+        </div>
+        <div class="info-block">
+          <div class="section-label">Situação Cadastral</div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;">
+            <span class="pill pill-green"><span class="dot" style="background:var(--green)"></span>SIGEF Certificado</span>
+            <span class="pill pill-green"><span class="dot" style="background:var(--green)"></span>CAR Ativo</span>
+            <span class="pill pill-green"><span class="dot" style="background:var(--green)"></span>ITR Quitado</span>
+            <span class="pill pill-green"><span class="dot" style="background:var(--green)"></span>CCIR Regular</span>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:18px;">
+        <div class="info-block">
+          <div class="section-label">Dimensões e Área</div>
+          <table class="data-table">
+            <tr><td>Área Total SIGEF</td><td>962,2 ha</td></tr>
+            <tr><td>Área Aproveitável</td><td>694,8 ha (72%)</td></tr>
+            <tr><td>APP + Reserva Legal</td><td>270,2 ha (28%)</td></tr>
+            <tr><td>Datum</td><td>SIRGAS 2000</td></tr>
+            <tr><td>CAR</td><td style="font-family:'Space Mono',monospace;font-size:10px;">MG-3111507-08BEF51B…</td></tr>
+            <tr><td>CAR atualizado em</td><td>04/08/2022</td></tr>
+          </table>
+        </div>
+        <div class="info-block">
+          <div class="section-label">Comercialização</div>
+          <table class="data-table">
+            <tr><td>Preço Pedido</td><td style="color:var(--green);font-weight:700;">R$ 100.000.000</td></tr>
+            <tr><td>Preço por Hectare</td><td style="color:var(--green);">R$ 103.928 / ha</td></tr>
+            <tr><td>Corretor</td><td>João Luiz — CRECI 35687</td></tr>
+            <tr><td>Contato</td><td>+55 35 9914-9427</td></tr>
+            <tr><td>Situação</td><td><span class="pill pill-yellow" style="font-size:10px;">Apta para Venda</span></td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer"><span class="footer-prop">Fazenda Amizade — Campos Altos / MG</span><span class="footer-conf">CONFIDENCIAL · Maio 2026</span></div>
+</section>
+
+<!-- ═══ 04 LOCALIZAÇÃO ═══ -->
+<section data-screen-label="04 Localização">
+  <div class="grid-bg"></div>
+  <div class="top-bar"><div class="logo-mark"><img src="/logo-oficial.png" alt="talhão" class="talhao-logo"><span class="logo-text">Fazenda Amizade</span></div><span class="slide-tag">04 — Localização e Região</span></div>
+  <div class="slide-content" style="display:flex;gap:36px;">
+    <div style="flex:1;display:flex;flex-direction:column;gap:20px;">
+      <div>
+        <div class="slide-title">Localização</div>
+        <div class="slide-h3" style="margin-bottom:12px;">Campos Altos · Alto Paranaíba MG</div>
+        <p style="font-size:15px;color:var(--muted);line-height:1.7;">A Fazenda Amizade está inserida na <strong style="color:var(--text)">Região de Campos Altos</strong>, no Alto Paranaíba — entre as serras da Canastra, da Saudade e do Salitre. Território reconhecido internacionalmente como produtor de cafés especiais de origem, com altitude média de 1.100 m e terroir entre os biomas Cerrado e Mata Atlântica.</p>
+      </div>
+      <div class="info-block">
+        <div class="section-label">Distâncias Estratégicas</div>
+        <table class="data-table">
+          <tr><td>São Paulo (capital)</td><td>596 km — ~6h30 (BR-381/Fernão Dias)</td></tr>
+          <tr><td>Belo Horizonte</td><td>268 km — ~4h (BR-262)</td></tr>
+          <tr><td>Araxá (polo agrícola)</td><td>85 km — ~1h15</td></tr>
+          <tr><td>Rodovia principal (BR-262)</td><td>Acesso direto — sem estradas de terra</td></tr>
+        </table>
+      </div>
+      <div class="info-block">
+        <div class="section-label">Vias de Acesso</div>
+        <table class="data-table">
+          <tr><td>Rodovia Federal</td><td>BR-262 — duplicada em trechos</td></tr>
+          <tr><td>Tipo de acesso</td><td>100% asfalto — sem estradas de terra</td></tr>
+          <tr><td>Ligação</td><td>BR-365 e BR-354 (acesso rápido)</td></tr>
+          <tr><td>Pedágio</td><td>Verificar trecho BR-381</td></tr>
+        </table>
+      </div>
+    </div>
+    <div style="flex:1.2;">
+      <div class="map-placeholder" style="height:100%;">
+        <div class="map-inner" style="width:100%;height:100%;position:relative;">
+          <img src="/fazenda-amizade-assets/report-3.png" alt="Mapa de situação da Fazenda Amizade" style="width:100%;height:100%;position:absolute;inset:0;object-fit:cover;object-position:38% center;">
+        </div>
+        <div class="map-label">Mapa de Situação — Alto Paranaíba / MG</div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer"><span class="footer-prop">Fazenda Amizade — Campos Altos / MG</span><span class="footer-conf">CONFIDENCIAL · Maio 2026</span></div>
+</section>
+
+
+<!-- ═══ 05 PERÍMETRO ═══ -->
+<section data-screen-label="05 Perímetro e Limites">
+  <div class="grid-bg"></div>
+  <div class="top-bar"><div class="logo-mark"><img src="/logo-oficial.png" alt="talhão" class="talhao-logo"><span class="logo-text">Fazenda Amizade</span></div><span class="slide-tag">05 — Perímetro e Limites</span></div>
+  <div class="slide-content" style="display:flex;gap:36px;">
+    <div style="flex:1.2;">
+      <img src="/fazenda-amizade-assets/report-4.png" alt="Mapa de perímetro e confrontações da Fazenda Amizade" style="width:100%;height:680px;display:block;object-fit:cover;object-position:center center;border:1px solid var(--border);border-radius:12px;">
+    </div>
+    <div style="flex:1;display:flex;flex-direction:column;gap:18px;">
+      <div><div class="slide-title">Georreferenciamento</div><div class="slide-h3" style="margin-bottom:16px;">Perímetro e Confrontações</div></div>
+      <div class="info-block">
+        <div class="section-label">Dados de Perímetro</div>
+        <table class="data-table">
+          <tr><td>Área SIGEF</td><td>962,2 ha</td></tr>
+          <tr><td>Código SIGEF</td><td style="font-family:'Space Mono',monospace;font-size:12px;">4230250026234</td></tr>
+          <tr><td>Status SIGEF</td><td><span class="pill pill-green" style="font-size:10px;">Certificado</span></td></tr>
+          <tr><td>Datum</td><td>SIRGAS 2000</td></tr>
+          <tr><td>Fonte principal</td><td>Arquivo KML oficial</td></tr>
+          <tr><td>Diferença relevante de área</td><td>Não identificada</td></tr>
+        </table>
+      </div>
+      <div class="info-block">
+        <div class="section-label">Confrontações e Hidrologia</div>
+        <table class="data-table">
+          <tr><td>Pontos de captação</td><td>6 outorgas vigentes (SOUT)</td></tr>
+          <tr><td>Tipo de limites</td><td>Cercas e cursos d'água</td></tr>
+          <tr><td>Vizinhança</td><td>Propriedades com cafeicultura</td></tr>
+        </table>
+      </div>
+      <div class="info-block" style="background:rgba(78,255,140,0.04);">
+        <p style="font-size:13px;color:var(--muted);line-height:1.6;">Fazenda georreferenciada e certificada pelo INCRA. Sem sobreposições detectadas com imóveis vizinhos. Arquivos KML, matrícula, CCIR e ITR disponíveis para download no dossiê técnico.</p>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer"><span class="footer-prop">Fazenda Amizade — Campos Altos / MG</span><span class="footer-conf">CONFIDENCIAL · Maio 2026</span></div>
+</section>
+
+
+<!-- ═══ 06 TOPOGRAFIA ═══ -->
+<section data-screen-label="06 Topografia e Relevo">
+  <div class="grid-bg"></div>
+  <div class="top-bar"><div class="logo-mark"><img src="/logo-oficial.png" alt="talhão" class="talhao-logo"><span class="logo-text">Fazenda Amizade</span></div><span class="slide-tag">06 — Topografia e Relevo</span></div>
+  <div class="slide-content">
+    <div class="slide-title">Topografia</div>
+    <div class="slide-h2" style="margin-bottom:30px;">Relevo, Altitude e Declividade</div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;">
+      <div class="stat-card">
+        <div class="stat-label">Altitude Mínima</div>
+        <div class="stat-value">~900<span class="stat-unit">m</span></div>
+        <div class="stat-sub">Fundos de vale / áreas baixas</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Altitude Máxima</div>
+        <div class="stat-value">~1.200<span class="stat-unit">m</span></div>
+        <div class="stat-sub">Pontos mais elevados</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Altitude Média</div>
+        <div class="stat-value">~1.100<span class="stat-unit">m</span></div>
+        <div class="stat-sub">Favorável para café especial</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Área Mecanizável</div>
+        <div class="stat-value">~45<span class="stat-unit">%</span></div>
+        <div class="stat-sub">~433 ha aptos à mecanização</div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:24px;">
+      <div>
+        <div class="section-label">Perfil Altimétrico</div>
+        <div style="height:220px;background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden;position:relative;">
+          <svg viewBox="0 0 600 220" style="width:100%;height:100%;position:absolute;">
+            <defs><linearGradient id="tg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#4eff8c" stop-opacity="0.45"/><stop offset="100%" stop-color="#4eff8c" stop-opacity="0.04"/></linearGradient></defs>
+            <path d="M0,200 L0,180 C60,165 100,140 150,115 C200,90 230,75 280,70 C330,65 360,78 400,85 C440,92 480,125 530,145 C560,158 585,170 600,178 L600,200 Z" fill="url(#tg)"/>
+            <path d="M0,180 C60,165 100,140 150,115 C200,90 230,75 280,70 C330,65 360,78 400,85 C440,92 480,125 530,145 C560,158 585,170 600,178" fill="none" stroke="var(--green)" stroke-width="2"/>
+            <text x="8" y="12" font-size="9" fill="var(--muted)" font-family="Space Mono">1.200m</text>
+            <text x="8" y="108" font-size="9" fill="var(--muted)" font-family="Space Mono">1.100m</text>
+            <text x="8" y="195" font-size="9" fill="var(--muted)" font-family="Space Mono">900m</text>
+            <line x1="55" y1="12" x2="600" y2="12" stroke="rgba(78,255,140,0.07)" stroke-width="1" stroke-dasharray="4,4"/>
+            <line x1="55" y1="108" x2="600" y2="108" stroke="rgba(78,255,140,0.07)" stroke-width="1" stroke-dasharray="4,4"/>
+            <line x1="280" y1="72" x2="280" y2="92" stroke="rgba(255,255,255,0.3)" stroke-width="1" stroke-dasharray="3,3"/>
+            <text x="280" y="104" text-anchor="middle" font-size="9" fill="rgba(255,255,255,0.4)" font-family="Space Mono">Cume</text>
+          </svg>
+        </div>
+        <div class="section-label" style="margin-top:18px;">Classes de Declividade</div>
+        <div class="topo-bar">
+          <div style="flex:0.20;background:#2ecf68;"></div>
+          <div style="flex:0.35;background:#1a7a3f;"></div>
+          <div style="flex:0.25;background:#0f4a26;"></div>
+          <div style="flex:0.20;background:#060f0a;"></div>
+        </div>
+        <div style="display:flex;gap:16px;flex-wrap:wrap;">
+          <div style="font-size:12px;color:var(--muted);"><span style="color:#2ecf68">■</span> 0-3% (20%)</div>
+          <div style="font-size:12px;color:var(--muted);"><span style="color:#1a7a3f">■</span> 3-8% (35%)</div>
+          <div style="font-size:12px;color:var(--muted);"><span style="color:#0f4a26">■</span> 8-20% (25%)</div>
+          <div style="font-size:12px;color:var(--muted);"><span style="color:#4eff8c22">■</span> &gt;20% (20%)</div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px;">
+          <div style="height:220px;background:#060f0a;border:1px solid var(--border);border-radius:10px;overflow:hidden;display:flex;align-items:center;justify-content:center;">
+            <img src="/fazenda-amizade-assets/talhao-ai-mg-altitude.png" alt="Mapa de altitude da Fazenda Amizade" style="width:100%;height:100%;object-fit:contain;object-position:center center;display:block;">
+          </div>
+          <div style="height:220px;background:#060f0a;border:1px solid var(--border);border-radius:10px;overflow:hidden;display:flex;align-items:center;justify-content:center;">
+            <img src="/fazenda-amizade-assets/talhao-ai-mg-declividade.png" alt="Mapa de declividade da Fazenda Amizade" style="width:100%;height:100%;object-fit:contain;object-position:center center;display:block;">
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:16px;">
+        <div class="info-block">
+          <div class="section-label">Caracterização do Relevo</div>
+          <table class="data-table">
+            <tr><td>Tipo dominante</td><td>Plano a suave ondulado</td></tr>
+            <tr><td>Declividade faixa</td><td>3–8%</td></tr>
+            <tr><td>Áreas críticas (&gt;20%)</td><td>~20% da área</td></tr>
+            <tr><td>Mecanizável (~0-12%)</td><td>~45% — ~433 ha</td></tr>
+          </table>
+        </div>
+        <div class="info-block">
+          <div class="section-label">Aptidão à Mecanização</div>
+          <div class="bar-chart">
+            <div class="bar-row">
+              <div class="bar-meta"><span class="bar-name">Mecanizável (0–12%)</span><span class="bar-pct">~45%</span></div>
+              <div class="bar-track"><div class="bar-fill" style="width:45%"></div></div>
+            </div>
+            <div class="bar-row">
+              <div class="bar-meta"><span class="bar-name">Semi-mecanizável (12–20%)</span><span class="bar-pct">~35%</span></div>
+              <div class="bar-track"><div class="bar-fill" style="width:35%;background:#2ecf68"></div></div>
+            </div>
+            <div class="bar-row">
+              <div class="bar-meta"><span class="bar-name">Manual / Restrito (&gt;20%)</span><span class="bar-pct">~20%</span></div>
+              <div class="bar-track"><div class="bar-fill" style="width:20%;background:var(--muted)"></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="info-block" style="background:rgba(78,255,140,0.04);">
+          <p style="font-size:13px;color:var(--muted);line-height:1.6;">Altitude acima de <strong style="color:var(--text)">1.000 m</strong> com média regional de ~1.100 m posiciona a fazenda como ativo de café de altitude com perfil sensorial diferenciado — notas de chocolate, caramelo e frutas.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer"><span class="footer-prop">Fazenda Amizade — Campos Altos / MG</span><span class="footer-conf">CONFIDENCIAL · Maio 2026</span></div>
+</section>
+
+<!-- ═══ 07 HISTÓRICO DE USO ═══ -->
+<section data-screen-label="07 Histórico de Uso">
+  <div class="grid-bg"></div>
+  <div class="top-bar"><div class="logo-mark"><img src="/logo-oficial.png" alt="talhão" class="talhao-logo"><span class="logo-text">Fazenda Amizade</span></div><span class="slide-tag">07 — Histórico de Uso do Solo</span></div>
+  <div class="slide-content">
+    <div class="slide-title">Histórico</div>
+    <div class="slide-h2" style="margin-bottom:32px;">Evolução do Uso do Solo (2004–2024)</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:28px;">
+      <div>
+        <div class="section-label">Linha do Tempo de Uso</div>
+        <div class="timeline">
+          <div class="timeline-item">
+            <div class="tl-year">2004</div>
+            <div class="tl-line"><div class="tl-dot"></div><div class="tl-connector"></div></div>
+            <div class="tl-content"><div class="tl-title">Área Consolidada — ~70% limpa</div><div class="tl-desc">Área útil já em excelente condição. Expansão cafeeira em andamento na região.</div></div>
+          </div>
+          <div class="timeline-item">
+            <div class="tl-year">2011</div>
+            <div class="tl-line"><div class="tl-dot"></div><div class="tl-connector"></div></div>
+            <div class="tl-content"><div class="tl-title">Vizinhos Consolidados</div><div class="tl-desc">Fazendas vizinhas consolidadas com cafeicultura desde 2011 — padrão produtivo da região estabelecido.</div></div>
+          </div>
+          <div class="timeline-item">
+            <div class="tl-year">2014</div>
+            <div class="tl-line"><div class="tl-dot"></div><div class="tl-connector"></div></div>
+            <div class="tl-content"><div class="tl-title">Café em Expansão</div><div class="tl-desc">Cultivo de café aumenta na propriedade. Região em ascensão como polo cafeeiro do Alto Paranaíba.</div></div>
+          </div>
+          <div class="timeline-item">
+            <div class="tl-year">2019</div>
+            <div class="tl-line"><div class="tl-dot"></div><div class="tl-connector"></div></div>
+            <div class="tl-content"><div class="tl-title">Café Bastante Consolidado</div><div class="tl-desc">Cafeicultura plenamente consolidada na fazenda. Mais de 15 anos de produção contínua.</div></div>
+          </div>
+          <div class="timeline-item">
+            <div class="tl-year">2021–22</div>
+            <div class="tl-line"><div class="tl-dot"></div><div class="tl-connector"></div></div>
+            <div class="tl-content"><div class="tl-title">Polo Regional Consolidado</div><div class="tl-desc">Fazenda e vizinhança com cultivos consolidados. Marca Território Campos Altos em processo de criação.</div></div>
+          </div>
+          <div class="timeline-item">
+            <div class="tl-year">2024</div>
+            <div class="tl-line"><div class="tl-dot"></div></div>
+            <div class="tl-content"><div class="tl-title">Condição Atual — 20+ anos de café</div><div class="tl-desc">Cafeicultura plenamente madura. Bioma Café premiado 2º melhor café do mundo (2024). Fazenda disponível.</div></div>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:16px;">
+        <div class="info-block">
+          <div class="section-label">Uso Atual do Solo</div>
+          <div class="bar-chart" style="gap:18px;">
+            <div class="bar-row">
+              <div class="bar-meta"><span class="bar-name">Cafeicultura (área produtiva)</span><span class="bar-pct">~500 ha</span></div>
+              <div class="bar-track"><div class="bar-fill" style="width:72%"></div></div>
+            </div>
+            <div class="bar-row">
+              <div class="bar-meta"><span class="bar-name">Outras áreas aproveitáveis</span><span class="bar-pct">~195 ha</span></div>
+              <div class="bar-track"><div class="bar-fill" style="width:28%;background:var(--accent2)"></div></div>
+            </div>
+            <div class="bar-row">
+              <div class="bar-meta"><span class="bar-name">APP e Reserva Legal (nativo)</span><span class="bar-pct">270,2 ha</span></div>
+              <div class="bar-track"><div class="bar-fill" style="width:28%;background:#2d6a4f"></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="info-block" style="background:rgba(78,255,140,0.04);">
+          <div class="section-label">Conclusão do Histórico</div>
+          <p style="font-size:14px;color:var(--muted);line-height:1.7;">Histórico de <strong style="color:var(--text)">mais de 20 anos de cafeicultura consolidada</strong> reduz significativamente o risco agrícola da região — solo e clima já provados para a cultura. <strong style="color:var(--text)">Nenhum desmatamento ilegal detectado</strong> em toda série histórica.</p>
+        </div>
+        <div class="info-block">
+          <div class="section-label">Reconhecimento Regional</div>
+          <div class="checklist">
+            <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">Bioma Café — 2º melhor café do mundo (2024)</div></div></div>
+            <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">Café Campos Altos — Medalha Alysson Paolinelli (2025)</div></div></div>
+            <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">Marca Território Campos Altos lançada em 2023</div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer"><span class="footer-prop">Fazenda Amizade — Campos Altos / MG</span><span class="footer-conf">CONFIDENCIAL · Maio 2026</span></div>
+</section>
+
+
+<!-- ═══ 07B EVOLUÇÃO EM FOTOS ═══ -->
+<section data-screen-label="07B Evolução em Fotos">
+  <div class="grid-bg"></div>
+  <div class="top-bar"><div class="logo-mark"><img src="/logo-oficial.png" alt="talhão" class="talhao-logo"><span class="logo-text">Fazenda Amizade</span></div><span class="slide-tag">07B — Evolução em Fotos</span></div>
+  <div class="slide-content" style="padding:50px 60px;">
+    <div class="slide-title">Histórico</div>
+    <div class="slide-h2" style="margin-bottom:36px;">Evolução do Uso do Solo (2004–2024)</div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:20px;">
+      <div style="height:230px;background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden;position:relative;">
+        <img src="/fazenda-amizade-assets/2004.png" alt="Histórico da Fazenda Amizade em 2004" style="width:100%;height:100%;object-fit:cover;display:block;">
+        <div style="position:absolute;top:14px;left:14px;background:rgba(0,20,10,0.82);border:1px solid rgba(78,255,140,0.22);border-radius:999px;padding:5px 13px;font-family:'Space Mono',monospace;font-size:12px;font-weight:700;color:var(--green);">2004</div>
+      </div>
+      <div style="height:230px;background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden;position:relative;">
+        <img src="/fazenda-amizade-assets/2011.png" alt="Histórico da Fazenda Amizade em 2011" style="width:100%;height:100%;object-fit:cover;display:block;">
+        <div style="position:absolute;top:14px;left:14px;background:rgba(0,20,10,0.82);border:1px solid rgba(78,255,140,0.22);border-radius:999px;padding:5px 13px;font-family:'Space Mono',monospace;font-size:12px;font-weight:700;color:var(--green);">2011</div>
+      </div>
+      <div style="height:230px;background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden;position:relative;">
+        <img src="/fazenda-amizade-assets/2014.png" alt="Histórico da Fazenda Amizade em 2014" style="width:100%;height:100%;object-fit:cover;display:block;">
+        <div style="position:absolute;top:14px;left:14px;background:rgba(0,20,10,0.82);border:1px solid rgba(78,255,140,0.22);border-radius:999px;padding:5px 13px;font-family:'Space Mono',monospace;font-size:12px;font-weight:700;color:var(--green);">2014</div>
+      </div>
+      <div style="height:230px;background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden;position:relative;">
+        <img src="/fazenda-amizade-assets/2019.png" alt="Histórico da Fazenda Amizade em 2019" style="width:100%;height:100%;object-fit:cover;display:block;">
+        <div style="position:absolute;top:14px;left:14px;background:rgba(0,20,10,0.82);border:1px solid rgba(78,255,140,0.22);border-radius:999px;padding:5px 13px;font-family:'Space Mono',monospace;font-size:12px;font-weight:700;color:var(--green);">2019</div>
+      </div>
+      <div style="height:230px;background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden;position:relative;">
+        <img src="/fazenda-amizade-assets/2021.png" alt="Histórico da Fazenda Amizade em 2021" style="width:100%;height:100%;object-fit:cover;display:block;">
+        <div style="position:absolute;top:14px;left:14px;background:rgba(0,20,10,0.82);border:1px solid rgba(78,255,140,0.22);border-radius:999px;padding:5px 13px;font-family:'Space Mono',monospace;font-size:12px;font-weight:700;color:var(--green);">2021</div>
+      </div>
+      <div style="height:230px;background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden;position:relative;">
+        <img src="/fazenda-amizade-assets/2022.png" alt="Histórico da Fazenda Amizade em 2022" style="width:100%;height:100%;object-fit:cover;display:block;">
+        <div style="position:absolute;top:14px;left:14px;background:rgba(0,20,10,0.82);border:1px solid rgba(78,255,140,0.22);border-radius:999px;padding:5px 13px;font-family:'Space Mono',monospace;font-size:12px;font-weight:700;color:var(--green);">2022</div>
+      </div>
+      <div style="height:230px;background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden;position:relative;">
+        <img src="/fazenda-amizade-assets/2023.png" alt="Histórico da Fazenda Amizade em 2023" style="width:100%;height:100%;object-fit:cover;display:block;">
+        <div style="position:absolute;top:14px;left:14px;background:rgba(0,20,10,0.82);border:1px solid rgba(78,255,140,0.22);border-radius:999px;padding:5px 13px;font-family:'Space Mono',monospace;font-size:12px;font-weight:700;color:var(--green);">2023</div>
+      </div>
+      <div style="height:230px;background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden;position:relative;">
+        <img src="/fazenda-amizade-assets/2024.png" alt="Histórico da Fazenda Amizade em 2024" style="width:100%;height:100%;object-fit:cover;display:block;">
+        <div style="position:absolute;top:14px;left:14px;background:rgba(0,20,10,0.82);border:1px solid rgba(78,255,140,0.22);border-radius:999px;padding:5px 13px;font-family:'Space Mono',monospace;font-size:12px;font-weight:700;color:var(--green);">2024</div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer"><span class="footer-prop">Fazenda Amizade — Campos Altos / MG</span><span class="footer-conf">CONFIDENCIAL · Maio 2026</span></div>
+</section>
+
+
+<!-- ═══ 08 APTIDÃO AGRÍCOLA ═══ -->
+<section data-screen-label="08 Aptidão Agrícola">
+  <div class="grid-bg"></div>
+  <div class="top-bar"><div class="logo-mark"><img src="/logo-oficial.png" alt="talhão" class="talhao-logo"><span class="logo-text">Fazenda Amizade</span></div><span class="slide-tag">08 — Aptidão Agrícola</span></div>
+  <div class="slide-content">
+    <div class="slide-title">Zoneamento</div>
+    <div class="slide-h2" style="margin-bottom:32px;">Aptidão Agrícola — Polo Cafeeiro de Excelência</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:28px;">
+      <div style="display:flex;flex-direction:column;gap:18px;">
+        <div class="info-block">
+          <div class="section-label">Aptidão por Cultura</div>
+          <table class="data-table">
+            <tr><td>Café Arábica Especial</td><td><span class="pill pill-green" style="font-size:10px;">Alta Aptidão — 20+ anos</span></td></tr>
+            <tr><td>Grãos (milho, soja)</td><td><span class="pill pill-green" style="font-size:10px;">Alta Aptidão</span></td></tr>
+            <tr><td>Fruticultura</td><td><span class="pill pill-green" style="font-size:10px;">Alta Aptidão</span></td></tr>
+            <tr><td>Pecuária de leite</td><td><span class="pill pill-yellow" style="font-size:10px;">Aptidão Regular</span></td></tr>
+            <tr><td>Horticultura</td><td><span class="pill pill-yellow" style="font-size:10px;">Aptidão Regular</span></td></tr>
+          </table>
+        </div>
+        <div class="info-block">
+          <div class="section-label">Zoneamento Climático MAPA</div>
+          <table class="data-table">
+            <tr><td>Café Arábica</td><td><strong style="color:var(--green);">Favorável — ZARC vigente</strong></td></tr>
+            <tr><td>Temperatura média anual</td><td>20,4°C</td></tr>
+            <tr><td>Precipitação anual</td><td>1.400–1.600 mm</td></tr>
+            <tr><td>Altitude média</td><td>~1.100 m (favorável especial)</td></tr>
+            <tr><td>Estação seca</td><td>Mai–Ago (bem definida)</td></tr>
+          </table>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:18px;">
+        <div class="info-block">
+          <div class="section-label">Pontuação de Aptidão</div>
+          <div style="display:flex;flex-direction:column;gap:12px;margin-top:4px;">
+            <div>
+              <div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="font-size:14px;">Café Arábica Especial</span><span style="font-family:'Space Mono',monospace;color:var(--green);">97%</span></div>
+              <div class="prog-bar"><div class="prog-fill" style="width:97%"></div></div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="font-size:14px;">Grãos (milho/soja)</span><span style="font-family:'Space Mono',monospace;color:var(--green);">88%</span></div>
+              <div class="prog-bar"><div class="prog-fill" style="width:88%"></div></div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="font-size:14px;">Fruticultura</span><span style="font-family:'Space Mono',monospace;color:var(--green);">80%</span></div>
+              <div class="prog-bar"><div class="prog-fill" style="width:80%"></div></div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="font-size:14px;">Pecuária / Pastagens</span><span style="font-family:'Space Mono',monospace;color:var(--accent2);">65%</span></div>
+              <div class="prog-bar"><div class="prog-fill" style="width:65%;background:var(--accent2)"></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="info-block" style="background:rgba(78,255,140,0.04);">
+          <p style="font-size:14px;color:var(--muted);line-height:1.7;">A altitude acima de 1.000 m combinada com <strong style="color:var(--text)">20+ anos de café consolidado</strong>, outorgas de irrigação vigentes e o reconhecimento internacional da "Marca Território Campos Altos" posiciona a fazenda como um dos ativos cafeeiros mais completos do Brasil.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer"><span class="footer-prop">Fazenda Amizade — Campos Altos / MG</span><span class="footer-conf">CONFIDENCIAL · Maio 2026</span></div>
+</section>
+
+
+<!-- ═══ 09 SOLO E MANEJO ═══ -->
+<section data-screen-label="09 Solo e Manejo">
+  <div class="grid-bg"></div>
+  <div class="top-bar"><div class="logo-mark"><img src="/logo-oficial.png" alt="talhão" class="talhao-logo"><span class="logo-text">Fazenda Amizade</span></div><span class="slide-tag">09 — Solo e Manejo</span></div>
+  <div class="slide-content">
+    <div class="slide-title">Pedologia</div>
+    <div class="slide-h2" style="margin-bottom:32px;">Classificação e Características do Solo</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:22px;">
+      <div style="display:flex;flex-direction:column;gap:16px;">
+        <div class="info-block">
+          <div class="section-label">Classificação Pedológica</div>
+          <table class="data-table">
+            <tr><td>Ordem / Subordem</td><td>Latossolo Vermelho</td></tr>
+            <tr><td>Qualificação</td><td>Distrófico Típico e Ácrico</td></tr>
+            <tr><td>Textura</td><td>Argilosa a muito argilosa</td></tr>
+            <tr><td>Horizonte B</td><td>Latossólico (Bw) — evoluído</td></tr>
+            <tr><td>Drenagem</td><td>Profundo e bem drenado</td></tr>
+          </table>
+        </div>
+        <div class="info-block" style="background:rgba(255,224,102,0.05);border-color:rgba(255,224,102,0.2);">
+          <div style="font-size:12px;font-weight:700;color:var(--accent2);margin-bottom:8px;letter-spacing:0.1em;text-transform:uppercase;">Atenção</div>
+          <p style="font-size:13px;color:var(--muted);line-height:1.6;">Solo distrófico (V &lt; 50%) requer <strong style="color:var(--text)">calagem e adubação</strong> para manutenção da produtividade. Históricamente manejado com sucesso para café há 20+ anos.</p>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:16px;">
+        <div class="info-block">
+          <div class="section-label">O que é Latossolo Vermelho?</div>
+          <div style="display:flex;flex-direction:column;gap:10px;margin-top:4px;">
+            <div style="padding:10px;background:rgba(78,255,140,0.05);border-radius:6px;border-left:3px solid var(--green);">
+              <div style="font-size:12px;font-weight:600;color:var(--green);margin-bottom:3px;">Solo Profundo e Evoluído</div>
+              <div style="font-size:12px;color:var(--muted);">Perfil &gt;2m — favorece enraizamento profundo do cafeeiro e mecanização</div>
+            </div>
+            <div style="padding:10px;background:rgba(78,255,140,0.05);border-radius:6px;border-left:3px solid var(--muted);">
+              <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:3px;">Alta % de Argila (35–60%)</div>
+              <div style="font-size:12px;color:var(--muted);">Boa retenção de água e nutrientes — caulinita, gibbsita, óxidos de Fe</div>
+            </div>
+            <div style="padding:10px;background:rgba(78,255,140,0.05);border-radius:6px;border-left:3px solid var(--green2);">
+              <div style="font-size:12px;font-weight:600;color:var(--green);margin-bottom:3px;">Típico do Alto Paranaíba</div>
+              <div style="font-size:12px;color:var(--muted);">Formado sobre Grupo Araxá e cobertura tufítica — explica vocação cafeeira consolidada</div>
+            </div>
+            <div style="padding:10px;background:rgba(255,224,102,0.05);border-radius:6px;border-left:3px solid var(--accent2);">
+              <div style="font-size:12px;font-weight:600;color:var(--accent2);margin-bottom:3px;">Distrófico + Ácrico</div>
+              <div style="font-size:12px;color:var(--muted);">Baixa CTC efetiva — requer correção de pH e fertilizantes para alta produção</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:16px;">
+        <div class="info-block">
+          <div class="section-label">Histórico de Manejo</div>
+          <div class="checklist">
+            <div class="check-item">
+              <div class="check-icon check-ok">✓</div>
+              <div><div class="check-text">Café há mais de 20 anos</div><div class="check-sub">Reduz muito o risco agrícola da região</div></div>
+            </div>
+            <div class="check-item">
+              <div class="check-icon check-ok">✓</div>
+              <div><div class="check-text">Solo comprovado para café especial</div><div class="check-sub">Prêmios regionais consolidam a aptidão</div></div>
+            </div>
+            <div class="check-item">
+              <div class="check-icon check-warn">!</div>
+              <div><div class="check-text">Histórico de análise de solo não obtido</div><div class="check-sub">Recomenda-se análise antes da aquisição</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="info-block">
+          <div class="section-label">Recomendação Pré-implantação</div>
+          <table class="data-table">
+            <tr><td>Análise de solo</td><td>Recomendada (múltiplos pontos)</td></tr>
+            <tr><td>Calagem</td><td>Necessária — solo distrófico</td></tr>
+            <tr><td>Adubação NPK</td><td>Protocolo cafeeiro padrão</td></tr>
+            <tr><td>Custo estimado correção</td><td>R$ 1.000–2.000/ha</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer"><span class="footer-prop">Fazenda Amizade — Campos Altos / MG</span><span class="footer-conf">CONFIDENCIAL · Maio 2026</span></div>
+</section>
+
+<!-- ═══ 10 ÁGUA E IRRIGAÇÃO ═══ -->
+<section data-screen-label="10 Água e Irrigação">
+  <div class="grid-bg"></div>
+  <div class="top-bar"><div class="logo-mark"><img src="/logo-oficial.png" alt="talhão" class="talhao-logo"><span class="logo-text">Fazenda Amizade</span></div><span class="slide-tag">10 — Água e Irrigação</span></div>
+  <div class="slide-content">
+    <div class="slide-title">Hidrologia</div>
+    <div class="slide-h2" style="margin-bottom:32px;">Recursos Hídricos — 6 Outorgas Vigentes</div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;">
+      <div class="stat-card">
+        <div class="stat-label">Outorgas Vigentes</div>
+        <div class="stat-value">6<span class="stat-unit">un.</span></div>
+        <div class="stat-sub">Sistema SOUT — IGAM</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Área com irrigação</div>
+        <div class="stat-value">100<span class="stat-unit">%</span></div>
+        <div class="stat-sub">Da área produtiva</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Pontos de captação</div>
+        <div class="stat-value" style="font-size:28px;">6<span class="stat-unit"> pontos</span></div>
+        <div class="stat-sub">Distribuídos na propriedade</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Status</div>
+        <div class="stat-value" style="color:var(--green);font-size:28px;">Ativo</div>
+        <div class="stat-sub">Outorgas transferíveis ao comprador</div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:28px;">
+      <div style="display:flex;flex-direction:column;gap:16px;">
+        <div class="info-block">
+          <div class="section-label">Outorgas — Sistema SOUT / IGAM</div>
+          <table class="data-table">
+            <tr><td>Quantidade de outorgas</td><td style="color:var(--green);font-weight:700;">6 outorgas ativas</td></tr>
+            <tr><td>Órgão emissor</td><td>IGAM — MG</td></tr>
+            <tr><td>Sistema</td><td>SOUT (Sistema de Outorgas)</td></tr>
+            <tr><td>Cultura base</td><td>Cafeicultura irrigada</td></tr>
+            <tr><td>Transferência</td><td>A ser formalizada na venda</td></tr>
+            <tr><td>Vazão outorgada</td><td>Variável por cultura e ponto</td></tr>
+          </table>
+        </div>
+        <div class="info-block">
+          <div class="section-label">Pontos de Captação</div>
+          <table class="data-table">
+            <tr><td>Tipo predominante</td><td>Cursos d'água e nascentes</td></tr>
+            <tr><td>Distribuição</td><td>Cobertura de 100% da área produtiva</td></tr>
+            <tr><td>Visualização</td><td>Disponível no relatório talhão.ai</td></tr>
+          </table>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:16px;">
+        <div class="info-block">
+          <div class="section-label">Diferencial Hídrico da Propriedade</div>
+          <div class="checklist">
+            <div class="check-item">
+              <div class="check-icon check-ok">✓</div>
+              <div><div class="check-text">6 outorgas ativas — irrigação de 100% da área</div><div class="check-sub">Ativo raro no mercado — seca não paralisa produção</div></div>
+            </div>
+            <div class="check-item">
+              <div class="check-icon check-ok">✓</div>
+              <div><div class="check-text">Sistema SOUT em dia — processo formal vigente</div><div class="check-sub">Documentação disponível no dossiê técnico</div></div>
+            </div>
+            <div class="check-item">
+              <div class="check-icon check-ok">✓</div>
+              <div><div class="check-text">Vazão compatível com cafeicultura irrigada</div><div class="check-sub">Garante estabilidade produtiva em anos adversos</div></div>
+            </div>
+            <div class="check-item">
+              <div class="check-icon check-ok">✓</div>
+              <div><div class="check-text">Estrutura já operacional</div><div class="check-sub">Sem necessidade de abertura de processos pelo comprador</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="info-block" style="background:rgba(78,255,140,0.04);">
+          <p style="font-size:14px;color:var(--muted);line-height:1.7;">As <strong style="color:var(--text)">6 outorgas vigentes</strong> são um diferencial competitivo excepcional — permitem irrigar 100% da área produtiva, eliminando o risco hídrico mesmo nos anos de estiagem severa que afetaram a região em 2014–2015 e 2020–2021.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer"><span class="footer-prop">Fazenda Amizade — Campos Altos / MG</span><span class="footer-conf">CONFIDENCIAL · Maio 2026</span></div>
+</section>
+
+
+<!-- ═══ 11 CLIMA ═══ -->
+<section data-screen-label="11 Clima e Temperatura">
+  <div class="grid-bg"></div>
+  <div class="top-bar"><div class="logo-mark"><img src="/logo-oficial.png" alt="talhão" class="talhao-logo"><span class="logo-text">Fazenda Amizade</span></div><span class="slide-tag">11 — Clima e Temperatura</span></div>
+  <div class="slide-content">
+    <div class="slide-title">Climatologia</div>
+    <div class="slide-h2" style="margin-bottom:28px;">Clima — Temperatura e Precipitação Anual</div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;">
+      <div class="stat-card">
+        <div class="stat-label">Precipitação Anual</div>
+        <div class="stat-value">1.500<span class="stat-unit">mm</span></div>
+        <div class="stat-sub">Média histórica Campos Altos</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Temp. Média Anual</div>
+        <div class="stat-value">20,4<span class="stat-unit">°C</span></div>
+        <div class="stat-sub">Ideal para café arábica</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Temp. Mínima Média</div>
+        <div class="stat-value">15<span class="stat-unit">°C</span></div>
+        <div class="stat-sub">Boa amplitude térmica no inverno</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Temp. Máxima Média</div>
+        <div class="stat-value">26<span class="stat-unit">°C</span></div>
+        <div class="stat-sub">Verões amenos pela altitude</div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1.6fr 1fr;gap:28px;">
+      <div>
+        <div class="section-label">Distribuição Mensal — Precipitação e Temperaturas</div>
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:20px;">
+          <svg viewBox="0 0 700 240" style="width:100%;height:auto;">
+            <defs><linearGradient id="rainGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#4eff8c" stop-opacity="0.7"/><stop offset="100%" stop-color="#2ecf68" stop-opacity="0.3"/></linearGradient></defs>
+            <!-- axes -->
+            <line x1="50" y1="20" x2="50" y2="210" stroke="var(--border)" stroke-width="1"/>
+            <line x1="50" y1="210" x2="700" y2="210" stroke="var(--border)" stroke-width="1"/>
+            <!-- month labels -->
+            <text x="78" y="228" text-anchor="middle" font-size="9" fill="var(--muted)" font-family="Space Grotesk">Jan</text>
+            <text x="130" y="228" text-anchor="middle" font-size="9" fill="var(--muted)" font-family="Space Grotesk">Fev</text>
+            <text x="182" y="228" text-anchor="middle" font-size="9" fill="var(--muted)" font-family="Space Grotesk">Mar</text>
+            <text x="234" y="228" text-anchor="middle" font-size="9" fill="var(--muted)" font-family="Space Grotesk">Abr</text>
+            <text x="286" y="228" text-anchor="middle" font-size="9" fill="var(--muted)" font-family="Space Grotesk">Mai</text>
+            <text x="338" y="228" text-anchor="middle" font-size="9" fill="var(--muted)" font-family="Space Grotesk">Jun</text>
+            <text x="390" y="228" text-anchor="middle" font-size="9" fill="var(--muted)" font-family="Space Grotesk">Jul</text>
+            <text x="442" y="228" text-anchor="middle" font-size="9" fill="var(--muted)" font-family="Space Grotesk">Ago</text>
+            <text x="494" y="228" text-anchor="middle" font-size="9" fill="var(--muted)" font-family="Space Grotesk">Set</text>
+            <text x="546" y="228" text-anchor="middle" font-size="9" fill="var(--muted)" font-family="Space Grotesk">Out</text>
+            <text x="598" y="228" text-anchor="middle" font-size="9" fill="var(--muted)" font-family="Space Grotesk">Nov</text>
+            <text x="650" y="228" text-anchor="middle" font-size="9" fill="var(--muted)" font-family="Space Grotesk">Dez</text>
+            <!-- rain bars: Jan280 Fev250 Mar200 Abr120 Mai55 Jun15 Jul12 Ago18 Set65 Out155 Nov185 Dez245 / max280→scale/280*180 -->
+            <rect x="60" y="30" width="36" height="180" fill="url(#rainGrad)" rx="3"/>
+            <rect x="112" y="49" width="36" height="161" fill="url(#rainGrad)" rx="3"/>
+            <rect x="164" y="81" width="36" height="129" fill="url(#rainGrad)" rx="3"/>
+            <rect x="216" y="133" width="36" height="77" fill="url(#rainGrad)" rx="3" opacity="0.7"/>
+            <rect x="268" y="175" width="36" height="35" fill="url(#rainGrad)" rx="3" opacity="0.5"/>
+            <rect x="320" y="200" width="36" height="10" fill="url(#rainGrad)" rx="3" opacity="0.4"/>
+            <rect x="372" y="202" width="36" height="8" fill="url(#rainGrad)" rx="3" opacity="0.4"/>
+            <rect x="424" y="198" width="36" height="12" fill="url(#rainGrad)" rx="3" opacity="0.4"/>
+            <rect x="476" y="168" width="36" height="42" fill="url(#rainGrad)" rx="3" opacity="0.6"/>
+            <rect x="528" y="110" width="36" height="100" fill="url(#rainGrad)" rx="3" opacity="0.8"/>
+            <rect x="580" y="91" width="36" height="119" fill="url(#rainGrad)" rx="3"/>
+            <rect x="632" y="52" width="36" height="158" fill="url(#rainGrad)" rx="3"/>
+            <!-- temp max line: 28,28,28,26,25,22,21,24,26,28,29,28 → y = 210 - (t-15)/20*160 -->
+            <polyline points="78,34 130,34 182,34 234,42 286,50 338,66 390,74 442,50 494,42 546,34 598,26 650,34" fill="none" stroke="rgba(255,107,107,0.6)" stroke-width="1.5"/>
+            <!-- temp min line: 17,17,17,15,12,10,10,11,14,18,19,18 -->
+            <polyline points="78,82 130,82 182,82 234,90 286,106 338,114 390,114 442,110 494,94 546,74 598,66 650,74" fill="none" stroke="rgba(100,180,255,0.5)" stroke-width="1.5"/>
+            <!-- legend -->
+            <line x1="400" y1="20" x2="420" y2="20" stroke="rgba(255,107,107,0.6)" stroke-width="1.5"/><text x="424" y="24" font-size="9" fill="var(--muted)" font-family="Space Grotesk">Temp. Máx.</text>
+            <line x1="510" y1="20" x2="530" y2="20" stroke="rgba(100,180,255,0.5)" stroke-width="1.5"/><text x="534" y="24" font-size="9" fill="var(--muted)" font-family="Space Grotesk">Temp. Mín.</text>
+          </svg>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:16px;">
+        <div class="info-block">
+          <div class="section-label">Estações</div>
+          <table class="data-table">
+            <tr><td>Início da estação chuvosa</td><td>Outubro</td></tr>
+            <tr><td>Meses chuvosos</td><td>Outubro — Março</td></tr>
+            <tr><td>Meses secos</td><td>Maio — Agosto</td></tr>
+            <tr><td>Maior precipitação</td><td>Janeiro (~280 mm)</td></tr>
+            <tr><td>Menor precipitação</td><td>Julho (~12 mm)</td></tr>
+          </table>
+        </div>
+        <div class="info-block" style="background:rgba(78,255,140,0.04);">
+          <p style="font-size:13px;color:var(--muted);line-height:1.7;">Estação seca <strong style="color:var(--text)">muito definida entre maio e agosto</strong> — diferencial para café de qualidade (florada concentrada). Com as 6 outorgas de irrigação, a seca não impacta a produtividade.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer"><span class="footer-prop">Fazenda Amizade — Campos Altos / MG</span><span class="footer-conf">CONFIDENCIAL · Maio 2026</span></div>
+</section>
+
+<!-- ═══ 12 RISCOS CLIMÁTICOS ═══ -->
+<section data-screen-label="12 Riscos Climáticos">
+  <div class="grid-bg"></div>
+  <div class="top-bar"><div class="logo-mark"><img src="/logo-oficial.png" alt="talhão" class="talhao-logo"><span class="logo-text">Fazenda Amizade</span></div><span class="slide-tag">12 — Riscos Climáticos</span></div>
+  <div class="slide-content">
+    <div class="slide-title">Risco Climático</div>
+    <div class="slide-h2" style="margin-bottom:32px;">Geada, Seca e Granizo — Histórico e Mitigação</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:22px;">
+      <div style="display:flex;flex-direction:column;gap:14px;">
+        <div style="background:rgba(100,180,255,0.07);border:1px solid rgba(100,180,255,0.2);border-radius:12px;padding:24px;">
+          <div style="font-size:12px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:rgba(100,180,255,0.8);margin-bottom:14px;">❄ Risco de Geada</div>
+          <table class="data-table">
+            <tr><td>Nível de risco</td><td><span class="pill pill-yellow" style="font-size:10px;">Médio-Alto</span></td></tr>
+            <tr><td>Meses críticos</td><td>Junho, Julho, Agosto</td></tr>
+            <tr><td>Evento histórico</td><td>Jul/2021 — severa (MG)</td></tr>
+            <tr><td>Impacto Jul/2021</td><td>156 mil ha de café afetados</td></tr>
+          </table>
+        </div>
+        <div class="info-block">
+          <div class="section-label">Mitigação — Geada</div>
+          <div class="checklist">
+            <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">Irrigação protetora por aspersão</div><div class="check-sub">6 outorgas permitem aspersão anti-geada</div></div></div>
+            <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">Monitoramento meteorológico preventivo</div></div></div>
+            <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">Seguro agrícola ProagroMais / PSR</div></div></div>
+            <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">Variedades de café tolerantes ao frio</div></div></div>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:14px;">
+        <div style="background:rgba(255,224,102,0.07);border:1px solid rgba(255,224,102,0.2);border-radius:12px;padding:24px;">
+          <div style="font-size:12px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:rgba(255,224,102,0.8);margin-bottom:14px;">☁ Risco de Seca</div>
+          <table class="data-table">
+            <tr><td>Nível de risco</td><td><span class="pill pill-green" style="font-size:10px;">Baixo — irrigação total</span></td></tr>
+            <tr><td>Meses secos</td><td>Maio — Agosto</td></tr>
+            <tr><td>Eventos históricos</td><td>2014–15 e 2020–21 La Niña</td></tr>
+            <tr><td>Impacto estimado s/ irrigação</td><td>-20 a 35% produtividade</td></tr>
+          </table>
+        </div>
+        <div class="info-block">
+          <div class="section-label">Mitigação — Seca</div>
+          <div class="checklist">
+            <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">6 outorgas de irrigação vigentes</div><div class="check-sub">Principal diferencial da fazenda — risco eliminado</div></div></div>
+            <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">Irrigação de 100% da área produtiva</div></div></div>
+            <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">Seguro agrícola complementar</div></div></div>
+            <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">Manejo do solo — cobertura morta</div></div></div>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:14px;">
+        <div style="background:rgba(255,107,107,0.07);border:1px solid rgba(255,107,107,0.2);border-radius:12px;padding:24px;">
+          <div style="font-size:12px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:rgba(255,107,107,0.8);margin-bottom:14px;">⚡ Risco de Granizo</div>
+          <table class="data-table">
+            <tr><td>Nível de risco</td><td><span class="pill pill-red" style="font-size:10px;">Alto — atenção</span></td></tr>
+            <tr><td>Meses críticos</td><td>Set–Out–Nov (primavera)</td></tr>
+            <tr><td>Evento histórico</td><td>Set/2021 — acúmulo até 1m</td></tr>
+            <tr><td>Culturas afetadas</td><td>Café, hortaliças, estruturas</td></tr>
+          </table>
+        </div>
+        <div class="info-block">
+          <div class="section-label">Mitigação — Granizo</div>
+          <div class="checklist">
+            <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">Seguro agrícola PSR e ProagroMais</div></div></div>
+            <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">Telas antigranizo em áreas sensíveis</div><div class="check-sub">Custo: R$ 15–25 mil/ha</div></div></div>
+            <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">Diversificação de cultivos</div></div></div>
+            <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">Monitoramento INMET / CPTEC-INPE</div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer"><span class="footer-prop">Fazenda Amizade — Campos Altos / MG</span><span class="footer-conf">CONFIDENCIAL · Maio 2026</span></div>
+</section>
+
+
+<!-- ═══ 13 RESERVA LEGAL E APP ═══ -->
+<section data-screen-label="13 Reserva Legal e APP">
+  <div class="grid-bg"></div>
+  <div class="top-bar"><div class="logo-mark"><img src="/logo-oficial.png" alt="talhão" class="talhao-logo"><span class="logo-text">Fazenda Amizade</span></div><span class="slide-tag">13 — Reserva Legal e APP</span></div>
+  <div class="slide-content">
+    <div class="slide-title">Meio Ambiente</div>
+    <div class="slide-h2" style="margin-bottom:32px;">Reserva Legal e Áreas de Preservação Permanente</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-bottom:24px;">
+      <div class="stat-card">
+        <div class="stat-label">APP + RL Total</div>
+        <div class="stat-value">270,2<span class="stat-unit">ha</span></div>
+        <div class="stat-sub">28% da propriedade</div>
+        <div class="prog-bar" style="margin-top:10px;"><div class="prog-fill" style="width:100%"></div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Área Aproveitável</div>
+        <div class="stat-value">694,8<span class="stat-unit">ha</span></div>
+        <div class="stat-sub">72% — área produtiva total</div>
+        <div class="prog-bar" style="margin-top:10px;"><div class="prog-fill" style="width:100%"></div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Conformidade Legal</div>
+        <div class="stat-value" style="color:var(--green);font-size:28px;">Isento</div>
+        <div class="stat-sub">Sem necessidade de compensação</div>
+        <div class="prog-bar" style="margin-top:10px;"><div class="prog-fill" style="width:100%"></div></div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:28px;">
+      <div style="display:flex;flex-direction:column;gap:16px;">
+        <div class="info-block">
+          <div class="section-label">CAR — Detalhamento</div>
+          <table class="data-table">
+            <tr><td>Número CAR</td><td style="font-family:'Space Mono',monospace;font-size:11px;">MG-3111507-08BEF…B6D0</td></tr>
+            <tr><td>Status</td><td><span class="pill pill-green" style="font-size:10px;">Ativo</span></td></tr>
+            <tr><td>Data inscrição</td><td>24/05/2016</td></tr>
+            <tr><td>Última retificação</td><td>04/08/2022</td></tr>
+            <tr><td>Invasão de APP</td><td><span class="pill pill-green" style="font-size:10px;">Não detectada</span></td></tr>
+            <tr><td>Passivo ambiental</td><td><span class="pill pill-green" style="font-size:10px;">Nenhum</span></td></tr>
+          </table>
+        </div>
+        <div class="info-block">
+          <div class="section-label">APP — Tipos</div>
+          <table class="data-table">
+            <tr><td>Tipo predominante</td><td>Rios e nascentes</td></tr>
+            <tr><td>Área total APP + RL</td><td>270,2 ha (28%)</td></tr>
+            <tr><td>Situação</td><td>Preservada</td></tr>
+            <tr><td>Desmatamento após 2008</td><td>Não identificado</td></tr>
+            <tr><td>Desmatamento antes de 2008</td><td>Confirmado em imagens</td></tr>
+          </table>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:16px;">
+        <div class="info-block">
+          <div class="section-label">Situação Geral</div>
+          <div class="checklist">
+            <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">CAR ativo e disponível para download</div></div></div>
+            <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">APPs delimitadas e não invadidas</div></div></div>
+            <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">Sem passivos ambientais</div></div></div>
+            <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">Sem embargos ativos</div></div></div>
+            <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">Sem sobreposição de áreas detectada</div></div></div>
+            <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">Isento de compensação de Reserva Legal</div></div></div>
+          </div>
+        </div>
+        <div class="info-block" style="background:rgba(78,255,140,0.04);">
+          <p style="font-size:14px;color:var(--muted);line-height:1.7;">Toda área desmatada ocorreu <strong style="color:var(--text)">antes de 2008</strong>, conforme histórico de imagens de satélite. A fazenda está em plena conformidade com o Código Florestal Brasileiro, sem qualquer passivo a regularizar.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer"><span class="footer-prop">Fazenda Amizade — Campos Altos / MG</span><span class="footer-conf">CONFIDENCIAL · Maio 2026</span></div>
+</section>
+
+
+<!-- ═══ 14 REGULARIDADE AMBIENTAL ═══ -->
+<section data-screen-label="14 Regularidade Ambiental">
+  <div class="grid-bg"></div>
+  <div class="top-bar"><div class="logo-mark"><img src="/logo-oficial.png" alt="talhão" class="talhao-logo"><span class="logo-text">Fazenda Amizade</span></div><span class="slide-tag">14 — Regularidade Ambiental</span></div>
+  <div class="slide-content">
+    <div class="slide-title">Conformidade Legal</div>
+    <div class="slide-h2" style="margin-bottom:32px;">Regularidade Ambiental — Checklist Completo</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:32px;">
+      <div style="display:flex;flex-direction:column;gap:18px;">
+        <div class="info-block">
+          <div class="section-label">Cadastro Ambiental Rural</div>
+          <table class="data-table">
+            <tr><td>Número</td><td style="font-family:'Space Mono',monospace;font-size:11px;">MG-3111507-08BEF…B6D0</td></tr>
+            <tr><td>Status análise</td><td><span class="pill pill-green" style="font-size:10px;">Ativo</span></td></tr>
+            <tr><td>Data inscrição</td><td>24/05/2016</td></tr>
+            <tr><td>Última retificação</td><td>04/08/2022</td></tr>
+          </table>
+        </div>
+        <div class="info-block">
+          <div class="section-label">Situação de Passivos</div>
+          <table class="data-table">
+            <tr><td>Passivo de APP</td><td><span class="pill pill-green" style="font-size:10px;">Nenhum</span></td></tr>
+            <tr><td>Passivo de RL</td><td><span class="pill pill-green" style="font-size:10px;">Isento — compensação desnecessária</span></td></tr>
+            <tr><td>Desmatamento ilegal</td><td><span class="pill pill-green" style="font-size:10px;">Não identificado</span></td></tr>
+            <tr><td>Embargo IBAMA/IEF</td><td><span class="pill pill-green" style="font-size:10px;">Sem embargos</span></td></tr>
+            <tr><td>Sobreposição UC/TI</td><td><span class="pill pill-green" style="font-size:10px;">Não detectada</span></td></tr>
+          </table>
+        </div>
+      </div>
+      <div>
+        <div class="section-label">Checklist de Conformidade</div>
+        <div class="checklist" style="gap:16px;">
+          <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">CAR ativo e disponível para download</div><div class="check-sub">MG-3111507-08BEF51B47F34CC69C915F395360B6D0</div></div></div>
+          <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">APPs preservadas e delimitadas</div><div class="check-sub">Rios e nascentes — sem invasão registrada</div></div></div>
+          <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">Reserva Legal regular — isenta de compensação</div></div></div>
+          <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">Sem embargos ou autos de infração ativos</div><div class="check-sub">Verificado IBAMA / IEF-MG</div></div></div>
+          <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">Sem sobreposição com UC ou Terra Indígena</div></div></div>
+          <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">Desmatamento histórico anterior a 2008</div><div class="check-sub">Confirmado por série histórica de imagens</div></div></div>
+        </div>
+        <div style="margin-top:20px;background:rgba(78,255,140,0.05);border:1px solid rgba(78,255,140,0.2);border-radius:10px;padding:20px;">
+          <div style="display:flex;align-items:center;gap:12px;">
+            <div style="font-size:28px;">✓</div>
+            <div>
+              <div style="font-size:15px;font-weight:600;color:var(--green);">Propriedade Ambientalmente Regular</div>
+              <div style="font-size:13px;color:var(--muted);margin-top:3px;">Sem nenhum passivo ou pendência ambiental identificada.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer"><span class="footer-prop">Fazenda Amizade — Campos Altos / MG</span><span class="footer-conf">CONFIDENCIAL · Maio 2026</span></div>
+</section>
+
+<!-- ═══ 15 REGULARIDADE FUNDIÁRIA ═══ -->
+<section data-screen-label="15 Regularidade Fundiária">
+  <div class="grid-bg"></div>
+  <div class="top-bar"><div class="logo-mark"><img src="/logo-oficial.png" alt="talhão" class="talhao-logo"><span class="logo-text">Fazenda Amizade</span></div><span class="slide-tag">15 — Regularidade Fundiária</span></div>
+  <div class="slide-content">
+    <div class="slide-title">Situação Jurídica</div>
+    <div class="slide-h2" style="margin-bottom:32px;">Regularidade Fundiária e Documentação</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:32px;">
+      <div style="display:flex;flex-direction:column;gap:18px;">
+        <div class="info-block">
+          <div class="section-label">Documentação Disponível</div>
+          <div class="checklist">
+            <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">Matrícula nº 2.979 — sem ônus</div><div class="check-sub">Atualizada em 05/11/2025</div></div></div>
+            <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">CCIR — exercício atual pago</div></div></div>
+            <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">ITR — sem impostos em aberto</div></div></div>
+            <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">Georreferenciamento INCRA certificado</div><div class="check-sub">SIGEF 4230250026234</div></div></div>
+            <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">Arquivo KML disponível para download</div></div></div>
+            <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">+15 documentos disponíveis no dossiê</div></div></div>
+          </div>
+        </div>
+        <div class="info-block">
+          <div class="section-label">Situação da Matrícula</div>
+          <table class="data-table">
+            <tr><td>Número</td><td>2.979</td></tr>
+            <tr><td>Gleba</td><td>Gleba 1 e Gleba 2</td></tr>
+            <tr><td>Ônus / Gravame</td><td><span class="pill pill-green" style="font-size:10px;">Livre e Desembaraçado</span></td></tr>
+            <tr><td>SIGEF Status</td><td><span class="pill pill-green" style="font-size:10px;">Certificado</span></td></tr>
+          </table>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:18px;">
+        <div class="info-block">
+          <div class="section-label">Due Diligence Fundiária</div>
+          <table class="data-table">
+            <tr><td>Fonte principal das áreas</td><td>Arquivo KML oficial</td></tr>
+            <tr><td>Diferença relevante de área</td><td>Não identificada</td></tr>
+            <tr><td>Georreferenciado INCRA</td><td>Sim — agiliza transferência</td></tr>
+            <tr><td>Análise histórica 20 anos</td><td>Não foi possível realizar</td></tr>
+            <tr><td>Data levantamento</td><td>08/05/2026</td></tr>
+          </table>
+        </div>
+        <div class="info-block" style="background:rgba(78,255,140,0.05);border-color:rgba(78,255,140,0.2);">
+          <div style="display:flex;align-items:center;gap:12px;">
+            <div style="width:44px;height:44px;background:rgba(78,255,140,0.15);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:18px;">✓</div>
+            <div>
+              <div style="font-size:15px;font-weight:600;color:var(--green);margin-bottom:3px;">Apta para Transferência</div>
+              <div style="font-size:13px;color:var(--muted);line-height:1.5;">Fazenda georreferenciada e documentada. A certificação SIGEF agiliza o processo de transferência. Recomenda-se certidão negativa atualizada antes da assinatura.</div>
+            </div>
+          </div>
+        </div>
+        <div class="info-block" style="background:rgba(255,224,102,0.05);border-color:rgba(255,224,102,0.2);">
+          <div style="font-size:12px;font-weight:600;color:var(--accent2);margin-bottom:6px;">Observação</div>
+          <p style="font-size:13px;color:var(--muted);line-height:1.6;">A análise da cadeia dominial dos últimos 20 anos não foi possível de realizar neste relatório. Recomendamos solicitar certidão vintenária ao cartório antes da aquisição.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer"><span class="footer-prop">Fazenda Amizade — Campos Altos / MG</span><span class="footer-conf">CONFIDENCIAL · Maio 2026</span></div>
+</section>
+
+
+<!-- ═══ 16 INFRAESTRUTURA ═══ -->
+<section data-screen-label="16 Infraestrutura">
+  <div class="grid-bg"></div>
+  <div class="top-bar"><div class="logo-mark"><img src="/logo-oficial.png" alt="talhão" class="talhao-logo"><span class="logo-text">Fazenda Amizade</span></div><span class="slide-tag">16 — Infraestrutura e Benfeitorias</span></div>
+  <div class="slide-content">
+    <div class="slide-title">Benfeitorias</div>
+    <div class="slide-h2" style="margin-bottom:32px;">Infraestrutura Instalada</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:28px;">
+      <div style="display:flex;flex-direction:column;gap:18px;">
+        <div class="info-block">
+          <div class="section-label">Edificações Confirmadas</div>
+          <table class="data-table">
+            <tr><td>Sede</td><td>1 unidade</td></tr>
+            <tr><td>Galpão para implementos</td><td>1 unidade</td></tr>
+            <tr><td>Curral</td><td>1 unidade</td></tr>
+            <tr><td>Cercas / Estradas internas</td><td>Informação a confirmar</td></tr>
+            <tr><td>Energia trifásica</td><td>Informação a confirmar</td></tr>
+          </table>
+        </div>
+        <div class="info-block">
+          <div class="section-label">Sistema de Irrigação</div>
+          <table class="data-table">
+            <tr><td>Outorgas vigentes</td><td style="color:var(--green);font-weight:600;">6 outorgas SOUT</td></tr>
+            <tr><td>Cobertura</td><td>100% da área produtiva</td></tr>
+            <tr><td>Sistema instalado</td><td>Informação a confirmar</td></tr>
+          </table>
+        </div>
+        <div class="info-block" style="background:rgba(255,224,102,0.05);border-color:rgba(255,224,102,0.15);">
+          <div style="font-size:12px;font-weight:600;color:var(--accent2);margin-bottom:8px;letter-spacing:0.1em;text-transform:uppercase;">Dados Pendentes</div>
+          <div class="checklist">
+            <div class="check-item"><div class="check-icon check-warn">!</div><div><div class="check-text">Detalhes de benfeitorias a complementar</div><div class="check-sub">Solicitados ao corretor — visita recomendada</div></div></div>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:18px;">
+        <div class="info-block" style="background:rgba(78,255,140,0.04);">
+          <div class="section-label">Diagnóstico</div>
+          <p style="font-size:15px;color:var(--muted);line-height:1.7;">A fazenda possui <strong style="color:var(--text)">infraestrutura básica</strong> — sede, galpão e curral — com o diferencial de <strong style="color:var(--text)">6 outorgas de irrigação vigentes</strong>. Ideal para compradores que já possuam operação próxima ou que desejam iniciar projeto com plena liberdade de planejamento.</p>
+        </div>
+        <div class="info-block">
+          <div class="section-label">Estimativa de Operação para Café (694,8 ha)</div>
+          <table class="data-table">
+            <tr><td>Sistema irrigação completo</td><td>R$ 3–8 M</td></tr>
+            <tr><td>Correção de solo + calagem</td><td>R$ 700k–1,4 M</td></tr>
+            <tr><td>Implantação de lavoura (se necessário)</td><td>R$ 5–12 M</td></tr>
+            <tr><td>Infraestrutura complementar</td><td>R$ 500k–2 M</td></tr>
+            <tr style="border-top:2px solid var(--border);"><td style="font-weight:700;color:var(--text);">Total estimado operação</td><td style="color:var(--accent2);font-weight:700;">R$ 9–23 M</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer"><span class="footer-prop">Fazenda Amizade — Campos Altos / MG</span><span class="footer-conf">CONFIDENCIAL · Maio 2026</span></div>
+</section>
+
+<!-- ═══ 17 ACESSO E LOGÍSTICA ═══ -->
+<section data-screen-label="17 Acesso e Logística">
+  <div class="grid-bg"></div>
+  <div class="top-bar"><div class="logo-mark"><img src="/logo-oficial.png" alt="talhão" class="talhao-logo"><span class="logo-text">Fazenda Amizade</span></div><span class="slide-tag">17 — Acesso e Logística</span></div>
+  <div class="slide-content">
+    <div class="slide-title">Logística</div>
+    <div class="slide-h2" style="margin-bottom:32px;">Acesso e Conectividade Regional</div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;">
+      <div class="stat-card">
+        <div class="stat-label">São Paulo</div>
+        <div class="stat-value">596<span class="stat-unit">km</span></div>
+        <div class="stat-sub">~6h30 — BR-381/Fernão Dias</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Belo Horizonte</div>
+        <div class="stat-value">268<span class="stat-unit">km</span></div>
+        <div class="stat-sub">~4h — BR-262</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Araxá (polo agrícola)</div>
+        <div class="stat-value">85<span class="stat-unit">km</span></div>
+        <div class="stat-sub">~1h15 — polo regional</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Acesso</div>
+        <div class="stat-value" style="font-size:28px;color:var(--green);">BR-262</div>
+        <div class="stat-sub">Sem estradas de terra</div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:28px;">
+      <div style="display:flex;flex-direction:column;gap:16px;">
+        <div class="info-block">
+          <div class="section-label">Vias de Acesso</div>
+          <table class="data-table">
+            <tr><td>Rodovia Federal</td><td>BR-262</td></tr>
+            <tr><td>Condição</td><td>Boa — duplicada em trechos</td></tr>
+            <tr><td>Ligações</td><td>BR-365 e BR-354</td></tr>
+            <tr><td>Trecho de terra</td><td>Não há — 100% asfalto</td></tr>
+          </table>
+        </div>
+        <div class="info-block">
+          <div class="section-label">Proximidade de Mercados e Serviços</div>
+          <table class="data-table">
+            <tr><td>São Paulo (maior mercado)</td><td>596 km — rodoviário</td></tr>
+            <tr><td>Belo Horizonte</td><td>268 km</td></tr>
+            <tr><td>Araxá (polo agrícola)</td><td>85 km</td></tr>
+            <tr><td>CAPECA (cooperativa)</td><td>Campos Altos</td></tr>
+            <tr><td>Sicoob Crediagro</td><td>Campos Altos</td></tr>
+          </table>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:16px;">
+        <div class="info-block" style="background:rgba(78,255,140,0.05);border-color:rgba(78,255,140,0.2);">
+          <div class="section-label">Destaque Logístico</div>
+          <div class="checklist">
+            <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">100% do acesso por asfalto — sem barreiras logísticas</div></div></div>
+            <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">BR-262 liga diretamente à BR-381 (Fernão Dias — SP)</div></div></div>
+            <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">CAPECA como cooperativa local de escoamento</div></div></div>
+            <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">Região com forte estrutura de assistência técnica</div></div></div>
+            <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">4h de BH — segundo maior mercado consumidor</div></div></div>
+          </div>
+        </div>
+        <div class="info-block">
+          <div class="section-label">Serviços na Região</div>
+          <table class="data-table">
+            <tr><td>Cooperativa agrícola</td><td>CAPECA — Campos Altos</td></tr>
+            <tr><td>Crédito rural</td><td>Sicoob Crediagro</td></tr>
+            <tr><td>Emater-MG</td><td>Assistência técnica regional</td></tr>
+            <tr><td>Hospital referência</td><td>Campos Altos e Araxá</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer"><span class="footer-prop">Fazenda Amizade — Campos Altos / MG</span><span class="footer-conf">CONFIDENCIAL · Maio 2026</span></div>
+</section>
+
+
+<!-- ═══ 18 CONTEXTO REGIONAL ═══ -->
+<section data-screen-label="18 Contexto Regional">
+  <div class="grid-bg"></div>
+  <div class="top-bar"><div class="logo-mark"><img src="/logo-oficial.png" alt="talhão" class="talhao-logo"><span class="logo-text">Fazenda Amizade</span></div><span class="slide-tag">18 — Contexto Regional</span></div>
+  <div class="slide-content">
+    <div class="slide-title">Região</div>
+    <div class="slide-h2" style="margin-bottom:32px;">Campos Altos — Polo Cafeeiro de Excelência</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:22px;">
+      <div style="display:flex;flex-direction:column;gap:14px;">
+        <div style="background:rgba(78,255,140,0.06);border:1px solid rgba(78,255,140,0.2);border-radius:12px;padding:24px;">
+          <div style="font-size:12px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--green);margin-bottom:12px;">Cafeicultura Especial</div>
+          <p style="font-size:14px;color:var(--muted);line-height:1.6;">Campos Altos é <strong style="color:var(--text)">um dos principais polos de café especial de Minas Gerais</strong>, com 9.100 ha cultivados, 15 milhões de pés e produção de 150 mil sacas/ano. Em 2023, lançou a <strong style="color:var(--text)">"Marca Território Campos Altos"</strong> com ACCA, Sebrae, Sicoob e CAPECA.</p>
+        </div>
+        <div class="info-block">
+          <div class="section-label">Indicadores Cafeeiros</div>
+          <table class="data-table">
+            <tr><td>Área cultivada</td><td>~9.100 ha de café</td></tr>
+            <tr><td>Pés de café</td><td>~15 milhões</td></tr>
+            <tr><td>Produção anual</td><td>~150 mil sacas</td></tr>
+            <tr><td>Altitude média</td><td>1.100–1.185 m</td></tr>
+          </table>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:14px;">
+        <div style="background:rgba(78,255,140,0.06);border:1px solid rgba(78,255,140,0.2);border-radius:12px;padding:24px;">
+          <div style="font-size:12px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--green);margin-bottom:12px;">Prêmios e Reconhecimento</div>
+          <p style="font-size:14px;color:var(--muted);line-height:1.6;">A região acumula prêmios de classe mundial: <strong style="color:var(--text)">Bioma Café — 2º melhor café do mundo (2024)</strong> e <strong style="color:var(--text)">Café Campos Altos — Medalha Alysson Paolinelli (2025)</strong>. Notas marcantes de chocolate, caramelo, frutas vermelhas e mel.</p>
+        </div>
+        <div class="info-block">
+          <div class="section-label">Terroir e Clima</div>
+          <table class="data-table">
+            <tr><td>Biomas</td><td>Cerrado + Mata Atlântica</td></tr>
+            <tr><td>Serras próximas</td><td>Canastra, Saudade e Salitre</td></tr>
+            <tr><td>Notas sensoriais</td><td>Chocolate, caramelo, frutas</td></tr>
+          </table>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:14px;">
+        <div style="background:rgba(255,224,102,0.06);border:1px solid rgba(255,224,102,0.2);border-radius:12px;padding:24px;">
+          <div style="font-size:12px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--accent2);margin-bottom:12px;">Diversificação e Pecuária</div>
+          <p style="font-size:14px;color:var(--muted);line-height:1.6;">Além do café, Campos Altos tem tradição em <strong style="color:var(--text)">bovinocultura de leite</strong> e agroindústrias reconhecidas — Rocca Doce de Leite e Queijaria Roça da Cidade. A <strong style="color:var(--text)">CAPECA</strong> articula toda a cadeia produtiva.</p>
+        </div>
+        <div class="info-block">
+          <div class="section-label">Estrutura Regional</div>
+          <table class="data-table">
+            <tr><td>Cooperativa principal</td><td>CAPECA</td></tr>
+            <tr><td>Crédito rural</td><td>Sicoob Crediagro</td></tr>
+            <tr><td>Associação cafeeira</td><td>ACCA</td></tr>
+            <tr><td>Apoio</td><td>Sebrae Minas</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer"><span class="footer-prop">Fazenda Amizade — Campos Altos / MG</span><span class="footer-conf">CONFIDENCIAL · Maio 2026</span></div>
+</section>
+
+<!-- ═══ 19 POTENCIAL DE EXPANSÃO ═══ -->
+<section data-screen-label="19 Potencial de Expansão">
+  <div class="grid-bg"></div>
+  <div class="top-bar"><div class="logo-mark"><img src="/logo-oficial.png" alt="talhão" class="talhao-logo"><span class="logo-text">Fazenda Amizade</span></div><span class="slide-tag">19 — Potencial de Expansão</span></div>
+  <div class="slide-content">
+    <div class="slide-title">Crescimento</div>
+    <div class="slide-h2" style="margin-bottom:30px;">Potencial de Implantação e Cenários de Uso</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-bottom:24px;">
+      <div class="stat-card">
+        <div class="stat-label">Área aproveitável total</div>
+        <div class="stat-value">694,8<span class="stat-unit">ha</span></div>
+        <div class="stat-sub">72% da propriedade</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Outorgas para irrigação</div>
+        <div class="stat-value">6<span class="stat-unit">un.</span></div>
+        <div class="stat-sub">100% da área irrigável</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Café consolidado</div>
+        <div class="stat-value">20+<span class="stat-unit">anos</span></div>
+        <div class="stat-sub">Menor risco agrícola</div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:28px;">
+      <div style="display:flex;flex-direction:column;gap:16px;">
+        <div class="info-block">
+          <div class="section-label">Cenários de Implantação</div>
+          <table class="data-table">
+            <tr><td>Café arábica especial (manutenção)</td><td style="color:var(--green);">Viável imediato — já operacional</td></tr>
+            <tr><td>Expansão de café (áreas livres)</td><td style="color:var(--green);">Alta aptidão confirmada</td></tr>
+            <tr><td>Grãos (milho/soja — ~200 ha)</td><td style="color:var(--green);">Alta aptidão — mecanizável</td></tr>
+            <tr><td>Fruticultura</td><td style="color:var(--accent2);">Viável — altitude favorável</td></tr>
+            <tr><td>Café especial + certificação</td><td style="color:var(--green);">Prêmio 20–40% sobre commodity</td></tr>
+          </table>
+        </div>
+        <div class="info-block">
+          <div class="section-label">Investimento por Cenário (estimado)</div>
+          <table class="data-table">
+            <tr><td>Manutenção café atual</td><td>Custo operacional anual</td></tr>
+            <tr><td>Implantação grãos (200 ha)</td><td>R$ 1,5–3,0 M</td></tr>
+            <tr><td>Irrigação completa (se ausente)</td><td>R$ 3–8 M</td></tr>
+            <tr><td>Certificação orgânica</td><td>R$ 300–600k (auditoria)</td></tr>
+          </table>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:16px;">
+        <div class="info-block">
+          <div class="section-label">Projeção de Receita — Café (500 ha irrigados)</div>
+          <div style="background:var(--bg);border-radius:8px;padding:16px;margin-top:4px;">
+            <svg viewBox="0 0 400 160" style="width:100%;height:auto;">
+              <line x1="40" y1="150" x2="400" y2="150" stroke="var(--border)" stroke-width="1"/>
+              <rect x="50" y="90" width="50" height="60" fill="rgba(78,255,140,0.3)" rx="2"/>
+              <text x="75" y="86" text-anchor="middle" font-size="9" fill="var(--text)" font-family="Space Mono">Atual</text>
+              <text x="75" y="165" text-anchor="middle" font-size="9" fill="var(--muted)" font-family="Space Grotesk">Operação</text>
+              <rect x="140" y="60" width="50" height="90" fill="rgba(78,255,140,0.5)" rx="2"/>
+              <text x="165" y="56" text-anchor="middle" font-size="9" fill="var(--text)" font-family="Space Mono">+Irrig.</text>
+              <text x="165" y="165" text-anchor="middle" font-size="9" fill="var(--muted)" font-family="Space Grotesk">Irrigado</text>
+              <rect x="230" y="30" width="50" height="120" fill="rgba(78,255,140,0.7)" rx="2"/>
+              <text x="255" y="26" text-anchor="middle" font-size="9" fill="var(--text)" font-family="Space Mono">+Esp.</text>
+              <text x="255" y="165" text-anchor="middle" font-size="9" fill="var(--muted)" font-family="Space Grotesk">Especial</text>
+              <rect x="320" y="10" width="60" height="140" fill="rgba(78,255,140,0.9)" rx="2"/>
+              <text x="350" y="6" text-anchor="middle" font-size="9" fill="var(--green)" font-family="Space Mono" font-weight="700">Máximo</text>
+              <text x="350" y="165" text-anchor="middle" font-size="9" fill="var(--muted)" font-family="Space Grotesk">Plena prod.</text>
+            </svg>
+          </div>
+          <p style="font-size:12px;color:var(--muted);margin-top:8px;line-height:1.5;">Com 500 ha de café irrigado e especial: produtividade 30–40 sacas/ha irrigado, preço café especial R$ 1.500–2.500/saca. Receita bruta potencial: <strong style="color:var(--green);">R$ 22–50 M/ano</strong> em plena operação otimizada.</p>
+        </div>
+        <div class="info-block" style="background:rgba(78,255,140,0.04);">
+          <p style="font-size:14px;color:var(--muted);line-height:1.7;">O grande diferencial é a combinação de <strong style="color:var(--text)">escala (962 ha), café já estabelecido há 20+ anos, e 6 outorgas de irrigação</strong> — uma tríade rara que posiciona a fazenda como ativo de geração de caixa desde o primeiro ano.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer"><span class="footer-prop">Fazenda Amizade — Campos Altos / MG</span><span class="footer-conf">CONFIDENCIAL · Maio 2026</span></div>
+</section>
+
+
+<!-- ═══ 20 ANÁLISE DE RISCO ═══ -->
+<section data-screen-label="20 Análise de Risco">
+  <div class="grid-bg"></div>
+  <div class="top-bar"><div class="logo-mark"><img src="/logo-oficial.png" alt="talhão" class="talhao-logo"><span class="logo-text">Fazenda Amizade</span></div><span class="slide-tag">20 — Análise de Risco</span></div>
+  <div class="slide-content">
+    <div class="slide-title">Risco</div>
+    <div class="slide-h2" style="margin-bottom:28px;">Matriz de Risco da Propriedade</div>
+    <div class="risk-grid">
+      <div class="risk-item">
+        <div class="risk-level" style="color:var(--accent2);">■ Médio-Alto</div>
+        <div class="risk-title">Risco de Geada</div>
+        <div class="risk-desc">Geadas recorrentes no inverno — julho 2021 severa (156k ha afetados em MG). As 6 outorgas permitem aspersão protetora, reduzindo impacto.</div>
+      </div>
+      <div class="risk-item">
+        <div class="risk-level" style="color:var(--red);">■ Alto</div>
+        <div class="risk-title">Risco de Granizo</div>
+        <div class="risk-desc">Set/2021 intenso com acúmulo de até 1m no Alto Paranaíba. Meses críticos: Set–Nov. Mitigação: seguro agrícola e telas antigranizo.</div>
+      </div>
+      <div class="risk-item">
+        <div class="risk-level" style="color:var(--green);">■ Baixo</div>
+        <div class="risk-title">Risco de Seca</div>
+        <div class="risk-desc">Estiagens 2014–15 e 2020–21 La Niña afetaram a região. As 6 outorgas vigentes eliminam o risco hídrico — ativo raro no mercado.</div>
+      </div>
+      <div class="risk-item">
+        <div class="risk-level" style="color:var(--green);">■ Baixo</div>
+        <div class="risk-title">Risco Ambiental</div>
+        <div class="risk-desc">CAR ativo, sem embargos, sem passivos. APPs preservadas e nenhum desmatamento ilegal identificado. Situação irrepreensível.</div>
+      </div>
+      <div class="risk-item">
+        <div class="risk-level" style="color:var(--accent2);">■ Médio</div>
+        <div class="risk-title">Risco Fundiário</div>
+        <div class="risk-desc">Matrícula limpa, SIGEF certificado, sem ônus. Cadeia dominial dos últimos 20 anos não foi possível analisar — recomenda-se certidão vintenária.</div>
+      </div>
+      <div class="risk-item">
+        <div class="risk-level" style="color:var(--accent2);">■ Médio</div>
+        <div class="risk-title">Risco de Solo</div>
+        <div class="risk-desc">Latossolo Vermelho distrófico requer calagem periódica. Manejado com sucesso há 20+ anos para café. Análise de solo não disponível — recomendada.</div>
+      </div>
+      <div class="risk-item">
+        <div class="risk-level" style="color:var(--accent2);">■ Médio</div>
+        <div class="risk-title">Risco de Infraestrutura</div>
+        <div class="risk-desc">Infraestrutura básica com detalhes a confirmar. Outorgas de irrigação são o grande diferencial. Investimento adicional pode ser necessário.</div>
+      </div>
+      <div class="risk-item">
+        <div class="risk-level" style="color:var(--green);">■ Baixo</div>
+        <div class="risk-title">Risco de Mercado</div>
+        <div class="risk-desc">Café especial em forte crescimento. Marca Território Campos Altos (2023), prêmios internacionais e CAPECA reduzem risco de escoamento.</div>
+      </div>
+      <div class="risk-item">
+        <div class="risk-level" style="color:var(--green);">■ Baixo</div>
+        <div class="risk-title">Risco de Logística</div>
+        <div class="risk-desc">Acesso 100% asfalto pela BR-262. CAPECA local para cooperativa. 4h de BH, 6h30 de SP. Sem gargalos logísticos identificados.</div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer"><span class="footer-prop">Fazenda Amizade — Campos Altos / MG</span><span class="footer-conf">CONFIDENCIAL · Maio 2026</span></div>
+</section>
+
+<!-- ═══ 21 SWOT ═══ -->
+<section data-screen-label="21 Análise SWOT">
+  <div class="grid-bg"></div>
+  <div class="top-bar"><div class="logo-mark"><img src="/logo-oficial.png" alt="talhão" class="talhao-logo"><span class="logo-text">Fazenda Amizade</span></div><span class="slide-tag">21 — Análise SWOT</span></div>
+  <div class="slide-content">
+    <div class="slide-title">Diagnóstico Estratégico</div>
+    <div class="slide-h2" style="margin-bottom:28px;">Análise SWOT da Propriedade</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;height:700px;">
+      <div style="background:rgba(78,255,140,0.05);border:1px solid rgba(78,255,140,0.2);border-radius:12px;padding:26px;">
+        <div style="font-size:12px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--green);margin-bottom:14px;">▲ Forças</div>
+        <div class="checklist" style="gap:13px;">
+          <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">Café consolidado há 20+ anos — baixíssimo risco agrícola</div></div></div>
+          <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">6 outorgas de irrigação vigentes — 100% da área</div></div></div>
+          <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">Altitude >1.000 m — café especial de origem</div></div></div>
+          <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">Documentação 100% regular — SIGEF, CAR, ITR, CCIR</div></div></div>
+          <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">Latossolo Vermelho ideal para cafeeiro</div></div></div>
+          <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">Acesso 100% asfalto pela BR-262</div></div></div>
+          <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">Escala — 962,2 ha com 694,8 ha aproveitáveis</div></div></div>
+        </div>
+      </div>
+      <div style="background:rgba(255,107,107,0.05);border:1px solid rgba(255,107,107,0.15);border-radius:12px;padding:26px;">
+        <div style="font-size:12px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--red);margin-bottom:14px;">▼ Fraquezas</div>
+        <div class="checklist" style="gap:13px;">
+          <div class="check-item"><div class="check-icon check-warn">!</div><div><div class="check-text">Detalhes de benfeitorias a confirmar</div></div></div>
+          <div class="check-item"><div class="check-icon check-warn">!</div><div><div class="check-text">Solo distrófico requer calagem periódica</div></div></div>
+          <div class="check-item"><div class="check-icon check-warn">!</div><div><div class="check-text">Cadeia dominial 20 anos não analisada</div></div></div>
+          <div class="check-item"><div class="check-icon check-warn">!</div><div><div class="check-text">6h30 de São Paulo — logística de longa distância</div></div></div>
+          <div class="check-item"><div class="check-icon check-no">✗</div><div><div class="check-text">Concentração em café — risco de monocultura</div></div></div>
+        </div>
+      </div>
+      <div style="background:rgba(78,255,140,0.03);border:1px solid rgba(78,255,140,0.12);border-radius:12px;padding:26px;">
+        <div style="font-size:12px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:rgba(78,200,140,0.7);margin-bottom:14px;">◆ Oportunidades</div>
+        <div class="checklist" style="gap:13px;">
+          <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">Mercado crescente de café especial — nacional e exportação</div></div></div>
+          <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">Marca Território Campos Altos (2023) — valorização de origem</div></div></div>
+          <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">Certificação orgânica / sustentável — prêmio 20–40%</div></div></div>
+          <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">Expansão de grãos com mecanização nas áreas planas</div></div></div>
+          <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">CAPECA + Sicoob como suporte cooperativo local</div></div></div>
+        </div>
+      </div>
+      <div style="background:rgba(255,224,102,0.04);border:1px solid rgba(255,224,102,0.15);border-radius:12px;padding:26px;">
+        <div style="font-size:12px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--accent2);margin-bottom:14px;">● Ameaças</div>
+        <div class="checklist" style="gap:13px;">
+          <div class="check-item"><div class="check-icon check-warn">!</div><div><div class="check-text">Geadas recorrentes — julho 2021 severa</div></div></div>
+          <div class="check-item"><div class="check-icon check-warn">!</div><div><div class="check-text">Granizo — setembro 2021 com acúmulo até 1m</div></div></div>
+          <div class="check-item"><div class="check-icon check-warn">!</div><div><div class="check-text">Volatilidade do preço do café (commodities)</div></div></div>
+          <div class="check-item"><div class="check-icon check-warn">!</div><div><div class="check-text">Concorrência de outros ativos cafeeiros na região</div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer"><span class="footer-prop">Fazenda Amizade — Campos Altos / MG</span><span class="footer-conf">CONFIDENCIAL · Maio 2026</span></div>
+</section>
+
+
+<!-- ═══ 22 VALUATION ═══ -->
+<section data-screen-label="22 Valuation">
+  <div class="grid-bg"></div>
+  <div class="top-bar"><div class="logo-mark"><img src="/logo-oficial.png" alt="talhão" class="talhao-logo"><span class="logo-text">Fazenda Amizade</span></div><span class="slide-tag">22 — Valuation</span></div>
+  <div class="slide-content">
+    <div class="slide-title">Precificação</div>
+    <div class="slide-h2" style="margin-bottom:28px;">Análise de Preço — Referências de Mercado</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:28px;">
+      <div style="display:flex;flex-direction:column;gap:18px;">
+        <div class="info-block">
+          <div class="section-label">Preço Pedido</div>
+          <table class="data-table">
+            <tr><td>Valor total</td><td style="color:var(--green);font-weight:700;font-size:18px;">R$ 100.000.000</td></tr>
+            <tr><td>Por hectare total</td><td style="color:var(--green);">R$ 103.928 / ha</td></tr>
+            <tr><td>Por hectare aproveitável</td><td>R$ 143.931 / ha</td></tr>
+          </table>
+        </div>
+        <div class="info-block">
+          <div class="section-label">Composição de Valor Estimada</div>
+          <table class="data-table">
+            <tr><td>Terra nua (962 ha × ~R$85k)</td><td>R$ 81.800.000</td></tr>
+            <tr><td>Benfeitorias (sede, galpão, curral)</td><td>A confirmar</td></tr>
+            <tr><td>6 outorgas de irrigação vigentes</td><td style="color:var(--green);">Prêmio significativo</td></tr>
+            <tr><td>Café 20+ anos consolidado</td><td style="color:var(--green);">Goodwill produtivo</td></tr>
+            <tr><td>Localização polo premiado</td><td style="color:var(--green);">Prêmio de terroir</td></tr>
+            <tr style="border-top:2px solid var(--border);"><td style="font-weight:700;color:var(--text);">Total pedido</td><td style="color:var(--green);font-weight:700;">R$ 100.000.000</td></tr>
+          </table>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:18px;">
+        <div class="price-card">
+          <div style="font-size:12px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:rgba(78,255,140,0.7);margin-bottom:10px;">Preço Pedido</div>
+          <div style="font-size:60px;font-weight:700;line-height:1;color:var(--green);font-family:'Space Mono',monospace;margin-bottom:6px;">R$100M</div>
+          <div style="font-size:18px;color:var(--muted);margin-bottom:20px;">R$ 103.928 / hectare total</div>
+          <div style="width:100%;height:1px;background:rgba(78,255,140,0.2);margin-bottom:16px;"></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+            <div><div style="font-size:11px;color:rgba(78,255,140,0.5);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:3px;">Por ha aproveitável</div><div style="font-family:'Space Mono',monospace;font-size:16px;color:var(--text);">R$ 143.931</div></div>
+            <div><div style="font-size:11px;color:rgba(78,255,140,0.5);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:3px;">Área aproveitável</div><div style="font-family:'Space Mono',monospace;font-size:16px;color:var(--text);">694,8 ha</div></div>
+          </div>
+        </div>
+        <div class="info-block">
+          <div class="section-label">Contexto Regional de Preços</div>
+          <p style="font-size:14px;color:var(--muted);line-height:1.7;">O preço pedido de <strong style="color:var(--text)">R$ 103.928/ha</strong> reflete o que essa fazenda já entrega: café estabelecido há 20+ anos, outorgas de irrigação vigentes para 100% da área, em polo premiado internacionalmente. Não é uma aposta — é um <strong style="color:var(--text)">ativo pronto, com histórico consistente</strong>.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer"><span class="footer-prop">Fazenda Amizade — Campos Altos / MG</span><span class="footer-conf">CONFIDENCIAL · Maio 2026</span></div>
+</section>
+
+<!-- ═══ 23 RESUMO EXECUTIVO ═══ -->
+<section data-screen-label="23 Resumo Executivo">
+  <div class="grid-bg"></div>
+  <div class="top-bar"><div class="logo-mark"><img src="/logo-oficial.png" alt="talhão" class="talhao-logo"><span class="logo-text">Fazenda Amizade</span></div><span class="slide-tag">23 — Resumo Executivo</span></div>
+  <div class="slide-content">
+    <div class="slide-title">Resumo</div>
+    <div class="slide-h2" style="margin-bottom:28px;">Resumo Executivo da Propriedade</div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;">
+      <div class="stat-card"><div class="stat-label">Área Total</div><div class="stat-value">962,2<span class="stat-unit">ha</span></div></div>
+      <div class="stat-card"><div class="stat-label">Área Aproveitável</div><div class="stat-value">694,8<span class="stat-unit">ha</span></div></div>
+      <div class="stat-card"><div class="stat-label">Outorgas Irrigação</div><div class="stat-value" style="color:var(--green);">6<span class="stat-unit">un.</span></div></div>
+      <div class="stat-card"><div class="stat-label">Preço Pedido</div><div class="stat-value" style="color:var(--green);font-size:28px;">R$100<span class="stat-unit">M</span></div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:28px;">
+      <div style="display:flex;flex-direction:column;gap:16px;">
+        <div class="info-block">
+          <div class="section-label">Destaques da Propriedade</div>
+          <div class="checklist">
+            <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">Café consolidado há 20+ anos — geração de caixa imediata</div></div></div>
+            <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">6 outorgas de irrigação — seca não é risco</div></div></div>
+            <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">Altitude >1.000 m — café especial de origem premiado</div></div></div>
+            <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">Documentação 100% regular — +15 documentos</div></div></div>
+            <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">Sem passivos ambientais ou fundiários</div></div></div>
+            <div class="check-item"><div class="check-icon check-warn">!</div><div><div class="check-text">Detalhes de infraestrutura a confirmar em visita</div></div></div>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:16px;">
+        <div class="price-card" style="padding:32px;">
+          <div style="font-size:11px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:rgba(78,255,140,0.6);margin-bottom:8px;">Preço de Referência</div>
+          <div style="font-size:52px;font-weight:700;line-height:1;color:var(--green);font-family:'Space Mono',monospace;margin-bottom:4px;">R$ 100M</div>
+          <div style="font-size:16px;color:var(--muted);">R$ 103.928 / hectare total</div>
+        </div>
+        <div class="info-block">
+          <div class="section-label">Perfil do Comprador Ideal</div>
+          <table class="data-table">
+            <tr><td>Operador cafeeiro experiente</td><td>Máxima eficiência e retorno</td></tr>
+            <tr><td>Fundo / investidor agrícola</td><td>Escala + café premium consolidado</td></tr>
+            <tr><td>Operação próxima</td><td>Complemento de área no Alto Paranaíba</td></tr>
+            <tr><td>Score de risco geral</td><td><span class="pill pill-green" style="font-size:10px;">Médio-Baixo — café e irrigação</span></td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer"><span class="footer-prop">Fazenda Amizade — Campos Altos / MG</span><span class="footer-conf">CONFIDENCIAL · Maio 2026</span></div>
+</section>
+
+
+<!-- ═══ 24 RECOMENDAÇÕES ═══ -->
+<section data-screen-label="24 Recomendações">
+  <div class="grid-bg"></div>
+  <div class="top-bar"><div class="logo-mark"><img src="/logo-oficial.png" alt="talhão" class="talhao-logo"><span class="logo-text">Fazenda Amizade</span></div><span class="slide-tag">24 — Recomendações Técnicas</span></div>
+  <div class="slide-content">
+    <div class="slide-title">Para o Comprador</div>
+    <div class="slide-h2" style="margin-bottom:28px;">Recomendações Técnicas Pré-Aquisição e Pós-Compra</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;">
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div style="font-size:12px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--green);margin-bottom:4px;">Diligências Imediatas</div>
+        <div class="info-block" style="flex:1;">
+          <div class="checklist">
+            <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">Certidão vintenária da matrícula 2.979</div><div class="check-sub">Cadeia dominial dos últimos 20 anos</div></div></div>
+            <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">Certidões negativas do proprietário</div><div class="check-sub">Trabalhistas, fiscais, cível</div></div></div>
+            <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">Vistoria de campo independente</div><div class="check-sub">Eng. agrônomo credenciado</div></div></div>
+            <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">Análise de solo — múltiplos pontos</div><div class="check-sub">Verificar estado atual das lavouras</div></div></div>
+            <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">Verificar sistema de irrigação instalado</div><div class="check-sub">Confirmar operacionalidade das outorgas</div></div></div>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div style="font-size:12px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--accent2);margin-bottom:4px;">Primeiros 12 meses</div>
+        <div class="info-block" style="flex:1;">
+          <div class="checklist">
+            <div class="check-item"><div class="check-icon check-warn">!</div><div><div class="check-text">Verificar e regularizar sistema de irrigação</div><div class="check-sub">6 outorgas — confirmar operação</div></div></div>
+            <div class="check-item"><div class="check-icon check-warn">!</div><div><div class="check-text">Análise e correção de solo</div><div class="check-sub">Calagem e adubação NPK atualizada</div></div></div>
+            <div class="check-item"><div class="check-icon check-warn">!</div><div><div class="check-text">Avaliar estado das lavouras de café</div><div class="check-sub">Poda, renovação ou manutenção</div></div></div>
+            <div class="check-item"><div class="check-icon check-warn">!</div><div><div class="check-text">Plano de gestão com CAPECA</div><div class="check-sub">Cooperativa local como parceira</div></div></div>
+            <div class="check-item"><div class="check-icon check-warn">!</div><div><div class="check-text">Contratar seguro agrícola</div><div class="check-sub">ProagroMais / PSR — geada e granizo</div></div></div>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div style="font-size:12px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);margin-bottom:4px;">Médio Prazo (2–5 anos)</div>
+        <div class="info-block" style="flex:1;">
+          <div class="checklist">
+            <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">Buscar certificação de café especial</div><div class="check-sub">Prêmio de 20–40% sobre commodity</div></div></div>
+            <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">Processar café in loco — agregar valor</div><div class="check-sub">Beneficiador / torrefação própria</div></div></div>
+            <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">Expandir com grãos nas áreas mecanizáveis</div><div class="check-sub">~200 ha para milho/soja — diversificação</div></div></div>
+            <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">Investir em telas antigranizo</div><div class="check-sub">Áreas mais expostas e de maior valor</div></div></div>
+            <div class="check-item"><div class="check-icon check-ok">✓</div><div><div class="check-text">Explorar Marca Território Campos Altos</div><div class="check-sub">Exportação direta — prêmio de origem</div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer"><span class="footer-prop">Fazenda Amizade — Campos Altos / MG</span><span class="footer-conf">CONFIDENCIAL · Maio 2026</span></div>
+</section>
+
+
+<!-- ═══ 25 CONCLUSÃO ═══ -->
+<section data-screen-label="25 Conclusão">
+  <div class="grid-bg"></div>
+  <div style="position:absolute;inset:0;background:radial-gradient(ellipse 70% 70% at 30% 50%, #0d3020 0%, var(--bg) 70%);"></div>
+  <div class="top-bar">
+    <div class="logo-mark"><img src="/logo-oficial.png" alt="talhão" class="talhao-logo"><span class="logo-text">Fazenda Amizade</span></div>
+    <span class="slide-tag">25 — Conclusão e Parecer</span>
+  </div>
+  <div class="slide-content" style="display:flex;flex-direction:column;justify-content:center;align-items:flex-start;max-width:1200px;">
+    <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px;">
+      <div style="width:56px;height:56px;background:rgba(78,255,140,0.15);border:1px solid rgba(78,255,140,0.3);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;">✓</div>
+      <div class="slide-title" style="margin:0;">Parecer Técnico Final</div>
+    </div>
+    <h1 style="font-size:56px;font-weight:700;line-height:1.0;margin-bottom:24px;color:var(--text);">Ativo de Alta Escala com<br><span style="color:var(--green);">Café Consolidado e Irrigação Garantida</span></h1>
+    <p style="font-size:20px;color:var(--muted);max-width:920px;line-height:1.65;margin-bottom:44px;font-weight:300;">A Fazenda Amizade reúne atributos excepcionais: <strong style="color:var(--text)">962 ha com café de altitude há 20+ anos, 6 outorgas de irrigação vigentes, polo premiado internacionalmente e documentação irrepreensível</strong>. Um dos ativos cafeeiros mais completos disponíveis no mercado.</p>
+    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:12px;overflow:hidden;width:100%;max-width:920px;">
+      <div style="background:var(--card);padding:18px 22px;text-align:center;"><div style="font-family:'Space Mono',monospace;font-size:20px;font-weight:700;color:var(--green);">962</div><div style="font-size:10px;color:var(--muted);margin-top:4px;text-transform:uppercase;letter-spacing:0.08em;">ha totais</div></div>
+      <div style="background:var(--card);padding:18px 22px;text-align:center;"><div style="font-family:'Space Mono',monospace;font-size:20px;font-weight:700;color:var(--green);">694,8</div><div style="font-size:10px;color:var(--muted);margin-top:4px;text-transform:uppercase;letter-spacing:0.08em;">ha aproveit.</div></div>
+      <div style="background:var(--card);padding:18px 22px;text-align:center;"><div style="font-family:'Space Mono',monospace;font-size:20px;font-weight:700;color:var(--green);">20+</div><div style="font-size:10px;color:var(--muted);margin-top:4px;text-transform:uppercase;letter-spacing:0.08em;">anos café</div></div>
+      <div style="background:var(--card);padding:18px 22px;text-align:center;"><div style="font-family:'Space Mono',monospace;font-size:20px;font-weight:700;color:var(--green);">6</div><div style="font-size:10px;color:var(--muted);margin-top:4px;text-transform:uppercase;letter-spacing:0.08em;">outorgas</div></div>
+      <div style="background:var(--card);padding:18px 22px;text-align:center;"><div style="font-family:'Space Mono',monospace;font-size:20px;font-weight:700;color:var(--green);">R$100M</div><div style="font-size:10px;color:var(--muted);margin-top:4px;text-transform:uppercase;letter-spacing:0.08em;">preço pedido</div></div>
+    </div>
+  </div>
+  <div class="slide-footer"><span class="footer-prop">Fazenda Amizade — Campos Altos / MG — Relatório Técnico Maio 2026</span><span class="footer-conf">CONFIDENCIAL · Uso restrito ao adquirente</span></div>
+</section>
+
+<!-- ── SLIDE 26 · CHECKLIST FINAL ─────────────────────────────────── -->
+<section data-screen-label="26 · Checklist Final">
+  <div class="top-bar"><div class="logo-mark"><img src="/logo-oficial.png" alt="talhão" class="talhao-logo"><span class="logo-text">Fazenda Amizade</span></div><span class="slide-tag">26 — Checklist Final</span></div>
+  <div class="slide-content" style="padding:50px 60px;">
+    <div class="slide-title">Visão Geral</div>
+    <div class="slide-h2" style="margin-bottom:38px;">Score Final por Categoria</div>
+    <div style="display:grid;grid-template-columns:1.05fr 1fr;gap:28px;align-items:start;">
+      <div style="background:rgba(17,31,22,0.86);border:1px solid var(--border);border-radius:10px;padding:30px 34px;">
+        <div class="section-label">Pontuação por Categoria</div>
+        <div style="display:flex;flex-direction:column;gap:16px;">
+          <div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:10px;"><span style="font-size:14px;font-weight:700;color:var(--text);">Localização e Acesso</span><span style="font-family:'Space Mono',monospace;font-size:20px;font-weight:700;color:var(--green);">9/10</span></div>
+            <div class="bar-track" style="height:5px;"><div class="bar-fill" style="width:90%;"></div></div>
+          </div>
+          <div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:10px;"><span style="font-size:14px;font-weight:700;color:var(--text);">Regularidade Fundiária</span><span style="font-family:'Space Mono',monospace;font-size:20px;font-weight:700;color:var(--green);">8/10</span></div>
+            <div class="bar-track" style="height:5px;"><div class="bar-fill" style="width:80%;"></div></div>
+          </div>
+          <div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:10px;"><span style="font-size:14px;font-weight:700;color:var(--text);">Situação Ambiental</span><span style="font-family:'Space Mono',monospace;font-size:20px;font-weight:700;color:var(--green);">10/10</span></div>
+            <div class="bar-track" style="height:5px;"><div class="bar-fill" style="width:100%;"></div></div>
+          </div>
+          <div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:10px;"><span style="font-size:14px;font-weight:700;color:var(--text);">Aptidão e Altitude</span><span style="font-family:'Space Mono',monospace;font-size:20px;font-weight:700;color:var(--green);">9/10</span></div>
+            <div class="bar-track" style="height:5px;"><div class="bar-fill" style="width:90%;"></div></div>
+          </div>
+          <div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:10px;"><span style="font-size:14px;font-weight:700;color:var(--text);">Recursos Hídricos</span><span style="font-family:'Space Mono',monospace;font-size:20px;font-weight:700;color:var(--green);">10/10</span></div>
+            <div class="bar-track" style="height:5px;"><div class="bar-fill" style="width:100%;"></div></div>
+          </div>
+          <div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:10px;"><span style="font-size:14px;font-weight:700;color:var(--text);">Infraestrutura</span><span style="font-family:'Space Mono',monospace;font-size:20px;font-weight:700;color:var(--accent2);">5/10</span></div>
+            <div class="bar-track" style="height:5px;"><div class="bar-fill" style="width:50%;background:var(--accent2);"></div></div>
+          </div>
+          <div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:10px;"><span style="font-size:14px;font-weight:700;color:var(--text);">Risco Climático (granizo/seca)</span><span style="font-family:'Space Mono',monospace;font-size:20px;font-weight:700;color:var(--accent2);">5/10</span></div>
+            <div class="bar-track" style="height:5px;"><div class="bar-fill" style="width:50%;background:var(--accent2);"></div></div>
+          </div>
+          <div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:10px;"><span style="font-size:14px;font-weight:700;color:var(--text);">Score Geral</span><span style="font-family:'Space Mono',monospace;font-size:20px;font-weight:700;color:var(--green);">8,1/10</span></div>
+            <div class="bar-track" style="height:5px;"><div class="bar-fill" style="width:81%;"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:16px;">
+        <div class="info-block" style="border-color:rgba(78,255,140,0.25);background:rgba(17,31,22,0.82);padding:30px 34px;">
+          <div class="section-label">Pontos Fortes Principais</div>
+          <div style="display:flex;flex-direction:column;gap:14px;">
+            <div style="display:flex;gap:12px;align-items:flex-start;"><span class="check-icon check-ok">✓</span><div><div class="check-text">Situação ambiental irrepreensível</div><div class="check-sub">CAR ativo, APP preservada e sem embargos</div></div></div>
+            <div style="display:flex;gap:12px;align-items:flex-start;"><span class="check-icon check-ok">✓</span><div><div class="check-text">Recursos hídricos confirmados</div><div class="check-sub">6 outorgas vigentes registradas no IGAM</div></div></div>
+            <div style="display:flex;gap:12px;align-items:flex-start;"><span class="check-icon check-ok">✓</span><div><div class="check-text">Altitude acima de 1.000 m</div><div class="check-sub">Diferencial competitivo para café de qualidade</div></div></div>
+            <div style="display:flex;gap:12px;align-items:flex-start;"><span class="check-icon check-ok">✓</span><div><div class="check-text">Acesso direto pela BR-262</div><div class="check-sub">Logística regional favorável</div></div></div>
+          </div>
+        </div>
+
+        <div class="info-block" style="border-color:rgba(255,224,102,0.28);background:rgba(255,224,102,0.045);padding:30px 34px;">
+          <div class="section-label">Pontos de Atenção</div>
+          <div style="display:flex;flex-direction:column;gap:14px;">
+            <div style="display:flex;gap:12px;align-items:flex-start;"><span class="check-icon check-warn">!</span><div class="check-text">Infraestrutura requer investimento de modernização</div></div>
+            <div style="display:flex;gap:12px;align-items:flex-start;"><span class="check-icon check-warn">!</span><div class="check-text">Risco climático de granizo exige seguro rural</div></div>
+            <div style="display:flex;gap:12px;align-items:flex-start;"><span class="check-icon check-warn">!</span><div class="check-text">Atualizar certidões antes da assinatura</div></div>
+          </div>
+        </div>
+
+        <div class="info-block" style="background:rgba(17,31,22,0.82);padding:30px 34px;">
+          <div class="section-label">Documentos Disponíveis no Dossiê</div>
+          <p style="font-size:15px;color:var(--muted);line-height:1.8;">Matrícula, CCIR, ITR, CAR, arquivos KML, demarcação SIGEF, outorgas de água e imagens técnicas disponíveis para due diligence completa.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer"><span class="footer-prop">Fazenda Amizade — Campos Altos / MG — Relatório Técnico Maio 2026</span><span class="footer-conf">CONFIDENCIAL · Uso restrito ao adquirente</span></div>
+</section>
+
+<!-- ── SLIDE 27 · CONTATO ─────────────────────────────────────────── -->
+<section data-screen-label="27 · Contato">
+  <div class="grid-bg"></div>
+  <div class="top-bar"><div class="logo-mark"><img src="/logo-oficial.png" alt="talhão" class="talhao-logo"><span class="logo-text">Fazenda Amizade</span></div><span class="slide-tag">27 — Contato e Responsabilidade</span></div>
+  <div class="slide-content" style="display:flex;flex-direction:column;padding:220px 60px 0;">
+    <div style="margin-bottom:48px;">
+      <div class="slide-title" style="margin-bottom:18px;">Responsabilidade Técnica</div>
+      <div class="slide-h3" style="font-size:34px;">Corretor e Equipe de Elaboração</div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:24px;">
+      <div class="info-block" style="height:270px;padding:32px 34px;">
+        <div style="width:50px;height:50px;border-radius:50%;background:rgba(78,255,140,0.12);display:flex;align-items:center;justify-content:center;margin-bottom:24px;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="var(--green)" stroke-width="1.8"/><path d="M5 21c0-4 3.2-7 7-7s7 3 7 7" stroke="var(--green)" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </div>
+        <div style="font-size:19px;font-weight:700;color:var(--text);margin-bottom:6px;">João Luiz</div>
+        <div style="font-size:13px;font-weight:700;color:var(--green);margin-bottom:30px;">Corretor de Imóveis Rurais · CRECI 35687</div>
+        <div style="display:grid;grid-template-columns:1fr auto;gap:0 20px;align-items:center;border-bottom:1px solid var(--border);padding-bottom:16px;margin-bottom:16px;">
+          <div style="font-size:12px;color:var(--muted);font-weight:700;letter-spacing:0.08em;text-transform:uppercase;">Telefone / WhatsApp</div>
+          <div style="font-size:15px;color:var(--text);font-weight:600;">+55 35 9914-9427</div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr auto;gap:0 20px;align-items:center;">
+          <div style="font-size:12px;color:var(--muted);font-weight:700;letter-spacing:0.08em;text-transform:uppercase;">Especialidade</div>
+          <div style="font-size:15px;color:var(--text);font-weight:600;">Imóveis rurais Alto Paranaíba</div>
+        </div>
+      </div>
+
+      <div class="info-block" style="height:270px;padding:34px 34px;">
+        <img src="/logo-oficial.png" alt="talhão" style="height:48px;width:auto;display:block;margin-bottom:20px;">
+        <div style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:4px;">Talhão Tecnologia Ltda.</div>
+        <div style="font-size:14px;color:var(--muted);margin-bottom:18px;">Dados técnicos e geoespaciais</div>
+        <p style="font-size:14px;color:var(--muted);line-height:1.7;max-width:520px;">Empresa especializada em coleta, organização e disponibilização de dados técnicos sobre imóveis rurais. Relatório gerado em maio/2026.</p>
+      </div>
+
+      <div class="info-block" style="height:270px;padding:32px 34px;">
+        <div style="width:50px;height:50px;border-radius:50%;background:rgba(78,255,140,0.12);display:flex;align-items:center;justify-content:center;margin-bottom:24px;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1-5.4-2.9-5.4 2.9 1-6.1-4.4-4.3 6.1-.9L12 3z" stroke="var(--green)" stroke-width="1.8" stroke-linejoin="round"/></svg>
+        </div>
+        <div style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:16px;">Disclaimer</div>
+        <p style="font-size:13px;color:var(--muted);line-height:1.75;">Este relatório tem caráter exclusivamente informativo. Os dados não substituem due diligence legal, ambiental, agronômica ou financeira conduzida por profissionais habilitados. Valores são estimativos. Base: maio/2026.</p>
+      </div>
+    </div>
+
+    <div style="margin-top:42px;background:rgba(78,255,140,0.05);border:1px solid rgba(78,255,140,0.22);border-radius:10px;padding:24px 30px;display:flex;align-items:center;justify-content:space-between;">
+      <div>
+        <div style="font-size:13px;color:var(--green);font-weight:700;margin-bottom:7px;">Para visita ou mais informações:</div>
+        <div style="font-size:17px;color:var(--text);font-weight:600;">João Luiz — CRECI 35687 · <span style="color:var(--green);font-weight:800;">+55 35 9914-9427</span></div>
+      </div>
+      <div style="font-family:'Space Mono',monospace;font-size:11px;color:var(--muted);line-height:1.7;text-align:right;">
+        TALHAO-2026.05<br>
+        Fazenda Amizade — Campos Altos / MG<br>
+        962,2 ha · R$ 100.000.000
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer"><span class="footer-prop">Fazenda Amizade — Campos Altos / MG — Relatório Técnico Maio 2026</span><span class="footer-conf">CONFIDENCIAL · Uso restrito ao adquirente</span></div>
+</section>
+
+</deck-stage>
+
+<script type="application/json" id="speaker-notes">
+{
+  "01 · Capa": "Fazenda Amizade – 962,2 ha em Campos Altos/MG, polo cafeeiro do Alto Paranaíba. Preço pedido R$100M (R$103.930/ha). Relatório técnico maio 2026.",
+  "02 · Sumário Executivo": "Ativo de alta aptidão agrícola em região consolidada de café especial. Latossolo Vermelho, 6 outorgas d'água, plena regularidade fundiária. Score 8.1/10.",
+  "03 · Localização": "Município de Campos Altos, MG. Acesso pela BR-262. Araxá 85 km, BH 268 km, SP 596 km. Altitude média ~1.000 m.",
+  "04 · Contexto Regional": "Polo Cafeeiro do Alto Paranaíba, referência nacional em café arábica de altitude. Infraestrutura regional consolidada com cooperativas e beneficiadoras.",
+  "05 · Dados Cadastrais": "Matrícula 2979, CRI Campos Altos. SIGEF 4230250026234. CAR MG-3111507-08BEF... ITR regular.",
+  "06 · Área e Uso do Solo": "962,2 ha totais: café arábica 20+ anos de cultura consolidada. Pastagem, APP e reserva legal complementam o uso.",
+  "07 · Topografia": "Relevo de topo aplainado, típico de Latossolo Vermelho. Altitude média ~1.000 m, favorável ao café de altitude.",
+  "07B · Evolução em Fotos": "Sequência histórica de imagens orbitais de 2004 a 2024 mostrando a evolução do uso do solo e a consolidação da cafeicultura na Fazenda Amizade.",
+  "08 · Solos": "Latossolo Vermelho predominante – alta fertilidade natural, boa drenagem, profundidade efetiva elevada. Aptidão plena para café e grãos.",
+  "09 · Recursos Hídricos": "6 outorgas vigentes. Drenagem superficial ativa. APP 100% preservada garantindo estabilidade hídrica de longo prazo.",
+  "10 · Clima": "Clima Cwb (Köppen) – verões chuvosos, invernos secos e amenos. Precipitação ~1.600 mm/ano concentrada out-mar. Temperatura média 19-22°C.",
+  "11 · Vegetação e APP": "APP preservada acima do mínimo legal. Reserva Legal averbada. Sem passivo ambiental identificado.",
+  "12 · Regularidade Fundiária": "SIGEF registrado, CAR ativo, matrícula única e limpa. Ação de usucapião inexistente. Nenhuma sobreposição identificada.",
+  "13 · Análise Ambiental": "Situação ambiental exemplar: APP 100%+, RL averbada, outorgas vigentes, sem embargo IBAMA/SEMA.",
+  "14 · Infraestrutura": "Sede com casa principal, alojamentos, galpões e tulha de café. Infraestrutura funcional, com oportunidade de modernização.",
+  "15 · Infraestrutura Hídrica": "Sistema de irrigação implantado, respaldado pelas 6 outorgas. Capacidade de expansão para novas áreas.",
+  "16 · Acesso e Logística": "Frente para BR-262 asfaltada. Araxá 85 km (aeroporto regional). BH 268 km. Logística de exportação via Triângulo Mineiro.",
+  "17 · Cultura do Café": "Café arábica com mais de 20 anos de cultura estabelecida. Região de altitude reconhecida por qualidade de bebida.",
+  "18 · Produtividade": "Potencial produtivo elevado para café especial de altitude. Histórico de colheitas regulares na região.",
+  "19 · Análise de Risco": "Riscos identificados: granizo (set/2021 – moderado), infraestrutura requer investimento. Demais dimensões com risco baixo.",
+  "20 · Comparativo de Mercado": "R$103.930/ha alinhado com transações recentes em Campos Altos e municípios vizinhos para fazendas cafeeiras de porte similar.",
+  "21 · Precificação": "Preço pedido R$100M. Valor justificado pela combinação: área expressiva + outorgas + Latossolo + café consolidado + regularidade plena.",
+  "22 · Projeção Financeira": "TIR estimada 12-18% a.a. em cenário de produção cafeeira com renovação gradual do parque produtivo.",
+  "23 · Oportunidades": "Café especial de altitude, expansão irrigada, arrendamento de pastagens, carbono florestal pela APP preservada.",
+  "24 · Pontos de Atenção": "Infraestrutura requer capex. Risco climático de granizo requer seguro rural. Avaliar atualização cadastral ITR.",
+  "25 · Conclusão": "Ativo recomendado: regularidade fundiária exemplar, recursos hídricos abundantes, solo de classe 1, localização estratégica no polo cafeeiro.",
+  "26 · Checklist Final": "Score 8.1/10. Destaques: ambiental 10/10, hídrico 10/10, aptidão 9/10, localização 9/10. Atenção: infraestrutura 5/10, risco climático 5/10.",
+  "27 · Contato": "Intermediação: João Luiz, CRECI 35687, WhatsApp +55 35 9914-9427. Relatório: Talhão Tecnologia, maio 2026."
+}
+</script>
+
+</body>
+</html>

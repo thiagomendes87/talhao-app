@@ -13,6 +13,11 @@ const nextConfig = {
         destination: '/fazenda-tres-barras.html',
         permanent: false,
       },
+      {
+        source: '/relatorio/fazenda-amizade',
+        destination: '/fazenda-amizade.html',
+        permanent: false,
+      },
     ]
   },
 }

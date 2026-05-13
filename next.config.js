@@ -18,6 +18,11 @@ const nextConfig = {
         destination: '/fazenda-amizade.html',
         permanent: false,
       },
+      {
+        source: '/relatorio/fazenda-villa-nova',
+        destination: '/fazenda-villa-nova.html',
+        permanent: false,
+      },
     ]
   },
 }

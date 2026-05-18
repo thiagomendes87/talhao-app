@@ -23,6 +23,11 @@ const nextConfig = {
         destination: '/fazenda-villa-nova.html',
         permanent: false,
       },
+      {
+        source: '/anuncio/fazenda-paraibuna',
+        destination: '/anuncio-fazenda-paraibuna.html',
+        permanent: false,
+      },
     ]
   },
 }
